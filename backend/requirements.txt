@@ -1,0 +1,24 @@
+fastapi
+uvicorn[standard]
+python-multipart
+jinja2
+matplotlib
+numpy
+pillow
+reportlab
+chardet
+pydantic
+weasyprint==62.3
+
+# Soolevo dependencies
+sqlalchemy
+alembic
+passlib[bcrypt]
+python-jose[cryptography]
+email-validator
+python-dotenv
+stripe
+
+# Additional utilities
+requests
+typing-extensions

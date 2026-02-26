@@ -27,7 +27,7 @@ from app.webhooks import paynow
 from app.core.database import engine
 from app.models.db import Base
 from app.routers import calculator
-app.include_router(calculator.router)
+
 # ── Inicjalizacja bazy danych ────────────────────────────────
 # W produkcji używamy Alembic — poniższe tylko do dev/pierwszego uruchomienia
 # Base.metadata.create_all(bind=engine)
@@ -60,6 +60,8 @@ app.include_router(payments.router)
 app.include_router(reports.router)
 app.include_router(batteries.router)
 app.include_router(paynow.router)
+app.include_router(calculator.router)   # ← PRZENIESIONE TUTAJ
+
 
 
 # ── Health check ──────────────────────────────────────────────
