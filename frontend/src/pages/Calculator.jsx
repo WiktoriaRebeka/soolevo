@@ -375,7 +375,7 @@ export default function Calculator() {
               </h3>
 
               {/* Wybór trybu */}
-              <div className="text-xs text-gray-500 mb-3 flex items-center">
+              <div className="text-xs text-gray-500 mb-3">
                 Skąd mamy policzyć ile prądu zużywasz?
                 <span className="inline-block ml-2 align-middle">
                   <Tooltip text="Na podstawie rachunków kalkulator dokładnie wylicza Twoje obecne koszty i dopasowuje moc instalacji. Jeśli dopiero budujesz dom lub nie masz rachunków — oszacujemy zużycie z metrażu." />
@@ -639,10 +639,10 @@ export default function Calculator() {
 
               {/* KROK 1: WYBÓR WIZUALNY */}
               <div className="mb-10">
-                <p className="text-sm font-semibold text-gray-500 mb-4 uppercase tracking-wider flex items-center gap-1">
+                <div className="text-sm font-semibold text-gray-500 mb-4 uppercase tracking-wider flex items-center gap-1">
                   Krok 1: Wybierz rodzaj swojej połaci
                   <Tooltip text="Połać to jedna płaska część dachu. Jeśli Twój dach ma 2 skosy — wybierz Prostokąt (podasz wymiary jednego skosu, od kalenicy do okapu). Dach czterospadowy = Hip. Nie jesteś pewny? Spójrz na swój dach z zewnątrz lub zapytaj instalatora." />
-                </p>
+                </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4">
                   {[
                     { id: 'rectangular',    img: '/images/roof01.png', label: 'Prostokąt' },

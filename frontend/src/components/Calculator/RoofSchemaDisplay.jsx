@@ -161,7 +161,7 @@ function TriangleTop({ azimuthDeg = 180 }) {
   const x = 65, y = 32, w = 150, h = 120;
   const cx = x + w / 2, cy = y + h / 2;
   return (
-    <svg viewBox="0 0 280 220" width="100%" height="auto">
+    <svg viewBox="0 0 280 220" width="100%" style={{ height: 'auto' }}>
       <rect width="280" height="220" fill={C.bg} rx="8"/>
       {/* Cały dach — tło */}
       <rect x={x} y={y} width={w} height={h} fill={C.s1} stroke={C.stroke} strokeWidth="2"/>
@@ -189,7 +189,7 @@ function HipTop({ azimuthDeg = 180 }) {
   const kOff = 42;
   const k1x = x + kOff, k2x = x + w - kOff;
   return (
-    <svg viewBox="0 0 280 220" width="100%" height="auto">
+    <svg viewBox="0 0 280 220" width="100%" style={{ height: 'auto' }}>
       <rect width="280" height="220" fill={C.bg} rx="8"/>
       {/* Cały dach — tło */}
       <rect x={x} y={y} width={w} height={h} fill={C.s1} stroke={C.stroke} strokeWidth="2"/>
@@ -249,7 +249,7 @@ function TrapRTop({ azimuthDeg = 180 }) {
   const yPy = (ty + wBot) / 2;                  // 89
 
   return (
-    <svg viewBox="0 0 280 220" width="100%" height="auto">
+    <svg viewBox="0 0 280 220" width="100%" style={{ height: 'auto' }}>
       <rect width="280" height="220" fill={C.bg} rx="8"/>
 
       {/* Budynek L */}
@@ -318,7 +318,7 @@ function RhombTop({ azimuthDeg = 180 }) {
   const yPy = xPy;                              // 89 (poziomo)
 
   return (
-    <svg viewBox="0 0 280 220" width="100%" height="auto">
+    <svg viewBox="0 0 280 220" width="100%" style={{ height: 'auto' }}>
       <rect width="280" height="220" fill={C.bg} rx="8"/>
 
       {/* Budynek L */}
@@ -360,7 +360,7 @@ function RhombTop({ azimuthDeg = 180 }) {
 function FlatTop({ azimuthDeg = 180 }) {
   const x = 50, y = 32, w = 180, h = 118;
   return (
-    <svg viewBox="0 0 280 220" width="100%" height="auto">
+    <svg viewBox="0 0 280 220" width="100%" style={{ height: 'auto' }}>
       <rect width="280" height="220" fill={C.bg} rx="8"/>
       <rect x={x} y={y} width={w} height={h} fill={C.s1} stroke={C.stroke} strokeWidth="2" rx="2"/>
       <text x="140" y={y+h/2} textAnchor="middle" dominantBaseline="middle"
@@ -377,7 +377,7 @@ function FlatTop({ azimuthDeg = 180 }) {
 function GroundTop({ azimuthDeg = 180 }) {
   const x = 42, y = 34, w = 188, h = 116;
   return (
-    <svg viewBox="0 0 280 220" width="100%" height="auto">
+    <svg viewBox="0 0 280 220" width="100%" style={{ height: 'auto' }}>
       <rect width="280" height="220" fill={C.bg} rx="8"/>
       <rect x={x} y={y} width={w} height={h}
             fill="#EBF5EB" stroke="#5D8A5E" strokeWidth="2" strokeDasharray="8,4" rx="3"/>
@@ -407,7 +407,7 @@ function GroundTop({ azimuthDeg = 180 }) {
 function GableNat() {
   const x = 50, y = 35, w = 180, h = 122, ky = y + h / 2; // ky = poziom kalenicy
   return (
-    <svg viewBox="0 0 280 220" width="100%" height="auto">
+    <svg viewBox="0 0 280 220" width="100%" style={{ height: 'auto' }}>
       <rect width="280" height="220" fill={C.bg} rx="8"/>
       {/* Cały zarys dachu (przerywany) — kontekst */}
       <rect x={x} y={y} width={w} height={h}
@@ -441,7 +441,7 @@ function TriangleNat() {
   const cx = 140, bY = 158, bW = 180, tY = 50;
   const x1 = cx - bW/2, x2 = cx + bW/2;
   return (
-    <svg viewBox="0 0 280 220" width="100%" height="auto">
+    <svg viewBox="0 0 280 220" width="100%" style={{ height: 'auto' }}>
       <rect width="280" height="220" fill={C.bg} rx="8"/>
       <polygon points={`${cx},${tY} ${x1},${bY} ${x2},${bY}`}
                fill={C.natBg} stroke={C.natStr} strokeWidth="2.5"/>
@@ -462,7 +462,7 @@ function HipNat() {
   const cx = 140, oY = 152, oW = 188, kY = 65, kW = 105;
   const pts = `${cx-oW/2},${oY} ${cx+oW/2},${oY} ${cx+kW/2},${kY} ${cx-kW/2},${kY}`;
   return (
-    <svg viewBox="0 0 280 220" width="100%" height="auto">
+    <svg viewBox="0 0 280 220" width="100%" style={{ height: 'auto' }}>
       <rect width="280" height="220" fill={C.bg} rx="8"/>
       <polygon points={pts} fill={C.natBg} stroke={C.natStr} strokeWidth="2.5"/>
       <line x1={cx-kW/2} y1={kY} x2={cx+kW/2} y2={kY}
@@ -485,7 +485,7 @@ function TrapNat() {
   const cx = 140, y1 = 45, h = 118, aB = 175, aT = 105;
   const pts = `${cx-aT/2},${y1} ${cx+aT/2},${y1} ${cx+aB/2},${y1+h} ${cx-aB/2},${y1+h}`;
   return (
-    <svg viewBox="0 0 280 220" width="100%" height="auto">
+    <svg viewBox="0 0 280 220" width="100%" style={{ height: 'auto' }}>
       <rect width="280" height="220" fill={C.bg} rx="8"/>
       <polygon points={pts} fill={C.natBg} stroke={C.natStr} strokeWidth="2.5"/>
       <Dim x1={cx-aT/2} y1={y1}   x2={cx+aT/2} y2={y1}   label="B" off={-18} color={C.dim}/>
@@ -505,7 +505,7 @@ function TrapRNat() {
   // Lewa krawędź pionowa (kąt prosty lewy), prawa krawędź skośna
   const pts = `${lx},${y1} ${lx+B},${y1} ${lx+A},${y1+h} ${lx},${y1+h}`;
   return (
-    <svg viewBox="0 0 280 220" width="100%" height="auto">
+    <svg viewBox="0 0 280 220" width="100%" style={{ height: 'auto' }}>
       <rect width="280" height="220" fill={C.bg} rx="8"/>
       <polygon points={pts} fill={C.natBg} stroke={C.natStr} strokeWidth="2.5"/>
       {/* Kąt prosty lewy-dół */}
@@ -530,7 +530,7 @@ function RhombNat() {
   // punkty: góra-lewy, góra-prawy, dół-prawy, dół-lewy
   const pts = `${lx+off},${y1} ${lx+off+w},${y1} ${lx+w},${y1+h} ${lx},${y1+h}`;
   return (
-    <svg viewBox="0 0 280 220" width="100%" height="auto">
+    <svg viewBox="0 0 280 220" width="100%" style={{ height: 'auto' }}>
       <rect width="280" height="220" fill={C.bg} rx="8"/>
       <polygon points={pts} fill={C.natBg} stroke={C.natStr} strokeWidth="2.5"/>
       {/* A = górna podstawa (i dolna = równa) */}
