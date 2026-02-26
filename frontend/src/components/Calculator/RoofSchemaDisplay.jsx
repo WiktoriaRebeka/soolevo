@@ -138,7 +138,7 @@ function CompassRose({ azimuthDeg = 180 }) {
 function GableTop({ azimuthDeg = 180 }) {
   const x = 50, y = 32, w = 180, h = 120, ky = y + h / 2;
   return (
-    <svg viewBox="0 0 280 220" width="100%" height="auto">
+    <svg viewBox="0 0 280 220" width="100%" style={{ height: 'auto' }}>
       <rect width="280" height="220" fill={C.bg} rx="8"/>
       {/* Cały dach — tło */}
       <rect x={x} y={y} width={w} height={h} fill={C.s1} stroke={C.stroke} strokeWidth="2"/>

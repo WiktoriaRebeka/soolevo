@@ -375,7 +375,7 @@ export default function Calculator() {
               </h3>
 
               {/* Wybór trybu */}
-              <div className="text-xs text-gray-500 mb-3">
+              <div className="text-xs text-gray-500 mb-3 flex items-center">
                 Skąd mamy policzyć ile prądu zużywasz?
                 <span className="inline-block ml-2 align-middle">
                   <Tooltip text="Na podstawie rachunków kalkulator dokładnie wylicza Twoje obecne koszty i dopasowuje moc instalacji. Jeśli dopiero budujesz dom lub nie masz rachunków — oszacujemy zużycie z metrażu." />
@@ -575,10 +575,10 @@ export default function Calculator() {
               {/* Urządzenia */}
               <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-8 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
                 <div className="space-y-4">
-                  <p className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-1">
+                  <div className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-1">
                     A. Posiadam (wliczone w rachunek)
                     <Tooltip text="Zaznacz urządzenia które już masz w domu — ich zużycie jest już wliczone w Twój rachunek. Kalkulator uwzględni to przy analizie opłacalności i autokonsumpcji." />
-                  </p>
+                  </div>
                   <div className="flex flex-col gap-3">
                     <label className={`flex items-center justify-between p-3 rounded-lg border-2 transition-all cursor-pointer ${formData.has_heat_pump ? 'border-orange-500 bg-orange-50' : 'border-gray-100 hover:border-orange-200'}`}>
                       <div>
@@ -602,10 +602,10 @@ export default function Calculator() {
                 </div>
 
                 <div className="space-y-4">
-                  <p className="text-xs font-black uppercase tracking-widest flex items-center gap-1" style={{ color: '#1B4F72' }}>
+                  <div className="text-xs font-black uppercase tracking-widest flex items-center gap-1" style={{ color: '#1B4F72' }}>
                     B. Planuję (dolicz do rachunku)
                     <Tooltip text="Zaznacz urządzenia które planujesz kupić w najbliższym czasie. Kalkulator dobierze większą instalację, która pokryje też ich przyszłe zużycie — żebyś nie musiał dopłacać za prąd po zakupie." />
-                  </p>
+                  </div>
                   <div className="flex flex-col gap-3">
                     <label className={`flex items-center justify-between p-3 rounded-lg border-2 transition-all cursor-pointer ${formData.planned_heat_pump ? 'border-[#1B4F72] bg-[#1B4F72]/5' : 'border-gray-100 hover:border-[#2E86C1]/50'}`}>
                       <div>
