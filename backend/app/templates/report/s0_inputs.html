@@ -1,0 +1,165 @@
+{# S0: DANE WEJŚCIOWE + BANER TYTUŁOWY #}
+{% set bill_str = (req.bill | int | string) ~ " zł/rok" if req.is_annual_bill else (req.bill | int | string) ~ " zł/mies." %}
+{% set facet = req.facets[0] if req.facets else none %}
+
+{# Mapowanie typów dachów na polskie nazwy #}
+{% set roof_labels = {
+    'rectangular':     'Dach dwuspadowy',
+    'gable':           'Dach dwuspadowy',
+    'hip':             'Dach czterospadowy (z kalenicą)',
+    'triangle':        'Dach czterospadowy namiotowy',
+    'trapezoid':       'Dach na rzucie trapezu',
+    'trapezoid_right': 'Dach na rzucie trapezu prostokątnego',
+    'rhombus':         'Dach na rzucie równoległoboku',
+    'flat':            'Dach płaski',
+    'ground':          'Instalacja naziemna'
+} %}
+
+<!-- BANER TYTUŁOWY -->
+<div style="background: var(--c-primary); border-radius: 14px; overflow: hidden; margin-bottom: 16px;">
+
+    <div style="padding: 22px 28px 16px;">
+        <h1 style="color: white; font-size: 24px; font-weight: 900; margin: 0 0 4px;">
+            Raport Fotowoltaiczny
+        </h1>
+        <p style="color: #BFD9ED; font-size: 12px; margin: 0;">
+            Pełna analiza opłacalności instalacji PV
+            &nbsp;·&nbsp; {{ generation_date }}
+            &nbsp;·&nbsp; Woj.: {{ req.province | capitalize }}
+            &nbsp;·&nbsp; Domownicy: {{ req.household_size }}
+        </p>
+    </div>
+
+    <!-- 4 hero-staty -->
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr);
+                background: #154360; border-top: 1px solid rgba(255,255,255,0.1);">
+
+        <div style="padding: 12px 14px; text-align: center; border-right: 1px solid rgba(255,255,255,0.12);">
+            <div style="font-size: 10px; font-weight: 700; color: #BFD9ED; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3px;">
+                Zużycie roczne
+            </div>
+            <div style="font-size: 15px; font-weight: 900; color: white;">
+                {% if data.annual_consumption_kwh %}
+                    {{ data.annual_consumption_kwh | round | int }} kWh
+                {% else %}—{% endif %}
+            </div>
+        </div>
+
+        <div style="padding: 12px 14px; text-align: center; border-right: 1px solid rgba(255,255,255,0.12);">
+            <div style="font-size: 10px; font-weight: 700; color: #BFD9ED; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3px;">
+                Moc systemu (Std)
+            </div>
+            <div style="font-size: 15px; font-weight: 900; color: white;">
+                {% if standard and standard.total_power_kwp %}
+                    {{ standard.total_power_kwp | round(2) }} kWp
+                {% else %}—{% endif %}
+            </div>
+        </div>
+
+        <div style="padding: 12px 14px; text-align: center; border-right: 1px solid rgba(255,255,255,0.12);">
+            <div style="font-size: 10px; font-weight: 700; color: #BFD9ED; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3px;">
+                Koszt instalacji
+            </div>
+            <div style="font-size: 15px; font-weight: 900; color: white;">
+                {% if standard and standard.pv_cost_gross_pln %}
+                    {{ standard.pv_cost_gross_pln | format_pln }}
+                {% else %}—{% endif %}
+            </div>
+        </div>
+
+        <div style="padding: 12px 14px; text-align: center;">
+            <div style="font-size: 10px; font-weight: 700; color: #BFD9ED; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3px;">
+                Zwrot inwestycji
+            </div>
+            <div style="font-size: 15px; font-weight: 900; color: white;">
+                {% if standard and standard.pv_payback_years %}
+                    ok. {{ standard.pv_payback_years | round(1) }} lat
+                {% else %}—{% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- TABELA DANYCH WEJŚCIOWYCH (kompaktowa) -->
+<div class="card avoid-break" style="margin-bottom: 16px; padding: 16px 20px;">
+
+    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase;
+                letter-spacing: .06em; color: var(--c-accent); margin-bottom: 12px;">
+        S0 — Sprawdź poprawność danych wejściowych
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px;">
+
+        <!-- Lewa kolumna: finansowe -->
+        <div>
+            <div class="param-row">
+                <span class="text-muted">Rachunek za prąd</span>
+                <span class="value-bold">{{ bill_str }}</span>
+            </div>
+            <div class="param-row">
+                <span class="text-muted">Operator / Taryfa</span>
+                <span class="value-bold">{{ req.operator | upper }} / {{ req.tariff | upper }}</span>
+            </div>
+            <div class="param-row">
+                <span class="text-muted">Liczba domowników</span>
+                <span class="value-bold">{{ req.household_size }}</span>
+            </div>
+            <div class="param-row">
+                <span class="text-muted">Osoby w domu w ciągu dnia</span>
+                <span class="value-bold">
+                    {% if req.people_home_weekday %}{{ req.people_home_weekday }}{% else %}—{% endif %}
+                </span>
+            </div>
+        </div>
+
+        <!-- Prawa kolumna: dach -->
+        <div>
+            <div class="param-row">
+                <span class="text-muted">Typ dachu</span>
+                <span class="value-bold">
+                    {% if facet %}{{ roof_labels.get(facet.roof_type, facet.roof_type) }}{% else %}—{% endif %}
+                </span>
+            </div>
+            <div class="param-row">
+                <span class="text-muted">Powierzchnia połaci</span>
+                <span class="value-bold">
+                    {% if data.roof_area_m2 %}{{ data.roof_area_m2 | round(1) }} m²{% else %}—{% endif %}
+                </span>
+            </div>
+            <div class="param-row">
+                <span class="text-muted">Kąt nachylenia</span>
+                <span class="value-bold">
+                    {% if facet and facet.angle is not none and facet.angle > 0 %}
+                        {{ facet.angle | round(1) }}&deg;
+                    {% else %}—{% endif %}
+                </span>
+            </div>
+            <div class="param-row">
+                <span class="text-muted">Orientacja połaci</span>
+                <span class="value-bold">
+                    {% if facet and facet.azimuth_deg is not none %}
+                        {% set az = facet.azimuth_deg %}
+                        {% if az >= 337.5 or az < 22.5 %}Północ
+                        {% elif az < 67.5 %}Północny wschód
+                        {% elif az < 112.5 %}Wschód
+                        {% elif az < 157.5 %}Południowy wschód
+                        {% elif az < 202.5 %}Południe
+                        {% elif az < 247.5 %}Południowy zachód
+                        {% elif az < 292.5 %}Zachód
+                        {% else %}Północny zachód{% endif %}
+                    {% else %}—{% endif %}
+                </span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Nota o kosztach -->
+    <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--gray-200);
+                font-size: 11px; color: var(--gray-500); line-height: 1.5;">
+        Koszt instalacji obejmuje szacowane ceny paneli, falownika, okablowania, konstrukcji montażowej oraz robocizny.
+        Ostateczną ofertę przygotuje instalator po wizji lokalnej.
+    </div>
+
+</div>

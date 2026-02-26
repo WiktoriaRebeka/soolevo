@@ -1,0 +1,69 @@
+{% set payback = standard.pv_payback_years %}
+{% set profit25 = standard.pv_total_savings_25y_pln %}
+{% set savings1y = standard.pv_savings_pln %}
+
+{# Logika werdyktu #}
+{% if payback and payback < 12 and profit25 > 0 %}
+    {% set verdict_type = "positive" %}
+    {% set verdict_badge = "TAK" %}
+    {% set verdict_title = "Fotowoltaika jest opłacalna" %}
+    {% set verdict_color_class = "text-green" %}
+{% elif payback and payback < 20 %}
+    {% set verdict_type = "warning" %}
+    {% set verdict_badge = "WARUNKOWO" %}
+    {% set verdict_title = "Sprawdź zastrzeżenia przed decyzją" %}
+    {% set verdict_color_class = "text-yellow" %}
+{% else %}
+    {% set verdict_type = "danger" %}
+    {% set verdict_badge = "NIE" %}
+    {% set verdict_title = "Inwestycja może być nieopłacalna" %}
+    {% set verdict_color_class = "text-red" %}
+{% endif %}
+
+<div class="verdict-card {{ verdict_type }} avoid-break mb-6">
+
+    <!-- Nagłówek -->
+    <div class="flex-row gap-16 mb-4" style="align-items: center;">
+        <div class="verdict-badge verdict-badge-{{ verdict_type }}">{{ verdict_badge }}</div>
+        <h2 class="verdict-title {{ verdict_color_class }}" style="margin: 0;">
+            {{ verdict_title }}
+        </h2>
+    </div>
+
+    <!-- Opis -->
+    <p class="text-base mb-6" style="color: var(--gray-700); line-height: 1.65;">
+        Szacowany czas zwrotu instalacji wynosi około
+        <strong class="{{ verdict_color_class }}">{{ payback | round(1) }} lat</strong>.
+        W ciągu 25 lat eksploatacji możliwy zysk to około
+        <strong class="{{ verdict_color_class }}">{{ profit25 | format_pln }}</strong>.
+        Prognozowane oszczędności w pierwszym roku wynoszą około
+        <strong class="{{ verdict_color_class }}">{{ savings1y | format_pln }}</strong>.
+        Wartości te zależą od warunków atmosferycznych, zmian cen energii oraz faktycznego zużycia.
+    </p>
+
+    <!-- Trzy kafelki -->
+    <div class="grid-3">
+
+        <div class="stat-box">
+            <div class="label-sm">Zwrot inwestycji</div>
+            <div class="value-xl {{ verdict_color_class }}">
+                ok. {{ payback | round(1) }} lat
+            </div>
+        </div>
+
+        <div class="stat-box">
+            <div class="label-sm">Szacowany zysk po 25 latach</div>
+            <div class="value-xl {{ verdict_color_class }}">
+                ok. {{ profit25 | format_pln }}
+            </div>
+        </div>
+
+        <div class="stat-box">
+            <div class="label-sm">Oszczędności — rok 1</div>
+            <div class="value-xl {{ verdict_color_class }}">
+                ok. {{ savings1y | format_pln }}
+            </div>
+        </div>
+
+    </div>
+</div>

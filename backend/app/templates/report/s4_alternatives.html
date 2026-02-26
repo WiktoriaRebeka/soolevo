@@ -1,0 +1,282 @@
+{% from 'report/_macros.html' import render_payback %}
+
+{# ── S4: PORÓWNANIE WARIANTÓW ─────────────────────────────────────────────── #}
+
+<!-- Nagłówek sekcji S4 -->
+<div style="page-break-before: always;"></div>
+<div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+    <div style="background: var(--c-primary); color: white; font-size: 10px; font-weight: 800;
+                padding: 4px 12px; border-radius: 6px; text-transform: uppercase;
+                letter-spacing: .05em; flex-shrink: 0;">S4</div>
+    <div style="font-size: 15px; font-weight: 700; color: var(--c-primary);">
+        Porównanie wariantów: Economy / Standard / Premium
+    </div>
+</div>
+
+{# ── TABELA PORÓWNAWCZA ────────────────────────────────────────────────────── #}
+<div class="card avoid-break mb-6" style="padding: 0; overflow: hidden;">
+
+    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+        <thead>
+            <tr>
+                <th style="text-align: left; padding: 12px 16px; background: var(--gray-100);
+                           color: var(--gray-700); font-weight: 700; width: 32%;">Parametr</th>
+                <th style="text-align: center; padding: 12px 16px; background: #1A7A40;
+                           color: white; font-weight: 800; font-size: 12px; letter-spacing: .03em;">
+                    ECONOMY
+                </th>
+                <th style="text-align: center; padding: 12px 16px; background: var(--c-primary);
+                           color: white; font-weight: 800; font-size: 12px; letter-spacing: .03em;">
+                    STANDARD
+                    <div style="font-size: 9px; font-weight: 600; opacity: .8; margin-top: 2px;">
+                        rekomendowany
+                    </div>
+                </th>
+                <th style="text-align: center; padding: 12px 16px; background: #6B21A8;
+                           color: white; font-weight: 800; font-size: 12px; letter-spacing: .03em;">
+                    PREMIUM
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+
+            <!-- Moc instalacji -->
+            <tr style="border-bottom: 1px solid var(--gray-100);">
+                <td style="padding: 10px 16px; font-weight: 600; color: var(--gray-700);">Moc instalacji</td>
+                <td style="padding: 10px 16px; text-align: center; color: #1A7A40; font-weight: 700;">
+                    {{ economy.total_power_kwp | round(2) if economy else '—' }} kWp
+                </td>
+                <td style="padding: 10px 16px; text-align: center; color: var(--c-primary); font-weight: 800;
+                           background: var(--light-blue);">
+                    {{ standard.total_power_kwp | round(2) }} kWp
+                </td>
+                <td style="padding: 10px 16px; text-align: center; color: #6B21A8; font-weight: 700;">
+                    {{ premium.total_power_kwp | round(2) if premium else '—' }} kWp
+                </td>
+            </tr>
+
+            <!-- Liczba paneli -->
+            <tr style="background: var(--gray-50); border-bottom: 1px solid var(--gray-100);">
+                <td style="padding: 10px 16px; font-weight: 600; color: var(--gray-700);">Liczba paneli</td>
+                <td style="padding: 10px 16px; text-align: center; color: #1A7A40; font-weight: 700;">
+                    {{ economy.panels_count if economy else '—' }} szt.
+                </td>
+                <td style="padding: 10px 16px; text-align: center; color: var(--c-primary); font-weight: 800;
+                           background: var(--light-blue);">
+                    {{ standard.panels_count }} szt.
+                </td>
+                <td style="padding: 10px 16px; text-align: center; color: #6B21A8; font-weight: 700;">
+                    {{ premium.panels_count if premium else '—' }} szt.
+                </td>
+            </tr>
+
+            <!-- Produkcja roczna -->
+            <tr style="border-bottom: 1px solid var(--gray-100);">
+                <td style="padding: 10px 16px; font-weight: 600; color: var(--gray-700);">Produkcja roczna</td>
+                <td style="padding: 10px 16px; text-align: center; color: #1A7A40; font-weight: 700;">
+                    ok. {{ (economy.annual_production_kwh | round | int) if economy else '—' }} kWh
+                </td>
+                <td style="padding: 10px 16px; text-align: center; color: var(--c-primary); font-weight: 800;
+                           background: var(--light-blue);">
+                    ok. {{ standard.annual_production_kwh | round | int }} kWh
+                </td>
+                <td style="padding: 10px 16px; text-align: center; color: #6B21A8; font-weight: 700;">
+                    ok. {{ (premium.annual_production_kwh | round | int) if premium else '—' }} kWh
+                </td>
+            </tr>
+
+            <!-- Koszt instalacji PV -->
+            <tr style="background: var(--gray-50); border-bottom: 1px solid var(--gray-100);">
+                <td style="padding: 10px 16px; font-weight: 600; color: var(--gray-700);">Koszt instalacji PV</td>
+                <td style="padding: 10px 16px; text-align: center; color: #1A7A40; font-weight: 700;">
+                    {{ economy.pv_cost_gross_pln | format_pln if economy else '—' }}
+                </td>
+                <td style="padding: 10px 16px; text-align: center; color: var(--c-primary); font-weight: 800;
+                           background: var(--light-blue);">
+                    {{ standard.pv_cost_gross_pln | format_pln }}
+                </td>
+                <td style="padding: 10px 16px; text-align: center; color: #6B21A8; font-weight: 700;">
+                    {{ premium.pv_cost_gross_pln | format_pln if premium else '—' }}
+                </td>
+            </tr>
+
+            <!-- Szacowany zwrot -->
+            <tr style="border-bottom: 1px solid var(--gray-100);">
+                <td style="padding: 10px 16px; font-weight: 600; color: var(--gray-700);">Szacowany zwrot</td>
+                <td style="padding: 10px 16px; text-align: center; color: #1A7A40; font-weight: 700;">
+                    {% if economy %}
+                        {{ render_payback(economy.pv_payback_years, economy.pv_payback_optimistic_years, economy.pv_payback_pessimistic_years) }}
+                    {% else %}—{% endif %}
+                </td>
+                <td style="padding: 10px 16px; text-align: center; color: var(--c-primary); font-weight: 800;
+                           background: var(--light-blue);">
+                    {{ render_payback(standard.pv_payback_years, standard.pv_payback_optimistic_years, standard.pv_payback_pessimistic_years) }}
+                </td>
+                <td style="padding: 10px 16px; text-align: center; color: #6B21A8; font-weight: 700;">
+                    {% if premium %}
+                        {{ render_payback(premium.pv_payback_years, premium.pv_payback_optimistic_years, premium.pv_payback_pessimistic_years) }}
+                    {% else %}—{% endif %}
+                </td>
+            </tr>
+
+            <!-- Roczne oszczędności -->
+            <tr style="background: var(--gray-50); border-bottom: 1px solid var(--gray-100);">
+                <td style="padding: 10px 16px; font-weight: 600; color: var(--gray-700);">Oszczędności rocznie</td>
+                <td style="padding: 10px 16px; text-align: center; color: #1A7A40; font-weight: 700;">
+                    ok. {{ economy.pv_savings_pln | format_pln if economy else '—' }}
+                </td>
+                <td style="padding: 10px 16px; text-align: center; color: var(--c-primary); font-weight: 800;
+                           background: var(--light-blue);">
+                    ok. {{ standard.pv_savings_pln | format_pln }}
+                </td>
+                <td style="padding: 10px 16px; text-align: center; color: #6B21A8; font-weight: 700;">
+                    ok. {{ premium.pv_savings_pln | format_pln if premium else '—' }}
+                </td>
+            </tr>
+
+            <!-- Zysk po 25 latach -->
+            <tr style="border-bottom: 1px solid var(--gray-100);">
+                <td style="padding: 10px 16px; font-weight: 600; color: var(--gray-700);">Szacowany zysk / 25 lat</td>
+                <td style="padding: 10px 16px; text-align: center; color: #1A7A40; font-weight: 700;">
+                    ok. {{ economy.pv_total_savings_25y_pln | format_pln if economy else '—' }}
+                </td>
+                <td style="padding: 10px 16px; text-align: center; color: var(--c-primary); font-weight: 800;
+                           background: var(--light-blue);">
+                    ok. {{ standard.pv_total_savings_25y_pln | format_pln }}
+                </td>
+                <td style="padding: 10px 16px; text-align: center; color: #6B21A8; font-weight: 700;">
+                    ok. {{ premium.pv_total_savings_25y_pln | format_pln if premium else '—' }}
+                </td>
+            </tr>
+
+            <!-- Falownik -->
+            <tr style="background: var(--gray-50); border-bottom: 1px solid var(--gray-100);">
+                <td style="padding: 10px 16px; font-weight: 600; color: var(--gray-700);">Falownik</td>
+                <td style="padding: 10px 16px; text-align: center; color: #1A7A40; font-weight: 600;">
+                    {{ economy.inverter_brand if economy else '—' }}
+                </td>
+                <td style="padding: 10px 16px; text-align: center; color: var(--c-primary); font-weight: 700;
+                           background: var(--light-blue);">
+                    {{ standard.inverter_brand }}
+                </td>
+                <td style="padding: 10px 16px; text-align: center; color: #6B21A8; font-weight: 600;">
+                    {{ premium.inverter_brand if premium else '—' }}
+                </td>
+            </tr>
+
+            <!-- PV + Magazyn -->
+            <tr style="border-bottom: 2px solid var(--gray-200);">
+                <td style="padding: 10px 16px; font-weight: 600; color: var(--gray-700);">PV + Magazyn (koszt)</td>
+                <td style="padding: 10px 16px; text-align: center; color: #1A7A40; font-weight: 600;">
+                    {{ economy.with_battery_total_cost_pln | format_pln if economy and economy.with_battery_total_cost_pln else '—' }}
+                </td>
+                <td style="padding: 10px 16px; text-align: center; color: var(--c-primary); font-weight: 700;
+                           background: var(--light-blue);">
+                    {{ standard.with_battery_total_cost_pln | format_pln if standard.with_battery_total_cost_pln else '—' }}
+                </td>
+                <td style="padding: 10px 16px; text-align: center; color: #6B21A8; font-weight: 600;">
+                    {{ premium.with_battery_total_cost_pln | format_pln if premium and premium.with_battery_total_cost_pln else '—' }}
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+
+    <!-- Stopka tabeli -->
+    <div style="background: var(--light-blue); padding: 9px 16px; font-size: 11px;
+                color: var(--gray-600); border-top: 1px solid var(--gray-200);">
+        Kolumna Standard wyróżniona — rekomendowany kompromis jakości i ceny.
+        Wartości produkcji i finansowe mają charakter szacunkowy.
+    </div>
+</div>
+
+{# ── KARTY ALTERNATYWNE (2 kolumny obok siebie) ───────────────────────────── #}
+<div class="grid-2">
+
+    {# --- PREMIUM --- #}
+    {% if premium %}
+    <div class="card avoid-break" style="background: var(--purple-50); border-color: var(--purple-200);
+                                         border-left: 4px solid #6B21A8;">
+
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+            <span style="background: #6B21A8; color: white; font-size: 10px; font-weight: 800;
+                         padding: 3px 10px; border-radius: 6px; letter-spacing: .04em;">PREMIUM</span>
+            <div>
+                <div style="font-size: 13px; font-weight: 700; color: #6B21A8;">{{ premium.label }}</div>
+                <div style="font-size: 11px; color: var(--purple-700); margin-top: 1px;">{{ premium.description }}</div>
+            </div>
+        </div>
+
+        <div class="param-row">
+            <span class="text-muted">Moc systemu</span>
+            <span class="value-bold text-purple">{{ premium.total_power_kwp | round(2) }} kWp</span>
+        </div>
+        <div class="param-row">
+            <span class="text-muted">Koszt instalacji</span>
+            <span class="value-bold text-purple">{{ premium.pv_cost_gross_pln | format_pln }}</span>
+        </div>
+        <div class="param-row">
+            <span class="text-muted">Szacowany zwrot</span>
+            <span class="value-bold text-purple">
+                {{ render_payback(premium.pv_payback_years, premium.pv_payback_optimistic_years, premium.pv_payback_pessimistic_years) }}
+            </span>
+        </div>
+        <div class="param-row">
+            <span class="text-muted">Szacowany zysk / 25 lat</span>
+            <span class="value-bold text-purple">ok. {{ premium.pv_total_savings_25y_pln | format_pln }}</span>
+        </div>
+        <div class="param-row">
+            <span class="text-muted">Panel</span>
+            <span class="value-bold">{{ premium.panel_brand }}</span>
+        </div>
+        <div class="param-row">
+            <span class="text-muted">Falownik</span>
+            <span class="value-bold">{{ premium.inverter_brand }}</span>
+        </div>
+    </div>
+    {% endif %}
+
+    {# --- ECONOMY --- #}
+    {% if economy %}
+    <div class="card avoid-break" style="background: var(--light-green); border-color: #A7D9B5;
+                                         border-left: 4px solid #1A7A40;">
+
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+            <span style="background: #1A7A40; color: white; font-size: 10px; font-weight: 800;
+                         padding: 3px 10px; border-radius: 6px; letter-spacing: .04em;">ECONOMY</span>
+            <div>
+                <div style="font-size: 13px; font-weight: 700; color: #1A7A40;">{{ economy.label }}</div>
+                <div style="font-size: 11px; color: #1A7A40; margin-top: 1px; opacity: .8;">{{ economy.description }}</div>
+            </div>
+        </div>
+
+        <div class="param-row">
+            <span class="text-muted">Moc systemu</span>
+            <span class="value-bold" style="color: #1A7A40;">{{ economy.total_power_kwp | round(2) }} kWp</span>
+        </div>
+        <div class="param-row">
+            <span class="text-muted">Koszt instalacji</span>
+            <span class="value-bold" style="color: #1A7A40;">{{ economy.pv_cost_gross_pln | format_pln }}</span>
+        </div>
+        <div class="param-row">
+            <span class="text-muted">Szacowany zwrot</span>
+            <span class="value-bold" style="color: #1A7A40;">
+                {{ render_payback(economy.pv_payback_years, economy.pv_payback_optimistic_years, economy.pv_payback_pessimistic_years) }}
+            </span>
+        </div>
+        <div class="param-row">
+            <span class="text-muted">Szacowany zysk / 25 lat</span>
+            <span class="value-bold" style="color: #1A7A40;">ok. {{ economy.pv_total_savings_25y_pln | format_pln }}</span>
+        </div>
+        <div class="param-row">
+            <span class="text-muted">Panel</span>
+            <span class="value-bold">{{ economy.panel_brand }}</span>
+        </div>
+        <div class="param-row">
+            <span class="text-muted">Falownik</span>
+            <span class="value-bold">{{ economy.inverter_brand }}</span>
+        </div>
+    </div>
+    {% endif %}
+
+</div>

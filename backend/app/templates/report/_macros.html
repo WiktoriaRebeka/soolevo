@@ -1,0 +1,19 @@
+<!-- backend/app/templates/report/_macros.html -->
+{% macro render_payback(base, opt, pess) %}
+    {% set values = [] %}
+    {% if base and base > 0 %}{% set _ = values.append(base) %}{% endif %}
+    {% if opt and opt > 0 %}{% set _ = values.append(opt) %}{% endif %}
+    {% if pess and pess > 0 %}{% set _ = values.append(pess) %}{% endif %}
+
+    {% if values|length > 0 %}
+        {% set min_val = values|min | round(1) %}
+        {% set max_val = values|max | round(1) %}
+        {% if min_val == max_val %}
+            ok. {{ min_val }} lat
+        {% else %}
+            ok. {{ min_val }}–{{ max_val }} lat
+        {% endif %}
+    {% else %}
+        Brak danych
+    {% endif %}
+{% endmacro %}

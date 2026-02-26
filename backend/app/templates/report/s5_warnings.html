@@ -1,0 +1,69 @@
+{% if warnings and warnings|length > 0 %}
+
+<div class="avoid-break mb-6">
+
+    <!-- Nagłówek S5 — bez emotikonek -->
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+        <div style="background: var(--c-primary); color: white; font-size: 10px; font-weight: 800;
+                    padding: 4px 12px; border-radius: 6px; text-transform: uppercase;
+                    letter-spacing: .05em; flex-shrink: 0;">S5</div>
+        <div style="font-size: 15px; font-weight: 700; color: var(--c-primary);">
+            Analiza ekspercka i zastrzeżenia
+        </div>
+    </div>
+
+    <div class="flex-col gap-4">
+
+        {% for w in warnings %}
+
+            {# Kolory i etykiety dla każdego typu ostrzeżenia #}
+            {% if w.type == 'red' %}
+                {% set border_color = '#C0392B' %}
+                {% set bg_color = '#FDEDEC' %}
+                {% set badge_bg = '#C0392B' %}
+                {% set badge_label = 'UWAGA' %}
+                {% set text_color = '#7B241C' %}
+            {% elif w.type == 'yellow' %}
+                {% set border_color = '#B7950B' %}
+                {% set bg_color = '#FEF9E7' %}
+                {% set badge_bg = '#B7950B' %}
+                {% set badge_label = 'OSTRZEŻENIE' %}
+                {% set text_color = '#6E4E00' %}
+            {% else %}
+                {% set border_color = '#1E8449' %}
+                {% set bg_color = '#D5F5E3' %}
+                {% set badge_bg = '#1E8449' %}
+                {% set badge_label = 'INFO' %}
+                {% set text_color = '#1A5E35' %}
+            {% endif %}
+
+            <div style="background: {{ bg_color }}; border: 1px solid {{ border_color }};
+                        border-left: 4px solid {{ border_color }}; border-radius: 10px;
+                        padding: 14px 16px;">
+
+                <!-- Tytuł z badgem -->
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                    <span style="background: {{ badge_bg }}; color: white; font-size: 9px;
+                                 font-weight: 800; padding: 2px 8px; border-radius: 5px;
+                                 letter-spacing: .05em; flex-shrink: 0; text-transform: uppercase;">
+                        {{ badge_label }}
+                    </span>
+                    <div style="font-size: 13px; font-weight: 700; color: {{ text_color }};">
+                        {{ w.title }}
+                    </div>
+                </div>
+
+                <!-- Treść -->
+                <div style="font-size: 13px; color: var(--gray-700); line-height: 1.6;">
+                    {{ w.message }}
+                </div>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endif %}
