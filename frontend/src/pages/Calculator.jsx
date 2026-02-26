@@ -375,10 +375,12 @@ export default function Calculator() {
               </h3>
 
               {/* Wybór trybu */}
-              <p className="text-xs text-gray-500 mb-3">
+              <div className="text-xs text-gray-500 mb-3">
                 Skąd mamy policzyć ile prądu zużywasz?
-                <Tooltip text="Na podstawie rachunków kalkulator dokładnie wylicza Twoje obecne koszty i dopasowuje moc instalacji. Jeśli dopiero budujesz dom lub nie masz rachunków — oszacujemy zużycie z metrażu." />
-              </p>
+                <span className="inline-block ml-2 align-middle">
+                  <Tooltip text="Na podstawie rachunków kalkulator dokładnie wylicza Twoje obecne koszty i dopasowuje moc instalacji. Jeśli dopiero budujesz dom lub nie masz rachunków — oszacujemy zużycie z metrażu." />
+                </span>
+              </div>
               <div className="flex flex-col sm:flex-row gap-4 mb-6">
                 <label className={`flex items-center gap-3 cursor-pointer p-4 border-2 rounded-xl transition-all ${!formData.estimatedConsumptionMode ? 'border-[#1B4F72] bg-white shadow-md' : 'border-gray-200 bg-gray-50 opacity-70'}`}>
                   <input type="radio" name="consumptionMode" checked={!formData.estimatedConsumptionMode}

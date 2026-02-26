@@ -19,7 +19,27 @@ router = APIRouter(prefix="/api/reports", tags=["reports"])
 
 PDF_REPORTS_DIR = os.getenv("PDF_REPORTS_DIR", "/app/reports")
 
+def generate_mock_pdf(report_token: str) -> str:
+    """
+    Generuje prosty PDF w trybie deweloperskim.
+    Zwraca ścieżkę do wygenerowanego pliku.
+    """
+    from reportlab.pdfgen import canvas
 
+    # Upewnij się, że katalog istnieje
+    os.makedirs(PDF_REPORTS_DIR, exist_ok=True)
+
+    pdf_path = os.path.join(PDF_REPORTS_DIR, f"{report_token}.pdf")
+
+    c = canvas.Canvas(pdf_path)
+    c.setFont("Helvetica", 16)
+    c.drawString(100, 750, "Raport PV — tryb deweloperski")
+    c.setFont("Helvetica", 12)
+    c.drawString(100, 720, f"Token raportu: {report_token}")
+    c.drawString(100, 700, "Ten PDF został wygenerowany automatycznie.")
+    c.save()
+
+    return pdf_path
 # ── Schematy ──────────────────────────────────────────────────
 
 class CreateReportRequest(BaseModel):
@@ -38,28 +58,32 @@ class ReportSummary(BaseModel):
 # ── Endpointy ─────────────────────────────────────────────────
 
 @router.post("/create")
+@router.post("/create")
 def create_report(
     req: CreateReportRequest,
     db: Session = Depends(get_db),
     user: Optional[User] = Depends(get_current_user_optional),
 ):
-    """
-    Tworzy rekord raportu w bazie (przed płatnością).
-    Zwraca token raportu potrzebny do stworzenia płatności.
-    """
     report = Report(
         user_id=user.id if user else None,
         input_json=req.input_json,
-        status="pending",
+        status="generated",   # <-- od razu gotowy
     )
     db.add(report)
     db.commit()
     db.refresh(report)
 
+    # Generowanie PDF w trybie dev
+    pdf_path = generate_mock_pdf(report.token)
+    report.pdf_path = pdf_path
+    db.commit()
+
     return {
         "report_token": report.token,
         "status": report.status,
-        "price_pln": int(os.getenv("REPORT_PRICE_GROSZY", "4900")) / 100,
+        "pdf_ready": True,
+        "pdf_path": pdf_path,
+        "price_pln": 0.0,  # w dev raport jest darmowy
     }
 
 
