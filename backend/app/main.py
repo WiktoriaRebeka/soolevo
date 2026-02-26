@@ -26,7 +26,8 @@ from app.routers import auth, payments, reports, batteries
 from app.webhooks import paynow
 from app.core.database import engine
 from app.models.db import Base
-
+from app.routers import calculator
+app.include_router(calculator.router)
 # ── Inicjalizacja bazy danych ────────────────────────────────
 # W produkcji używamy Alembic — poniższe tylko do dev/pierwszego uruchomienia
 # Base.metadata.create_all(bind=engine)
