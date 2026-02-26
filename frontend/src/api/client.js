@@ -1,18 +1,19 @@
 // frontend/src/api/client.js
 // ─────────────────────────────────────────────────────────────
 //  Axios instance z auto-refresh tokenów
+//  Endpointy kalkulatora: /calculator/...
 // ─────────────────────────────────────────────────────────────
 
 import axios from "axios";
 
-const API_BASE = import.meta.env.VITE_API_URL || "https://api.soolevo.com";
+const API_BASE = import.meta.env.VITE_API_URL || "";
 
 export const api = axios.create({
   baseURL: API_BASE,
-  timeout: 60000, // 60s dla długich obliczeń PV
+  timeout: 90_000, // 90s dla długich obliczeń PV
 });
 
-// Request interceptor — dołącz token
+// ── Request interceptor — dołącz token JWT ───────────────────
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("access_token");
   if (token) {
@@ -21,7 +22,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Response interceptor — auto-refresh przy 401
+// ── Response interceptor — auto-refresh przy 401 ─────────────
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -40,7 +41,6 @@ api.interceptors.response.use(
           original.headers.Authorization = `Bearer ${access_token}`;
           return api(original);
         } catch {
-          // refresh nieudany — wyloguj
           localStorage.removeItem("access_token");
           localStorage.removeItem("refresh_token");
           window.location.href = "/konto";
@@ -51,16 +51,18 @@ api.interceptors.response.use(
   }
 );
 
-// ── API calls ─────────────────────────────────────────────────
-
+// ── Auth ─────────────────────────────────────────────────────
 export const authAPI = {
   register: (email, password) =>
     api.post("/api/auth/register", { email, password }),
   login: (email, password) =>
     api.post("/api/auth/login", { email, password }),
+  refresh: (refresh_token) =>
+    api.post("/api/auth/refresh", { refresh_token }),
   me: () => api.get("/api/auth/me"),
 };
 
+// ── Reports ──────────────────────────────────────────────────
 export const reportsAPI = {
   create: (inputJson) =>
     api.post("/api/reports/create", { input_json: inputJson }),
@@ -68,6 +70,7 @@ export const reportsAPI = {
   downloadUrl: (token) => `${API_BASE}/api/reports/download/${token}`,
 };
 
+// ── Payments ─────────────────────────────────────────────────
 export const paymentsAPI = {
   createPayment: (reportToken, buyerEmail) =>
     api.post("/api/payments/create", {
@@ -78,11 +81,23 @@ export const paymentsAPI = {
     api.get(`/api/payments/status/${reportToken}`),
 };
 
+// ── Batteries ────────────────────────────────────────────────
 export const batteriesAPI = {
   list: (params = {}) => api.get("/api/batteries", { params }),
   filters: () => api.get("/api/batteries/filters"),
 };
 
+// ── Calculator ───────────────────────────────────────────────
+// Prefix: /calculator (router w backend/app/routers/calculator.py)
 export const calculatorAPI = {
-  calculate: (data) => api.post("/calculate/scenarios", data),
+  // Oblicz scenariusze PV
+  calculate: (data) =>
+    api.post("/calculator/calculate/scenarios", data),
+
+  // Dane do raportu (pełny ReportData)
+  reportData: (data) =>
+    api.post("/calculator/report/data", data),
+
+  // PDF blob — używaj bezpośrednio z responseType: 'blob'
+  reportPdfUrl: () => `${API_BASE}/calculator/report/pdf`,
 };
