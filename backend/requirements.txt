@@ -8,7 +8,8 @@ pillow
 reportlab
 chardet
 pydantic
-weasyprint==62.3
+weasyprint>=63.0
+pydyf==0.12.1
 
 # Soolevo dependencies
 sqlalchemy
@@ -18,8 +19,7 @@ python-jose[cryptography]
 email-validator
 python-dotenv
 stripe
-weasyprint==62.3
-pydyf==0.10.0
+
 # Additional utilities
 requests
 typing-extensions
