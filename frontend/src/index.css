@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* frontend/src/index.css */
+/* WAŻNE: @import musi być PIERWSZĄ linią — przed komentarzami */
+
 /* ─────────────────────────────────────────────────────────────────────────────
    PALETA — identyczna z backend/app/core/report_generator.py:
    C_PRIMARY   = #1B4F72  (granatowy)
