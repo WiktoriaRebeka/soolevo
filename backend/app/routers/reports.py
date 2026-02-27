@@ -11,7 +11,6 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Response
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from sqlalchemy import text
 
 from app.core.database import get_db, engine
 from app.core.auth_utils import get_current_user, get_current_user_optional
@@ -34,10 +33,7 @@ def ensure_tables_exist():
 
 
 def generate_mock_pdf(report_token: str) -> str:
-    """
-    Generuje prosty PDF w trybie deweloperskim.
-    Zwraca ścieżkę do wygenerowanego pliku.
-    """
+    """Generuje prosty PDF w trybie deweloperskim."""
     try:
         from reportlab.pdfgen import canvas as rl_canvas
 
@@ -55,23 +51,23 @@ def generate_mock_pdf(report_token: str) -> str:
         return pdf_path
 
     except ImportError:
-        # reportlab nie zainstalowany — zapisz placeholder
         os.makedirs(PDF_REPORTS_DIR, exist_ok=True)
         pdf_path = os.path.join(PDF_REPORTS_DIR, f"{report_token}.pdf")
         with open(pdf_path, "wb") as f:
-            # Minimalny prawidłowy PDF (1-stronicowy placeholder)
-            f.write(b"%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj "
-                    b"2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj "
-                    b"3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R>>endobj\n"
-                    b"xref\n0 4\n0000000000 65535 f\n"
-                    b"trailer<</Size 4/Root 1 0 R>>\nstartxref\n0\n%%EOF")
+            f.write(
+                b"%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj "
+                b"2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj "
+                b"3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R>>endobj\n"
+                b"xref\n0 4\n0000000000 65535 f\n"
+                b"trailer<</Size 4/Root 1 0 R>>\nstartxref\n0\n%%EOF"
+            )
         return pdf_path
 
 
 # ── Schematy ──────────────────────────────────────────────────
 
 class CreateReportRequest(BaseModel):
-    input_json: dict    # pełny obiekt ScenariosRequest z frontendu
+    input_json: dict
 
 
 class ReportSummary(BaseModel):
@@ -91,32 +87,55 @@ def create_report(
     db: Session = Depends(get_db),
     user: Optional[User] = Depends(get_current_user_optional),
 ):
-    # Upewnij się że tabele istnieją (dev bez Alembic)
     ensure_tables_exist()
 
-        # TRYB DEV — BEZ BAZY DANYCH
-    # Generujemy token i PDF bez zapisu do DB
-    from app.core.report_generator import ReportGenerator
-    from app.schemas.report import ReportData
-
-    generator = ReportGenerator()
-
-    from app.core.engine import calculate_scenarios_engine
+    # Importy lokalne
+    from app.core.engine import (
+        calculate_scenarios_engine,
+        _prepare_context_from_facet,
+        _compute_annual_consumption
+    )
+    from app.schemas.scenarios import ScenariosRequest, RoofFacet
     from app.core.report_generator import ReportGenerator
     from app.schemas.report import ReportData
     import uuid
 
-    # 1. Uruchamiamy kalkulator
-    from app.schemas.scenarios import ScenariosRequest
-
+    # 1. Zamieniamy dict → ScenariosRequest
     scenarios_request = ScenariosRequest(**req.input_json)
+
+    # 2. Uruchamiamy kalkulator
     results = calculate_scenarios_engine(scenarios_request)
 
-    # 2. Tworzymy obiekt ReportData
+    # 3. Przygotowujemy dane wejściowe (tak samo jak w /report/data)
+    first_facet_raw = scenarios_request.facets[0]
+    first_facet = RoofFacet(**first_facet_raw) if isinstance(first_facet_raw, dict) else first_facet_raw
 
+    consumption_data = _compute_annual_consumption(scenarios_request)
+    annual_consumption_kwh = consumption_data["annual_consumption_kwh"]
+
+    context = _prepare_context_from_facet(
+        facet=first_facet,
+        annual_consumption_kwh=annual_consumption_kwh,
+        province=scenarios_request.province,
+        tariff_type=scenarios_request.tariff.upper().replace("-", ""),
+        operator=scenarios_request.operator,
+        household_size=scenarios_request.household_size,
+        people_home_weekday=getattr(scenarios_request, "people_home_weekday", 1),
+        request=scenarios_request,
+    )
+
+    input_data_summary = {
+        "annual_consumption_kwh": annual_consumption_kwh,
+        "roof_area_m2": context.get("roof_area_m2"),
+        "roof_slope_length_m": context.get("roof_slope_length_m"),
+        "roof_offset_x": context.get("roof_offset_x"),
+        "roof_type": first_facet.roof_type,
+    }
+
+    # 4. Budujemy ReportData
     report_data = ReportData(
-        input_request=req.input_json,
-        input_data_summary=results.input_data_summary,
+        input_request=scenarios_request,
+        input_data_summary=input_data_summary,
         all_scenarios_results={
             s.scenario_name: s.model_dump()
             for s in results.scenarios
@@ -124,11 +143,11 @@ def create_report(
         warnings_and_confirmations=results.warnings or []
     )
 
-    # 3. Generujemy PDF
+    # 5. Generujemy PDF
     generator = ReportGenerator()
     pdf_bytes = generator.generate(report_data)
 
-    # 4. Zapisujemy PDF
+    # 6. Zapisujemy PDF
     token = str(uuid.uuid4())
     os.makedirs(PDF_REPORTS_DIR, exist_ok=True)
     pdf_path = os.path.join(PDF_REPORTS_DIR, f"{token}.pdf")
@@ -147,7 +166,6 @@ def my_reports(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    """Lista raportów zalogowanego użytkownika."""
     reports = (
         db.query(Report)
         .filter(Report.user_id == user.id)
@@ -175,9 +193,6 @@ def download_pdf(
     db: Session = Depends(get_db),
     user: Optional[User] = Depends(get_current_user_optional),
 ):
-
-
-        # TRYB DEV — BEZ BAZY DANYCH
     pdf_path = os.path.join(PDF_REPORTS_DIR, f"{token}.pdf")
 
     if not os.path.exists(pdf_path):
