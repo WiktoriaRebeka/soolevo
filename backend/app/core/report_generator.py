@@ -568,6 +568,37 @@ class ReportGenerator:
             "generation_date": datetime.now().strftime("%d.%m.%Y %H:%M"),
             "version":         "2.2.0",
         }
+        # Wczytaj CSS do zmiennej i wstrzyknij do template
+        css_path = os.path.join(self.static_dir, 'report', 'report.css')
+        css_content = ""
+        if os.path.exists(css_path):
+            with open(css_path, 'r', encoding='utf-8') as f:
+                css_content = f.read()
+        else:
+            print(f"[ReportGenerator] OSTRZEZENIE: Nie znaleziono CSS: {css_path}")
+
+        context = {
+            "data":            report_data.input_data_summary,
+            "req":             report_data.input_request,
+            "standard":        std,
+            "premium":         prem,
+            "economy":         eco,
+            "warnings":        report_data.warnings_and_confirmations,
+            "charts":          charts,
+            "generation_date": datetime.now().strftime("%d.%m.%Y %H:%M"),
+            "version":         "2.2.0",
+            "css_content":     css_content,   # ← NOWE
+        }
+
+        rendered_html = template.render(**context)
+
+        # CSS już jest w HTML — nie potrzeba external stylesheet
+        pdf_bytes = HTML(
+            string=rendered_html,
+            base_url=self.base_dir
+        ).write_pdf()   # ← usunięto stylesheets=
+
+        return pdf_bytes
 
         rendered_html = template.render(**context)
 
