@@ -61,7 +61,7 @@ export default function Home() {
             </div>
 
             {/* Bullets */}
-            <div className="grid grid-cols-2 gap-x-6 gap-y-2 mb-8 text-sm text-gray-600">
+            <div className="grid grid-cols-2 gap-x-6 gap-y-2 mb-8 text-sm text-gray-800">
               {[
                 ["⏱", "Szybkie obliczenia"],
                 ["📅", "Gwarancja 25 lat"],
@@ -116,7 +116,7 @@ export default function Home() {
               className={`flex-1 py-4 font-semibold text-sm transition-colors ${
                 activeTab === "kalkulator"
                   ? "text-gray-900 border-b-2 border-teal-500 bg-white"
-                  : "text-gray-800 bg-gray-50 hover:text-gray-600"
+                  : "text-gray-800 bg-gray-50 hover:text-gray-800"
               }`}
             >
               Kalkulator PV
@@ -126,7 +126,7 @@ export default function Home() {
               className={`flex-1 py-4 font-semibold text-sm transition-colors ${
                 activeTab === "magazyny"
                   ? "text-gray-900 border-b-2 border-teal-500 bg-white"
-                  : "text-gray-800 bg-gray-50 hover:text-gray-600"
+                  : "text-gray-800 bg-gray-50 hover:text-gray-800"
               }`}
             >
               Porównywarka Magazynów
@@ -140,11 +140,11 @@ export default function Home() {
                 <div className="flex-1 space-y-4">
                   <div className="space-y-3">
                     <div className="flex items-center gap-3 p-3.5 border border-gray-200 rounded-xl text-gray-800 text-sm">
-                      <span className="text-gray-300">○</span>
+                      <span className="text-gray-800">○</span>
                       Adres inwestycji
                     </div>
                     <div className="flex items-center gap-3 p-3.5 border border-gray-200 rounded-xl text-gray-800 text-sm">
-                      <span className="text-gray-300">○</span>
+                      <span className="text-gray-800">○</span>
                       Roczne zużycie (kWh)
                     </div>
                     <div className="flex items-center gap-4">
@@ -198,7 +198,7 @@ export default function Home() {
           {/* Porównywarka preview */}
           {activeTab === "magazyny" && (
             <div className="p-8">
-              <p className="text-gray-600 mb-4 text-sm">
+              <p className="text-gray-800 mb-4 text-sm">
                 Porównaj magazyny energii — pojemność, cena, gwarancja, technologia.
               </p>
               <Link

@@ -91,7 +91,7 @@ function ProgressBar({ value, color = "bg-blue-500", label, sublabel }) {
   return (
     <div>
       <div className="flex justify-between items-baseline mb-1.5">
-        <span className="text-sm font-semibold text-gray-600">{label}</span>
+        <span className="text-sm font-semibold text-gray-800">{label}</span>
         <span className="text-lg font-black text-gray-800">{pct}%</span>
       </div>
       <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
@@ -112,7 +112,7 @@ function ParamRow({ label, value, highlight = false, purple = false }) {
   return (
     <div
       className={`flex justify-between items-center py-2.5 px-1 border-b border-gray-100 last:border-0 ${
-        highlight ? "font-bold text-gray-800" : "text-gray-600"
+        highlight ? "font-bold text-gray-800" : "text-gray-800"
       }`}
     >
       <span className="text-sm">{label}</span>
@@ -481,12 +481,12 @@ function ScenarioCard({ scenario, inputData }) {
                   border: `2px solid ${item.border}`,
                 }}
               />
-              <span className="text-sm text-gray-600 font-medium">{item.label}</span>
+              <span className="text-sm text-gray-800 font-medium">{item.label}</span>
             </div>
           ))}
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-800">
-              Paneli: <strong className="text-gray-600">{allPanels.length} szt.</strong>
+              Paneli: <strong className="text-gray-800">{allPanels.length} szt.</strong>
             </span>
           </div>
         </div>
@@ -499,7 +499,7 @@ function ScenarioCard({ scenario, inputData }) {
           className="w-full flex items-center justify-between px-4 py-3 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-xl text-left transition-colors"
         >
           <SectionLabel icon="📊">
-            <span className="normal-case font-bold text-gray-600 tracking-normal">
+            <span className="normal-case font-bold text-gray-800 tracking-normal">
               Analiza energetyczna (wykresy)
             </span>
           </SectionLabel>

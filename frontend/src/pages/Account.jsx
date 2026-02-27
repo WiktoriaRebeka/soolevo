@@ -113,7 +113,7 @@ function StatusBadge({ status }) {
     generated: { label: "Gotowy do pobrania", cls: "bg-green-50 text-green-700" },
     failed:    { label: "Błąd generowania", cls: "bg-red-50 text-red-700" },
   };
-  const { label, cls } = map[status] || { label: status, cls: "bg-gray-100 text-gray-600" };
+  const { label, cls } = map[status] || { label: status, cls: "bg-gray-100 text-gray-800" };
   return (
     <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${cls}`}>{label}</span>
   );

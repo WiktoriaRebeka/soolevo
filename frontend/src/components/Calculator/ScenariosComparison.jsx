@@ -380,7 +380,7 @@ function ScenariosComparison({ data, inputFacet }) {
 
       {/* ── 6. STOPKA Z ZASTRZEŻENIAMI ────────────────────────────────────── */}
       <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 text-sm text-gray-500">
-        <p className="font-semibold text-gray-600 mb-2">📋 Ważne informacje:</p>
+        <p className="font-semibold text-gray-800 mb-2">📋 Ważne informacje:</p>
         <ul className="space-y-1 list-disc list-inside leading-relaxed">
           <li>Obliczenia zakładają bazową inflację cen energii na poziomie 4% rocznie</li>
           <li>Net-billing: nadwyżki rozliczane wg stawki RCEm (~30% ceny detalicznej)</li>
@@ -484,7 +484,7 @@ function ComparisonTable({ premium, standard, economy, fmtNum, renderPaybackRang
           <table className="w-full text-sm border-collapse">
             <thead>
               <tr className="bg-gray-100 border-b border-gray-200">
-                <th className="text-left px-4 py-3 font-bold text-gray-600 min-w-[160px]">
+                <th className="text-left px-4 py-3 font-bold text-gray-800 min-w-[160px]">
                   Parametr
                 </th>
                 {headers.map((h) => (
@@ -503,7 +503,7 @@ function ComparisonTable({ premium, standard, economy, fmtNum, renderPaybackRang
                   key={row.label}
                   className={`border-b border-gray-100 ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
                 >
-                  <td className="px-4 py-3 font-semibold text-gray-600">{row.label}</td>
+                  <td className="px-4 py-3 font-semibold text-gray-800">{row.label}</td>
                   {row.vals.map((val, j) => (
                     <td
                       key={j}

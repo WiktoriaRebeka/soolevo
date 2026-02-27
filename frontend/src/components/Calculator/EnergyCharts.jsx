@@ -159,7 +159,7 @@ function EnergyCharts({ scenario }) {
             className={`flex items-center gap-1.5 px-4 py-2 rounded-t-xl text-sm font-bold border-b-2 transition-colors ${
               activeTab === "summer"
                 ? "border-amber-400 text-amber-700 bg-amber-50"
-                : "border-transparent text-gray-800 hover:text-gray-600"
+                : "border-transparent text-gray-800 hover:text-gray-800"
             }`}
           >
             ☀️ Szczyt letni
@@ -171,7 +171,7 @@ function EnergyCharts({ scenario }) {
               className={`flex items-center gap-1.5 px-4 py-2 rounded-t-xl text-sm font-bold border-b-2 transition-colors ${
                 activeTab === "winter"
                   ? "border-blue-400 text-blue-700 bg-blue-50"
-                  : "border-transparent text-gray-800 hover:text-gray-600"
+                  : "border-transparent text-gray-800 hover:text-gray-800"
               }`}
             >
               ❄️ Minimum zimowe

@@ -30,14 +30,14 @@ const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
     <div className="bg-white border border-gray-200 rounded-xl shadow-lg p-3 text-sm">
-      <p className="font-bold text-gray-600 mb-2">Godzina {label}:00</p>
+      <p className="font-bold text-gray-800 mb-2">Godzina {label}:00</p>
       {payload.map((entry) => (
         <div key={entry.dataKey} className="flex items-center gap-2 py-0.5">
           <span
             className="inline-block w-3 h-3 rounded-sm shrink-0"
             style={{ backgroundColor: entry.color }}
           />
-          <span className="text-gray-600">{entry.name}:</span>
+          <span className="text-gray-800">{entry.name}:</span>
           <span className="font-bold text-gray-800">
             {entry.dataKey === "soc"
               ? `${entry.value}%`

@@ -39,7 +39,7 @@ const RoofRotator = ({ rotation, setRotation }) => {
           <span>N (360°)</span>
         </div>
         
-        <p className="mt-4 text-sm text-gray-600">
+        <p className="mt-4 text-sm text-gray-800">
           Obecny azymut frontu: <span className="font-bold text-teal-600">{rotation}°</span> 
           ({rotation > 135 && rotation < 225 ? 'Południe' : 'Inny kierunek'})
         </p>

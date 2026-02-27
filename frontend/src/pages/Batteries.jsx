@@ -36,7 +36,7 @@ function BatteryCard({ battery }) {
           {battery.tags.map((tag) => (
             <span
               key={tag}
-              className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full font-medium"
+              className="px-2 py-0.5 bg-gray-100 text-gray-800 text-xs rounded-full font-medium"
             >
               {tag}
             </span>

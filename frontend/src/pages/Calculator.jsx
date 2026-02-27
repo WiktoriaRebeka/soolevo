@@ -711,7 +711,7 @@ export default function Calculator() {
                       {['rectangular', 'flat', 'gable', 'hip', 'ground'].includes(formData.roofType) && (
                         <>
                           <div className="space-y-2">
-                            <label className="text-xs font-bold text-gray-600 uppercase flex items-center gap-1">
+                            <label className="text-xs font-bold text-gray-800 uppercase flex items-center gap-1">
                               {formData.roofType === 'ground' ? 'Szerokość terenu (m)' : 'Szerokość dachu — A (m)'}
                               <Tooltip text={formData.roofType === 'ground'
                                 ? "Szerokość działki lub obszaru przeznaczonego pod instalację naziemną. Mierz prostopadle do kierunku południa."
@@ -721,7 +721,7 @@ export default function Calculator() {
                               className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 outline-none font-bold" placeholder="np. 10" />
                           </div>
                           <div className="space-y-2">
-                            <label className="text-xs font-bold text-gray-600 uppercase flex items-center gap-1">
+                            <label className="text-xs font-bold text-gray-800 uppercase flex items-center gap-1">
                               {formData.roofType === 'ground'  ? 'Długość terenu (m)' :
                                formData.roofType === 'flat'    ? 'Długość dachu (m)' :
                                formData.roofMode === 'real_roof_length' ? 'Długość połaci dachowej — h (m)' : 'Głębokość budynku — H (m)'}
@@ -745,7 +745,7 @@ export default function Calculator() {
                           {/* Kalenica dla gable/hip */}
                           {['gable', 'hip'].includes(formData.roofType) && (
                             <div className="space-y-2">
-                              <label className="text-xs font-bold text-gray-600 uppercase flex items-center gap-1">
+                              <label className="text-xs font-bold text-gray-800 uppercase flex items-center gap-1">
                                 Wysokość kalenicy (m)
                                 <Tooltip text="Pionowa odległość od podłogi strychu (lub sufitu najwyższego piętra) do najwyższego punktu kalenicy. Potrzebna do obliczenia kąta nachylenia połaci. Możesz zapytać kierownika budowy lub odczytać z projektu." />
                               </label>
@@ -760,7 +760,7 @@ export default function Calculator() {
                       {formData.roofType === 'triangle' && (
                         <>
                           <div className="space-y-2">
-                            <label className="text-xs font-bold text-gray-600 uppercase flex items-center gap-1">
+                            <label className="text-xs font-bold text-gray-800 uppercase flex items-center gap-1">
                               Podstawa — b (m)
                               <Tooltip text="Długość dolnej krawędzi trójkątnej połaci — mierzona wzdłuż okapu. To szerokość dachu w najniższym punkcie." />
                             </label>
@@ -768,7 +768,7 @@ export default function Calculator() {
                               className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 outline-none font-bold" placeholder="np. 12" />
                           </div>
                           <div className="space-y-2">
-                            <label className="text-xs font-bold text-gray-600 uppercase flex items-center gap-1">
+                            <label className="text-xs font-bold text-gray-800 uppercase flex items-center gap-1">
                               {formData.roofMode === 'real_roof_length' ? 'Długość połaci dachowej — H (m)' : 'Wysokość rzutu — H (m)'}
                               <Tooltip text={formData.roofMode === 'real_roof_length'
                                 ? "Długość zmierzona taśmą wzdłuż powierzchni dachu — od okapu do szczytu (wierzchołka trójkąta)."
@@ -789,7 +789,7 @@ export default function Calculator() {
                       {['trapezoid', 'trapezoid_right'].includes(formData.roofType) && (
                         <>
                           <div className="space-y-2">
-                            <label className="text-xs font-bold text-gray-600 uppercase flex items-center gap-1">
+                            <label className="text-xs font-bold text-gray-800 uppercase flex items-center gap-1">
                               Krawędź dłuższa — A (m)
                               <Tooltip text="Długość dłuższej krawędzi równoległobocznej połaci — zazwyczaj dolna krawędź (okap). Mierz wzdłuż najdłuższego boku trapezu." />
                             </label>
@@ -797,7 +797,7 @@ export default function Calculator() {
                               className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 outline-none font-bold" placeholder="np. 12" />
                           </div>
                           <div className="space-y-2">
-                            <label className="text-xs font-bold text-gray-600 uppercase flex items-center gap-1">
+                            <label className="text-xs font-bold text-gray-800 uppercase flex items-center gap-1">
                               Krawędź krótsza — B (m)
                               <Tooltip text="Długość krótszej krawędzi trapezu — zazwyczaj górna (przy kalenicy). Jeśli trapez jest symetryczny, oba boki równoległe są do siebie." />
                             </label>
@@ -805,7 +805,7 @@ export default function Calculator() {
                               className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 outline-none font-bold" placeholder="np. 6" />
                           </div>
                           <div className="col-span-2 space-y-2">
-                            <label className="text-xs font-bold text-gray-600 uppercase flex items-center gap-1">
+                            <label className="text-xs font-bold text-gray-800 uppercase flex items-center gap-1">
                               {formData.roofMode === 'real_roof_length' ? 'Długość połaci dachowej — h (m)' : 'Wysokość rzutu — h (m)'}
                               <Tooltip text={formData.roofMode === 'real_roof_length'
                                 ? "Długość zmierzona taśmą prostopadle do krawędzi — od dolnego okapu do górnej krawędzi trapezu."
@@ -826,7 +826,7 @@ export default function Calculator() {
                       {formData.roofType === 'rhombus' && (
                         <>
                           <div className="space-y-2">
-                            <label className="text-xs font-bold text-gray-600 uppercase flex items-center gap-1">
+                            <label className="text-xs font-bold text-gray-800 uppercase flex items-center gap-1">
                               Podstawa — A (m)
                               <Tooltip text="Długość poziomej podstawy równoległoboku — dolna krawędź połaci mierzona wzdłuż okapu." />
                             </label>
@@ -834,7 +834,7 @@ export default function Calculator() {
                               className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 outline-none font-bold" placeholder="np. 10" />
                           </div>
                           <div className="space-y-2">
-                            <label className="text-xs font-bold text-gray-600 uppercase flex items-center gap-1">
+                            <label className="text-xs font-bold text-gray-800 uppercase flex items-center gap-1">
                               {formData.roofMode === 'real_roof_length' ? 'Długość połaci dachowej — h (m)' : 'Wysokość rzutu — H (m)'}
                               <Tooltip text={formData.roofMode === 'real_roof_length'
                                 ? "Długość połaci zmierzona taśmą prostopadle do dolnej krawędzi — od okapu do górnej krawędzi."
@@ -849,7 +849,7 @@ export default function Calculator() {
                             )}
                           </div>
                           <div className="col-span-2 space-y-2">
-                            <label className="text-xs font-bold text-gray-600 uppercase flex items-center gap-1">
+                            <label className="text-xs font-bold text-gray-800 uppercase flex items-center gap-1">
                               Bok skośny — b (m)
                               <Tooltip text="Długość skośnej krawędzi równoległoboku — bok który nie jest poziomy. Mierz wzdłuż nachylonej krawędzi połaci. Musi być dłuższy niż połowa wysokości rzutu." />
                             </label>
@@ -862,7 +862,7 @@ export default function Calculator() {
                       {/* Wspólne: kąt, kierunek */}
                       <div className="col-span-2 grid grid-cols-2 gap-4 border-t pt-4 mt-2">
                         <div className="space-y-2">
-                          <label className="text-xs font-bold text-gray-600 uppercase flex items-center gap-1">
+                          <label className="text-xs font-bold text-gray-800 uppercase flex items-center gap-1">
                             Kąt nachylenia (°)
                             <Tooltip text="Kąt między połacią a poziomem. Typowe dachy: 30–45°. Możesz zapytać wykonawcę lub zmierzyć kątomierzem. Optymalny dla Polski to ok. 35°." />
                           </label>
@@ -877,7 +877,7 @@ export default function Calculator() {
                           )}
                         </div>
                         <div className="space-y-2">
-                          <label className="text-xs font-bold text-gray-600 uppercase flex items-center gap-1">
+                          <label className="text-xs font-bold text-gray-800 uppercase flex items-center gap-1">
                             Orientacja połaci
                             <Tooltip text="Kierunek na który &quot;patrzy&quot; połać dachowa. Południe = maksimum energii. Odchylenie o 45° (Płd-Wschód/Płd-Zachód) zmniejsza produkcję o ok. 5–10%." />
                           </label>
@@ -927,7 +927,7 @@ export default function Calculator() {
                     <option value="west">Od zachodu</option>
                     <option value="north">Od północy (najmniejszy wpływ)</option>
                   </select>
-                  <p className="text-xs text-gray-600 mt-2">
+                  <p className="text-xs text-gray-800 mt-2">
                     Przy silnym zacienieniu możemy rekomendować mikroinwertery
                   </p>
                 </div>

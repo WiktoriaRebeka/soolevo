@@ -660,7 +660,7 @@ const RoofSchemaDisplay = ({ roofType, roofMode = 'building_length', azimuthDeg 
             >
               {sym}
             </span>
-            <span className="text-[11px] text-gray-600 leading-4">{desc}</span>
+            <span className="text-[11px] text-gray-800 leading-4">{desc}</span>
           </div>
         ))}
 

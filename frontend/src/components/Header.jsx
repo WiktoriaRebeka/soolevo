@@ -44,7 +44,7 @@ export default function Header() {
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   active
                     ? "bg-teal-50 text-teal-700 font-semibold"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                    : "text-gray-800 hover:text-gray-900 hover:bg-gray-50"
                 }`}
               >
                 {label}
