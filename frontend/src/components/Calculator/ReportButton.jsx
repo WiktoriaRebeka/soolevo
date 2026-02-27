@@ -93,22 +93,9 @@ const ReportButton = ({ formData, results, inputFacet }) => {
         (k) => payload[k] === undefined && delete payload[k]
       );
 
-      // ─────────────────────────────────────────────────────────────
-      // 4) Tworzymy raport → backend zwraca token
-      // ─────────────────────────────────────────────────────────────
-      const createRes = await axios.post(`${API_URL}/reports/create`, {
-        input_json: payload,
-      });
+      setLoadingStep("Generuję PDF...");
 
-      const token = createRes.data.report_token;
-      if (!token) throw new Error("Brak tokena raportu");
-
-      setLoadingStep("Pobieranie PDF...");
-
-      // ─────────────────────────────────────────────────────────────
-      // 5) Pobieramy PDF
-      // ─────────────────────────────────────────────────────────────
-      const pdfRes = await axios.get(`${API_URL}/reports/download/${token}`, {
+      const pdfRes = await axios.post(`/report/pdf`, payload, {
         responseType: "blob",
       });
 
@@ -120,6 +107,7 @@ const ReportButton = ({ formData, results, inputFacet }) => {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
+
 
     } catch (err) {
       console.error("Błąd pobierania PDF:", err);
