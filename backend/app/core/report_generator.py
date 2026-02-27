@@ -108,7 +108,8 @@ class ReportGenerator:
 
         self.base_dir      = BACKEND_DIR
         self.templates_dir = os.path.join(APP_DIR, "templates")
-        self.static_dir    = os.path.join(BACKEND_DIR, "static")
+        self.static_dir = os.path.join(APP_DIR, "static")
+
 
         self.env = Environment(loader=FileSystemLoader(self.templates_dir))
         self.env.filters['format_pln'] = self._format_pln
@@ -613,6 +614,14 @@ class ReportGenerator:
 
         template = self.env.get_template("report/base.html")
 
+        css_path = os.path.join(self.static_dir, "report", "report.css")
+        css_content = ""
+        if os.path.exists(css_path):
+            with open(css_path, "r", encoding="utf-8") as f:
+                css_content = f.read()
+        else:
+            print(f"[ReportGenerator] OSTRZEŻENIE: CSS nie znaleziony: {css_path}")
+
         context = {
             "data":            report_data.input_data_summary,
             "req":             report_data.input_request,
@@ -623,20 +632,23 @@ class ReportGenerator:
             "charts":          charts,
             "generation_date": datetime.now().strftime("%d.%m.%Y %H:%M"),
             "version":         "3.0.0",
+            "css_content":     css_content,   # ← DODANE
         }
 
-        rendered_html = template.render(**context)
-
         css_path = os.path.join(self.static_dir, "report", "report.css")
-        stylesheets = []
+        css_content = ""
         if os.path.exists(css_path):
-            stylesheets.append(CSS(filename=css_path))
+            with open(css_path, "r", encoding="utf-8") as f:
+                css_content = f.read()
         else:
-            print(f"[ReportGenerator] OSTRZEZENIE: Nie znaleziono CSS: {css_path}")
+            print(f"[ReportGenerator] OSTRZEŻENIE: CSS nie znaleziony: {css_path}")
+
+        context["css_content"] = css_content
+
+        rendered_html = template.render(**context)
 
         pdf_bytes = HTML(
             string=rendered_html,
             base_url=self.base_dir
-        ).write_pdf(stylesheets=stylesheets)
-
+        ).write_pdf()
         return pdf_bytes
