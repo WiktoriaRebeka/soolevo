@@ -3,7 +3,6 @@ import base64
 from io import BytesIO
 from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
-import pydyf  # <--- 1. Dodajemy import
 from weasyprint import HTML, CSS
 from app.schemas.report import ReportData
 
