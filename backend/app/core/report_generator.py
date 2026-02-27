@@ -66,7 +66,7 @@ class ReportGenerator:
 
         self.base_dir      = BACKEND_DIR
         self.templates_dir = os.path.join(APP_DIR, "templates")
-        self.static_dir    = os.path.join(BACKEND_DIR, "static")
+        self.static_dir = os.path.join(APP_DIR, "static")
 
         self.env = Environment(loader=FileSystemLoader(self.templates_dir))
         self.env.filters['format_pln'] = self._format_pln
