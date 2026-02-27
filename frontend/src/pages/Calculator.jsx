@@ -522,9 +522,10 @@ export default function Calculator() {
             {/* ── SEKCJA 2: RODZINA I LOKALIZACJA ── */}
             <div className="bg-gray-50 border-l-4 border-gray-400 rounded-xl p-6">
               <h3 className="text-xl font-bold text-gray-500 mb-4 flex items-center">
-                <span className="text-2xl mr-2">🏠</span>
-                Rodzina i lokalizacja
+                <span className="text-2xl mr-2">🌍</span>
+                Lokalizacja i tryb życia
               </h3>
+
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
@@ -632,9 +633,9 @@ export default function Calculator() {
 
             {/* ── SEKCJA 3: PARAMETRY DACHU ── */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 mb-8">
-              <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-                <span className="bg-orange-500 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3 text-sm">2</span>
-                Parametry dachu
+              <h3 className="text-xl font-bold text-gray-500 mb-4 flex items-center">
+                <span className="text-2xl mr-2">🏠</span>
+              Parametry dachu
               </h3>
 
               {/* KROK 1: WYBÓR WIZUALNY */}
@@ -900,9 +901,10 @@ export default function Calculator() {
 
             {/* ── SEKCJA 4: NASŁONECZNIENIE ── */}
             <div className="mb-6 bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded-xl">
-              <h4 className="text-lg font-bold text-gray-500 mb-3">
-                Warunki nasłonecznienia
-              </h4>
+              <h3 className="text-xl font-bold text-gray-500 mb-4 flex items-center">
+                <span className="text-2xl mr-2">☀️</span>
+              Warunki nasłonecznienia
+              </h3>
               <div className="mb-4">
                 <label className="flex items-center space-x-3 cursor-pointer">
                   <input type="checkbox" name="hasShading" checked={formData.hasShading} onChange={handleChange}

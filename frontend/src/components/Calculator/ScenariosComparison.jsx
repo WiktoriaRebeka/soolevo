@@ -268,12 +268,15 @@ function ScenariosComparison({ data, inputFacet }) {
         style={{ background: 'linear-gradient(135deg, #1B4F72 0%, #2E86C1 100%)' }}
         className="text-white rounded-2xl p-6 md:p-8 shadow-lg"
       >
-        <h2 className="text-2xl md:text-3xl font-black mb-1 leading-tight">
-          ☀️ Twoja Instalacja Fotowoltaiczna
-        </h2>
-        <p className="text-blue-100 text-sm mb-5">
-          Przeanalizowaliśmy Twój dach i przygotowaliśmy 3 gotowe rozwiązania.
-        </p>
+        <div className="text-center">
+          <h2 className="text-2xl md:text-3xl font-black mb-1 leading-tight">
+            Twoja Instalacja Fotowoltaiczna
+          </h2>
+
+          <p className="text-blue-100 text-sm mb-5">
+            Przeanalizowaliśmy Twój dach i przygotowaliśmy 3 gotowe rozwiązania.
+          </p>
+        </div>
 
         {/* Trzy dane kontekstowe */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
