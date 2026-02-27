@@ -233,6 +233,9 @@ class ScenarioRunner:
         # Nakładamy stratę zacienienia na roczną produkcję
         annual_production_kwh = yield_result["annual_kwh"] * (1 - shading_loss)
         # ── Buduj godzinowy profil produkcji z realnych danych miesięcznych ──
+        
+        import math 
+        
         def _expand_monthly_to_hourly_production(
             monthly_kwh_dict: dict,
             annual_total_kwh: float,
