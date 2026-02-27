@@ -3,6 +3,16 @@ import base64
 from io import BytesIO
 from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
+import pydyf  # <--- 1. Dodajemy import
+
+# ── FIX: Monkey Patch dla kompatybilności WeasyPrint z nowym pydyf ──
+# Naprawia błąd: AttributeError: 'super' object has no attribute 'transform'
+if not hasattr(pydyf.Stream, 'transform'):
+    def transform(self, a, b, c, d, e, f):
+        self.ctm(a, b, c, d, e, f)
+    pydyf.Stream.transform = transform
+# ────────────────────────────────────────────────────────────────────
+
 from weasyprint import HTML, CSS
 from app.schemas.report import ReportData
 
