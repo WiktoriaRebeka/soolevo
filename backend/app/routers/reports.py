@@ -94,37 +94,20 @@ def create_report(
     # Upewnij się że tabele istnieją (dev bez Alembic)
     ensure_tables_exist()
 
-    try:
-        report = Report(
-            user_id=user.id if user else None,
-            input_json=req.input_json,
-            status="generated",
-        )
-        db.add(report)
-        db.commit()
-        db.refresh(report)
+        # TRYB DEV — BEZ BAZY DANYCH
+    # Generujemy token i PDF bez zapisu do DB
+    from uuid import uuid4
+    report_token = str(uuid4())
 
-    except Exception as e:
-        db.rollback()
-        logger.error(f"Błąd tworzenia raportu w DB: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Błąd bazy danych: {str(e)}. Upewnij się że tabele zostały utworzone (alembic upgrade head)."
-        )
-
-    # Generowanie PDF w trybie dev
     try:
-        pdf_path = generate_mock_pdf(report.token)
-        report.pdf_path = pdf_path
-        db.commit()
+        pdf_path = generate_mock_pdf(report_token)
     except Exception as e:
         logger.error(f"Błąd generowania PDF: {e}")
-        # Nie przerywamy — raport już jest w DB, PDF można wygenerować później
         pdf_path = None
 
     return {
-        "report_token": report.token,
-        "status": report.status,
+        "report_token": report_token,
+        "status": "generated",
         "pdf_ready": pdf_path is not None,
         "pdf_path": pdf_path,
         "price_pln": 0.0,
@@ -164,30 +147,18 @@ def download_pdf(
     db: Session = Depends(get_db),
     user: Optional[User] = Depends(get_current_user_optional),
 ):
-    """Pobieranie PDF raportu."""
-    report = db.query(Report).filter(Report.token == token).first()
-    if not report:
-        raise HTTPException(status_code=404, detail="Raport nie istnieje")
 
-    if user and report.user_id and report.user_id != user.id:
-        raise HTTPException(status_code=403, detail="Brak dostępu do tego raportu")
 
-    if report.status not in ("paid", "generated") or not report.pdf_path:
-        raise HTTPException(
-            status_code=402,
-            detail="Raport nie jest jeszcze opłacony lub nie jest gotowy"
-        )
+        # TRYB DEV — BEZ BAZY DANYCH
+    pdf_path = os.path.join(PDF_REPORTS_DIR, f"{token}.pdf")
 
-    if not os.path.exists(report.pdf_path):
-        # Spróbuj wygenerować ponownie
+    if not os.path.exists(pdf_path):
         try:
-            pdf_path = generate_mock_pdf(report.token)
-            report.pdf_path = pdf_path
-            db.commit()
+            pdf_path = generate_mock_pdf(token)
         except Exception:
-            raise HTTPException(status_code=404, detail="Plik PDF nie istnieje na serwerze")
+            raise HTTPException(status_code=404, detail="Plik PDF nie istnieje")
 
-    with open(report.pdf_path, "rb") as f:
+    with open(pdf_path, "rb") as f:
         pdf_bytes = f.read()
 
     return Response(
