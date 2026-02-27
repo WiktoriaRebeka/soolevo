@@ -147,79 +147,39 @@ class ReportGenerator:
     def _chart_monthly_balance(self, std) -> str:
         if not MATPLOTLIB_AVAILABLE:
             return ""
-
         months = ["Sty", "Lut", "Mar", "Kwi", "Maj", "Cze",
                   "Lip", "Sie", "Wrz", "Paź", "Lis", "Gru"]
+        monthly = getattr(std, "monthly_production_kwh", None) or {}
+        monthly_consumption = getattr(std, "monthly_consumption_kwh", None) or {}
 
-        # ── Pobierz roczne wartości (std może być dict lub obiektem) ─────────
-        def _get(obj, key, default=0):
-            if isinstance(obj, dict):
-                return obj.get(key) or default
-            return getattr(obj, key, None) or default
+        prod_vals    = [monthly.get(str(m), monthly.get(m, 0)) for m in range(1, 13)]
+        cons_vals    = [monthly_consumption.get(str(m), monthly_consumption.get(m, 0)) for m in range(1, 13)]
 
-        ap        = _get(std, "annual_production_kwh", 4000)
-        ac        = _get(std, "annual_consumption_kwh", 3500)
-        auto_rate = _get(std, "autoconsumption_rate", 0.35)
+        auto_rate  = getattr(std, "autoconsumption_rate", 0.35)
+        auto_vals  = [p * auto_rate for p in prod_vals]
+        surplus    = [p - a for p, a in zip(prod_vals, auto_vals)]
+        grid_draw  = [max(0, c - a) for c, a in zip(cons_vals, auto_vals)]
 
-        # ── Sezonowe wagi produkcji (dla Polski, orientacja S, 30°) ──────────
-        # Suma = 1.0, źródło: dane IRR PVGIS dla województwa mazowieckiego
-        PROD_W = [0.030, 0.045, 0.082, 0.114, 0.145, 0.148,
-                  0.143, 0.127, 0.090, 0.053, 0.027, 0.023]
-
-        # ── Wagi zużycia (wyższe zimą ze względu na ogrzewanie) ──────────────
-        CONS_W = [0.095, 0.085, 0.083, 0.079, 0.079, 0.078,
-                  0.077, 0.077, 0.080, 0.085, 0.091, 0.091]
-
-        prod_vals = [ap * w for w in PROD_W]
-        cons_vals = [ac * w for w in CONS_W]
-
-        # ── Próbuj wziąć miesięczne nadwyżki z hourly_result jeśli dostępne ──
-        hr = None
-        if isinstance(std, dict):
-            hr = (std.get("hourly_result_with_battery")
-                  or std.get("hourly_result_without_battery") or {})
-        else:
-            hr = (getattr(std, "hourly_result_with_battery", None)
-                  or getattr(std, "hourly_result_without_battery", None) or {})
-
-        monthly_surplus_raw = (hr or {}).get("net_billing", {}).get("monthly_surplus_kwh", {})
-        if monthly_surplus_raw and len(monthly_surplus_raw) == 12:
-            # Nadwyżki są dostępne — użyj ich do wyliczenia autokonsumpcji miesięcznej
-            surplus_vals = [float(monthly_surplus_raw.get(str(m), monthly_surplus_raw.get(m, 0)))
-                            for m in range(1, 13)]
-            auto_vals    = [max(0, p - s) for p, s in zip(prod_vals, surplus_vals)]
-        else:
-            # Fallback: stała stopa autokonsumpcji
-            auto_vals   = [p * auto_rate for p in prod_vals]
-            surplus_vals = [p - a for p, a in zip(prod_vals, auto_vals)]
-
-        grid_vals = [max(0.0, c - a) for c, a in zip(cons_vals, auto_vals)]
-
-        # ── Rysuj wykres ──────────────────────────────────────────────────────
-        x = list(range(12))
+        x = range(12)
         fig, ax = plt.subplots(figsize=(9.5, 3.2))
         self._style_ax(ax, ylabel="kWh / miesiąc")
 
         bar_w = 0.55
-
-        # Słupki skumulowane: autokonsumpcja + nadwyżka
-        ax.bar(x, auto_vals,  bar_w, label="Autokonsumpcja",    color=C_AUTO,    zorder=3)
-        ax.bar(x, surplus_vals, bar_w, label="Nadwyżka do sieci", color=C_SURPLUS, zorder=3,
+        ax.bar(x, auto_vals,  bar_w, label="Autokonsumpcja",   color=C_AUTO,    zorder=3)
+        ax.bar(x, surplus,    bar_w, label="Nadwyżka do sieci", color=C_SURPLUS, zorder=3,
                bottom=auto_vals)
+        ax.bar(x, grid_draw,  bar_w, label="Pobór z sieci",     color=C_GRID,    zorder=3,
+               bottom=auto_vals, alpha=0.0)
 
-        # Pobór z sieci — osobny pasek z tyłu (przezroczysty dolny + czerwony górny)
-        ax.bar(x, grid_vals, bar_w, color=C_GRID, alpha=0.55, zorder=2,
-               label="Pobór z sieci")
+        offset = [a + s for a, s in zip(auto_vals, surplus)]
+        ax.bar(x, grid_draw, bar_w, color=C_GRID, zorder=3, bottom=offset, alpha=0.6)
 
-        # Linia zapotrzebowania
-        ax.plot(x, cons_vals, color=C_DEMAND, linewidth=1.8,
+        demand_line = [a + g for a, g in zip(auto_vals, grid_draw)]
+        ax.plot(x, demand_line, color=C_DEMAND, linewidth=1.8,
                 marker="o", markersize=4, zorder=5, label="Zapotrzebowanie")
 
-        ax.set_xticks(x)
+        ax.set_xticks(list(x))
         ax.set_xticklabels(months, fontsize=8)
-        ax.yaxis.set_major_formatter(
-            mticker.FuncFormatter(lambda v, _: f"{int(v)}")
-        )
         ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.18),
                   ncol=4, framealpha=0.95, edgecolor="#DDDDDD",
                   fontsize=8, handlelength=1.2)
@@ -443,17 +403,16 @@ class ReportGenerator:
 
         # ── Wyodrębnij scenariusze ────────────────────────────────────────────
         results = report_data.all_scenarios_results
-        from app.schemas.scenarios import ScenarioResult
 
         def _to_obj(name):
             raw = results.get(name) or results.get(name.upper())
             if raw is None:
                 return None
             if isinstance(raw, dict):
-                try:
-                    return ScenarioResult(**raw)
-                except Exception:
-                    return type("Obj", (), raw)()
+                # Tworzymy prosty obiekt z atrybutami zamiast polegać na
+                # konkretnym typie Pydantic (ScenarioResult). Dzięki temu
+                # generator PDF działa niezależnie od definicji schematów.
+                return type("Obj", (), raw)()
             return raw
 
         std  = _to_obj("standard")
