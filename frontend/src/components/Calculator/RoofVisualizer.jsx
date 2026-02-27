@@ -145,12 +145,12 @@ const RoofVisualizer = ({
 
       {/* ── SVG: viewBox + width="100%" = responsywność ─────────────────────
           Poprzednie: width={svgW} → overflowowało na mobile
-          Teraz: viewBox zachowuje proporcje, width="100%" skaluje do kontenera */}
+          Teraz: viewBox zachowuje proporcje, width="100%" skaluje do kontenera
+          FIX: height="auto" → style={{ height: 'auto' }} (SVG attr nie obsługuje "auto") */}
       <svg
         viewBox={`0 0 ${svgW} ${svgH}`}
         width="100%"
-        height="auto"
-        style={{ display: "block", maxWidth: svgW }}
+        style={{ display: "block", maxWidth: svgW, height: "auto" }}
         className="mx-auto"
       >
         {/* ── TŁO OBSZARU ROBOCZEGO ─────────────────────────────────────── */}
