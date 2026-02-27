@@ -6,20 +6,17 @@ from jinja2 import Environment, FileSystemLoader
 import pydyf  # <--- 1. Dodajemy import
 
 # ── FIX: Monkey Patch dla kompatybilności WeasyPrint z różnymi wersjami pydyf ──
-# Scenariusze:
-# - starsze pydyf: ma metodę `ctm`, nie ma `transform` ani `concat`
-# - pośrednie pydyf: ma `concat`, ale nie ma `transform`
-# - nowsze pydyf: ma już `transform` — wtedy nic nie robimy
+# Jeśli `pydyf.Stream` nie ma metody `transform`, dodajemy ją jako
+# bezpieczną nakładkę:
+# - gdy jest `concat` (nowsze pydyf) → delegujemy do `concat`
+# - w pozostałych przypadkach robimy no-op, żeby uniknąć błędów typu AttributeError/TypeError
 if not hasattr(pydyf.Stream, "transform"):
     def transform(self, a, b, c, d, e, f):
-        if hasattr(self, "concat"):
-            # nowe wersje pydyf
-            self.concat(a, b, c, d, e, f)
-        elif hasattr(self, "ctm"):
-            # starsze wersje pydyf
-            self.ctm(a, b, c, d, e, f)
+        concat = getattr(self, "concat", None)
+        if callable(concat):
+            concat(a, b, c, d, e, f)
         else:
-            # brak znanych metod — bezpieczny no-op
+            # Brak znanej metody transformacji — pomijamy, żeby nie wywalać PDF
             return
 
     pydyf.Stream.transform = transform
