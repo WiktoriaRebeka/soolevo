@@ -2,22 +2,24 @@
 """
 ScenarioRunner - Orkiestruje obliczenia dla pojedynczego scenariusza.
 
-v4.0 — WSZYSTKIE POPRAWKI:
+v3.2 — POPRAWKI (bezpieczny rollback po v4.0):
 ✅ Godzinowe ceny RCEm
 ✅ Taryfy G12/G12w
 ✅ Rozdział energia/dystrybucja
 ✅ Limit zwrotu 20%
 ✅ Opportunity cost baterii
 ✅ Wymiana falownika w ROI
-✅ ScenarioResult jako Pydantic BaseModel (obsługuje model_dump())
-✅ Realny godzinowy profil produkcji z danych irradiancji (nie sinus)
-✅ Spójny profil produkcji dla symulacji z baterią i bez
+✅ ScenarioResult pozostaje @dataclass (kompatybilność z engine.py)
+✅ USUNIĘTO: production_profile=real_production_profile
+     → powodował okno słoneczne 9:00–15:00 zamiast 6:00–18:00
+     → autoconsumption spadał z ~30% do 2.8% (drastic bug)
+✅ USUNIĘTO: ScenarioResult jako Pydantic BaseModel
+     → powodował błędy serializacji w engine.py
 """
 
-import math
+from dataclasses import dataclass
 from typing import Dict, Any, Optional, List
 
-from pydantic import BaseModel
 from app.core.hourly_engine import HourlyEngine
 from app.core.battery_engine import BatteryEngine
 from app.core.financial_engine import FinancialEngine
@@ -34,98 +36,13 @@ from app.core.consumption_engine import decompose_consumption
 
 
 # =============================================================================
-# POMOCNICZA FUNKCJA: Rozszerzenie miesięcznych danych produkcji do 8760h
+# DATACLASS WYNIKOWY
+# Pozostaje @dataclass (NIE Pydantic BaseModel) — engine.py używa atrybutów
+# bezpośrednio (result.scenario_name, result.panels_count itp.).
 # =============================================================================
 
-def _expand_monthly_to_hourly_production(
-    monthly_kwh_dict: dict,
-    annual_total_kwh: float,
-    days_per_month: list = None,
-) -> List[float]:
-    """
-    Rozszerza miesięczne dane produkcji PV (kWh/miesiąc) do profilu godzinowego 8760h.
-
-    Używa sezonowego modelu długości dnia słońca:
-      - Styczeń: słońce ok. 7:00–15:00 (8h)
-      - Czerwiec: słońce ok. 5:00–21:00 (16h)
-
-    Normalizuje wynik do rocznej sumy z ProductionEngine (z korekcją temperatury i IAM).
-
-    Args:
-        monthly_kwh_dict: Słownik {nazwa_miesiąca: kWh} z ProductionEngine.
-                          Obsługuje klucze polskie i angielskie.
-        annual_total_kwh: Roczna suma produkcji z ProductionEngine (do normalizacji).
-        days_per_month:   Opcjonalna lista liczby dni w każdym miesiącu
-                          (domyślnie rok nieprzestępny).
-
-    Returns:
-        Lista 8760 wartości float [kWh/h].
-    """
-    DAYS = days_per_month or [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-
-    NAMES_PL = [
-        "styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec",
-        "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień",
-    ]
-    NAMES_EN = [
-        "january", "february", "march", "april", "may", "june",
-        "july", "august", "september", "october", "november", "december",
-    ]
-
-    # Wyciągamy miesięczne wartości w kolejności kalendarzowej
-    monthly_vals: List[float] = []
-    for pl, en in zip(NAMES_PL, NAMES_EN):
-        val = (
-            monthly_kwh_dict.get(pl)
-            or monthly_kwh_dict.get(en)
-            or monthly_kwh_dict.get(pl.capitalize())
-            or monthly_kwh_dict.get(en.capitalize())
-            or 0.0
-        )
-        monthly_vals.append(float(val))
-
-    profile: List[float] = []
-
-    for m_idx, (days, monthly_kwh) in enumerate(zip(DAYS, monthly_vals)):
-        daily_kwh = monthly_kwh / max(days, 1)
-
-        # Sezonowa długość dnia słońca (przybliżona sinusoida)
-        # m_idx=0 → styczeń (min ~8h), m_idx=5 → czerwiec (max ~16h)
-        phase     = math.pi * m_idx / 11.0  # 0 → π w ciągu roku
-        sun_start = max(5, int(8 - 2 * math.sin(phase)))
-        sun_end   = min(21, int(16 + 2 * math.sin(phase)))
-        span      = max(sun_end - sun_start, 1)
-        mid       = (sun_start + sun_end) / 2.0
-
-        for _day in range(days):
-            for h in range(24):
-                if sun_start <= h <= sun_end:
-                    # Paraboliczny profil dzienny (0 na brzegach, 1 w południe)
-                    hf = max(0.0, 1.0 - ((h - mid) / (span / 2.0)) ** 2)
-                else:
-                    hf = 0.0
-                profile.append(daily_kwh * hf)
-
-    # Normalizacja do rocznej sumy z ProductionEngine
-    total = sum(profile)
-    if total > 0.0 and annual_total_kwh > 0.0:
-        scale   = annual_total_kwh / total
-        profile = [v * scale for v in profile]
-
-    # Gwarancja dokładnie 8760 wartości
-    if len(profile) > 8760:
-        profile = profile[:8760]
-    elif len(profile) < 8760:
-        profile += [0.0] * (8760 - len(profile))
-
-    return profile
-
-
-# =============================================================================
-# DATACLASS WYNIKOWY — Pydantic BaseModel (obsługuje .model_dump())
-# =============================================================================
-
-class ScenarioResult(BaseModel):
+@dataclass
+class ScenarioResult:
     """Wynik obliczeń dla pojedynczego scenariusza PV."""
 
     scenario_name: str
@@ -168,9 +85,6 @@ class ScenarioResult(BaseModel):
     hourly_result_without_battery: Optional[Dict[str, Any]] = None
     hourly_result_with_battery: Optional[Dict[str, Any]] = None
 
-    class Config:
-        arbitrary_types_allowed = True
-
 
 # =============================================================================
 # GŁÓWNA KLASA
@@ -206,7 +120,7 @@ class ScenarioRunner:
         slope_h  = geom["slope_length"]
         offset_x = geom["offset_x"]
 
-        # Inicjalizacja zmiennych baterii — domyślne zera, nadpisywane w KROK 7
+        # Inicjalizacja zmiennych baterii (domyślne zera, nadpisywane w KROK 7)
         battery_savings_pln                = 0.0
         total_savings_with_battery_pln     = 0.0
         is_economically_justified          = False
@@ -231,7 +145,7 @@ class ScenarioRunner:
         panel_power_kwp = panel_data["power_wp"] / 1000.0
 
         # =====================================================================
-        # KROK 3: Limity dachu i dobór liczby paneli
+        # KROK 3: Limity dachu i liczba paneli
         # =====================================================================
         max_panels_info = self.layout_engine.compute_max_panels(
             facet,
@@ -295,13 +209,10 @@ class ScenarioRunner:
             FacetLayout(
                 facet_id=facet.id,
                 panels_count=panels_count,
-                panel_width_m=panel_data["width_m"],
-                panel_height_m=panel_data["height_m"],
                 azimuth_deg=facet.azimuth_deg,
                 efficiency_factor=1.0,
                 layout=panel_positions,
                 rhombus_side_b=offset_x,
-                row_distribution=max_panels_info.get("row_distribution", []),
             )
         ]
 
@@ -315,7 +226,7 @@ class ScenarioRunner:
         }
 
         # =====================================================================
-        # KROK 3c: Produkcja miesięczna — dane rzeczywiste z irradiancji
+        # KROK 3c: Produkcja roczna (z irradiancją i zacienieniem)
         # =====================================================================
         from app.data.sunlight import get_monthly_sunlight
         from app.core.shading import calculate_shading_loss
@@ -341,17 +252,6 @@ class ScenarioRunner:
 
         # Roczna produkcja z korektą zacienienia
         annual_production_kwh = yield_result["annual_kwh"] * (1.0 - shading_loss)
-
-        # ── Realny godzinowy profil produkcji (FIX v4.0) ─────────────────────
-        # Rozszerzamy miesięczne kWh do 8760h zamiast syntetycznego sinusa.
-        # WAŻNE: OBYDWA silniki godzinowe (z baterią i bez) muszą dostać
-        # IDENTYCZNY profil — inaczej symulacje są nieporównywalne.
-        real_production_profile: Optional[List[float]] = None
-        if yield_result.get("monthly_kwh") and annual_production_kwh > 0:
-            real_production_profile = _expand_monthly_to_hourly_production(
-                monthly_kwh_dict=yield_result["monthly_kwh"],
-                annual_total_kwh=annual_production_kwh,
-            )
 
         # =====================================================================
         # KROK 4: Parametry taryfowe
@@ -413,10 +313,11 @@ class ScenarioRunner:
             },
         )
 
-        # Przekazujemy realny profil (None → engine generuje swój syntetyczny profil)
-        hourly_result_no_batt = hourly_engine_no_batt.run_hourly_simulation(
-            production_profile=real_production_profile,
-        )
+        # ⚠️  UWAGA: Nie przekazujemy production_profile!
+        # HourlyEngine używa wewnętrznego profilu parabolicznego (6:00–18:00),
+        # który pokrywa okno wieczorne (17:00–18:00) i daje poprawne autoconsumption ~30%.
+        # Zewnętrzny generator powodował okno 9:00–15:00 → autoconsumption 2.8% (bug).
+        hourly_result_no_batt = hourly_engine_no_batt.run_hourly_simulation()
 
         # Źródło prawdy dla oszczędności PV-only
         pv_savings_pln         = hourly_result_no_batt["annual_cashflow"]["net"]
@@ -489,16 +390,14 @@ class ScenarioRunner:
                 rcem_hourly=rcem_hourly,
                 tariff_type=tariff_type,
                 tariff_zones=tariff_zones,
-                # KRYTYCZNE: identyczne buckets jak dla no_batt!
+                # Identyczne buckets jak bez baterii — wyniki są porównywalne
                 heating_kwh=buckets["heating_kwh"],
                 cooling_kwh=buckets["cooling_kwh"],
                 battery_config=battery_cfg,
             )
 
-            # KRYTYCZNE: identyczny profil produkcji jak dla no_batt!
-            hourly_result_with_batt = hourly_engine_with_batt.run_hourly_simulation(
-                production_profile=real_production_profile,
-            )
+            # Symulacja z baterią — BEZ przekazywania production_profile (ta sama logika co wyżej)
+            hourly_result_with_batt = hourly_engine_with_batt.run_hourly_simulation()
 
             total_savings_with_battery_pln     = hourly_result_with_batt["annual_cashflow"]["net"]
             battery_savings_pln                = total_savings_with_battery_pln - pv_savings_pln
