@@ -100,7 +100,7 @@ export default function Home() {
             <div key={title} className="bg-white rounded-2xl p-6 shadow-sm">
               <div className="text-2xl mb-3">{icon}</div>
               <h3 className="font-bold text-gray-900 mb-1">{title}</h3>
-              <p className="text-sm text-gray-500">{desc}</p>
+              <p className="text-sm text-gray-800">{desc}</p>
             </div>
           ))}
         </div>
@@ -148,10 +148,10 @@ export default function Home() {
                       Roczne zużycie (kWh)
                     </div>
                     <div className="flex items-center gap-4">
-                      <button className="flex-1 p-3.5 border border-gray-200 rounded-xl text-gray-500 text-sm flex items-center justify-between">
+                      <button className="flex-1 p-3.5 border border-gray-200 rounded-xl text-gray-800 text-sm flex items-center justify-between">
                         Nachylenie dachu <span>›</span>
                       </button>
-                      <button className="flex-1 p-3.5 border border-gray-200 rounded-xl text-gray-500 text-sm flex items-center justify-between">
+                      <button className="flex-1 p-3.5 border border-gray-200 rounded-xl text-gray-800 text-sm flex items-center justify-between">
                         Nachylenie dachii <span>›</span>
                       </button>
                       <Link
@@ -188,7 +188,7 @@ export default function Home() {
                   <div key={title} className="bg-[#EEF9F7] rounded-xl p-4">
                     <div className="text-xl mb-2">{icon}</div>
                     <div className="font-bold text-gray-900 text-sm mb-1">{title}</div>
-                    <div className="text-xs text-gray-500">{desc}</div>
+                    <div className="text-xs text-gray-800">{desc}</div>
                   </div>
                 ))}
               </div>
@@ -225,7 +225,7 @@ export default function Home() {
                 </div>
                 <div>
                   <div className="font-bold text-gray-900 mb-1">{title}</div>
-                  <div className="text-sm text-gray-500">{desc}</div>
+                  <div className="text-sm text-gray-800">{desc}</div>
                 </div>
               </div>
             ))}

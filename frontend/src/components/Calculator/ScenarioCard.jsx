@@ -78,7 +78,7 @@ const TIER_COLORS = {
 // Zastępuje text-[10px] → text-sm dla czytelności 50+
 function SectionLabel({ icon, children }) {
   return (
-    <h4 className="flex items-center gap-2 text-sm font-black text-gray-500 uppercase tracking-wider mb-3">
+    <h4 className="flex items-center gap-2 text-sm font-black text-gray-800 uppercase tracking-wider mb-3">
       <span>{icon}</span>
       <span>{children}</span>
     </h4>
@@ -200,7 +200,7 @@ function ScenarioCard({ scenario, inputData }) {
           <h3 className={`text-2xl md:text-3xl font-black ${c.heading} leading-tight mb-1`}>
             {scenario.label}
           </h3>
-          <p className="text-sm text-gray-500 leading-snug">{scenario.description}</p>
+          <p className="text-sm text-gray-800 leading-snug">{scenario.description}</p>
         </div>
       </div>
 
@@ -259,7 +259,7 @@ function ScenarioCard({ scenario, inputData }) {
                 </div>
                 <div
                   className={`text-base font-black ${
-                    batJustified ? "text-purple-700" : "text-gray-500"
+                    batJustified ? "text-purple-700" : "text-gray-800"
                   }`}
                 >
                   {renderPaybackRange(

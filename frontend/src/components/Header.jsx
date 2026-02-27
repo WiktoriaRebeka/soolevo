@@ -54,10 +54,10 @@ export default function Header() {
 
           {user ? (
             <div className="flex items-center gap-2 ml-2 pl-2 border-l border-gray-200">
-              <span className="text-xs text-gray-500">{user.email}</span>
+              <span className="text-xs text-gray-800">{user.email}</span>
               <button
                 onClick={logout}
-                className="px-3 py-1.5 text-xs text-gray-500 hover:text-red-600 transition-colors"
+                className="px-3 py-1.5 text-xs text-gray-800 hover:text-red-600 transition-colors"
               >
                 Wyloguj
               </button>

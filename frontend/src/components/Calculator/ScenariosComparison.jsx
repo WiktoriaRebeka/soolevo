@@ -184,7 +184,7 @@ function CollapsedAlternative({ scenario, isOpen, onToggle, inputData }) {
           </span>
           <div>
             <div className={`text-lg font-black ${c.text}`}>{scenario.label}</div>
-            <div className="text-sm text-gray-500 mt-0.5">
+            <div className="text-sm text-gray-800 mt-0.5">
               {fmtPLN(pvCost)} · zwrot {paybackRange}
             </div>
           </div>
@@ -379,7 +379,7 @@ function ScenariosComparison({ data, inputFacet }) {
       />
 
       {/* ── 6. STOPKA Z ZASTRZEŻENIAMI ────────────────────────────────────── */}
-      <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 text-sm text-gray-500">
+      <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 text-sm text-gray-800">
         <p className="font-semibold text-gray-800 mb-2">📋 Ważne informacje:</p>
         <ul className="space-y-1 list-disc list-inside leading-relaxed">
           <li>Obliczenia zakładają bazową inflację cen energii na poziomie 4% rocznie</li>

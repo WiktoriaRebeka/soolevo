@@ -31,7 +31,7 @@ const RoofRotator = ({ rotation, setRotation }) => {
           className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-teal-600"
         />
         
-        <div className="flex justify-between w-full mt-2 text-xs font-bold text-gray-500">
+        <div className="flex justify-between w-full mt-2 text-xs font-bold text-gray-800">
           <span>N (0°)</span>
           <span>E (90°)</span>
           <span>S (180°)</span>

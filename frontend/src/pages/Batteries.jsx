@@ -63,7 +63,7 @@ function BatteryCard({ battery }) {
 
       {/* Opis */}
       {battery.description && (
-        <p className="text-xs text-gray-500 mb-4 leading-relaxed">{battery.description}</p>
+        <p className="text-xs text-gray-800 mb-4 leading-relaxed">{battery.description}</p>
       )}
 
       {/* Cena + CTA */}
@@ -134,7 +134,7 @@ export default function Batteries() {
               <h1 className="text-3xl font-black text-gray-900 mb-1">
                 🔋 Porównywarka magazynów energii
               </h1>
-              <p className="text-gray-500">
+              <p className="text-gray-800">
                 Porównaj {batteries.length} produktów — pojemność, cena, technologia, gwarancja.
               </p>
             </div>
@@ -196,7 +196,7 @@ export default function Batteries() {
         )}
         {!loading && !error && (
           <>
-            <div className="text-sm text-gray-500 mb-4">
+            <div className="text-sm text-gray-800 mb-4">
               Znaleziono: <strong>{filtered.length}</strong> produktów
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -39,7 +39,7 @@ function AuthForm() {
         <h2 className="text-2xl font-black text-gray-900 mb-2">
           {mode === "login" ? "Zaloguj się" : "Utwórz konto"}
         </h2>
-        <p className="text-gray-500 text-sm mb-6">
+        <p className="text-gray-800 text-sm mb-6">
           {mode === "login"
             ? "Zaloguj się, aby zobaczyć historię raportów."
             : "Konto pozwoli Ci zapisywać i pobierać raporty."}
@@ -85,7 +85,7 @@ function AuthForm() {
           </button>
         </form>
 
-        <div className="mt-4 text-center text-sm text-gray-500">
+        <div className="mt-4 text-center text-sm text-gray-800">
           {mode === "login" ? (
             <>Nie masz konta?{" "}
               <button onClick={() => setMode("register")} className="text-teal-600 font-semibold hover:underline">
@@ -158,7 +158,7 @@ function Dashboard() {
         </div>
         <button
           onClick={logout}
-          className="px-4 py-2 text-sm text-gray-500 hover:text-red-600 border border-gray-200 rounded-xl transition-colors"
+          className="px-4 py-2 text-sm text-gray-800 hover:text-red-600 border border-gray-200 rounded-xl transition-colors"
         >
           Wyloguj
         </button>
@@ -173,7 +173,7 @@ function Dashboard() {
         {!loading && reports.length === 0 && (
           <div className="text-center py-10">
             <div className="text-5xl mb-3">📄</div>
-            <p className="text-gray-500 text-sm">Nie masz jeszcze żadnych raportów.</p>
+            <p className="text-gray-800 text-sm">Nie masz jeszcze żadnych raportów.</p>
             <a href="/kalkulator" className="mt-4 inline-block px-5 py-2.5 bg-teal-500 text-white font-bold rounded-xl text-sm hover:bg-teal-600 transition-colors">
               Oblicz pierwszy raport →
             </a>
@@ -211,7 +211,7 @@ function Dashboard() {
                   ) : report.status === "pending" ? (
                     <a
                       href="/kalkulator"
-                      className="px-4 py-2 text-sm text-gray-500 border border-gray-200 rounded-xl hover:border-teal-300 transition-colors"
+                      className="px-4 py-2 text-sm text-gray-800 border border-gray-200 rounded-xl hover:border-teal-300 transition-colors"
                     >
                       Opłać raport
                     </a>

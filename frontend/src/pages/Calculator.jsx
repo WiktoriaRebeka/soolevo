@@ -360,7 +360,7 @@ export default function Calculator() {
             <h1 className="text-4xl font-black mb-3" style={{ color: '#1B4F72' }}>
               Kalkulator Fotowoltaiki
             </h1>
-            <p className="text-gray-500 text-base">
+            <p className="text-gray-800 text-base">
               Oblicz opłacalność instalacji PV w 3 wersjach: Premium, Standard, Economy
             </p>
           </div>
@@ -375,7 +375,7 @@ export default function Calculator() {
               </h3>
 
               {/* Wybór trybu */}
-              <div className="text-xs text-gray-500 mb-3">
+              <div className="text-xs text-gray-800 mb-3">
                 Skąd mamy policzyć ile prądu zużywasz?
                 <span className="inline-block ml-2 align-middle">
                   <Tooltip text="Na podstawie rachunków kalkulator dokładnie wylicza Twoje obecne koszty i dopasowuje moc instalacji. Jeśli dopiero budujesz dom lub nie masz rachunków — oszacujemy zużycie z metrażu." />
@@ -388,7 +388,7 @@ export default function Calculator() {
                     className="w-4 h-4 accent-[#1B4F72]" />
                   <div className="flex flex-col">
                     <span className="font-bold text-gray-800 text-sm">Chcę podać rachunki</span>
-                    <span className="text-xs text-gray-500">Na podstawie obecnych opłat — najdokładniejsza metoda</span>
+                    <span className="text-xs text-gray-800">Na podstawie obecnych opłat — najdokładniejsza metoda</span>
                   </div>
                 </label>
 
@@ -398,7 +398,7 @@ export default function Calculator() {
                     className="w-4 h-4 accent-[#1B4F72]" />
                   <div className="flex flex-col">
                     <span className="font-bold text-gray-800 text-sm">Nie znam rachunków / Planuję budowę</span>
-                    <span className="text-xs text-gray-500">Szacunek z metrażu — wystarczający do wstępnej analizy</span>
+                    <span className="text-xs text-gray-800">Szacunek z metrażu — wystarczający do wstępnej analizy</span>
                   </div>
                 </label>
               </div>
@@ -639,7 +639,7 @@ export default function Calculator() {
 
               {/* KROK 1: WYBÓR WIZUALNY */}
               <div className="mb-10">
-                <div className="text-sm font-semibold text-gray-500 mb-4 uppercase tracking-wider flex items-center gap-1">
+                <div className="text-sm font-semibold text-gray-800 mb-4 uppercase tracking-wider flex items-center gap-1">
                   Krok 1: Wybierz rodzaj swojej połaci
                   <Tooltip text="Połać to jedna płaska część dachu. Jeśli Twój dach ma 2 skosy — wybierz Prostokąt (podasz wymiary jednego skosu, od kalenicy do okapu). Dach czterospadowy = Hip. Nie jesteś pewny? Spójrz na swój dach z zewnątrz lub zapytaj instalatora." />
                 </div>
@@ -670,7 +670,7 @@ export default function Calculator() {
               {/* KROK 2: WYMIARY TECHNICZNE */}
               {formData.roofType && (
                 <div className="animate-fadeIn">
-                  <p className="text-sm font-semibold text-gray-500 mb-4 uppercase tracking-wider">Krok 2: Podaj wymiary</p>
+                  <p className="text-sm font-semibold text-gray-800 mb-4 uppercase tracking-wider">Krok 2: Podaj wymiary</p>
                   <div className="bg-gray-50 rounded-2xl p-6 border-2 border-gray-100 flex flex-col lg:flex-row gap-8 items-center">
 
                     {/* Schemat SVG */}
@@ -696,12 +696,12 @@ export default function Calculator() {
                             <label className={`flex-1 p-3 border-2 rounded-xl cursor-pointer transition-all ${formData.roofMode === 'building_length' ? 'border-[#1B4F72] bg-[#1B4F72]/5 shadow-sm' : 'border-gray-100 bg-white hover:border-[#2E86C1]/50'}`}>
                               <input type="radio" name="roofMode" value="building_length" checked={formData.roofMode === 'building_length'} onChange={handleChange} className="hidden" />
                               <span className="block text-sm font-bold text-center">Rzut z góry</span>
-                              <span className="block text-[9px] text-center text-gray-500 uppercase">System przeliczy długość połaci</span>
+                              <span className="block text-[9px] text-center text-gray-800 uppercase">System przeliczy długość połaci</span>
                             </label>
                             <label className={`flex-1 p-3 border-2 rounded-xl cursor-pointer transition-all ${formData.roofMode === 'real_roof_length' ? 'border-orange-500 bg-orange-50 shadow-sm' : 'border-gray-100 bg-white hover:border-orange-200'}`}>
                               <input type="radio" name="roofMode" value="real_roof_length" checked={formData.roofMode === 'real_roof_length'} onChange={handleChange} className="hidden" />
                               <span className="block text-sm font-bold text-center">Wymiar z natury</span>
-                              <span className="block text-[9px] text-center text-gray-500 uppercase">Podajesz długość połaci dachowej</span>
+                              <span className="block text-[9px] text-center text-gray-800 uppercase">Podajesz długość połaci dachowej</span>
                             </label>
                           </div>
                         </div>
@@ -986,7 +986,7 @@ export default function Calculator() {
                     </div>
                     <div>
                       <h3 className="text-base font-black text-gray-800">Raport Premium — 49 zł</h3>
-                      <p className="text-sm text-gray-500 mt-0.5">
+                      <p className="text-sm text-gray-800 mt-0.5">
                         Zapisany na koncie · Możliwość ponownego pobrania
                       </p>
                     </div>
