@@ -6,20 +6,45 @@ from jinja2 import Environment, FileSystemLoader
 import pydyf  # <--- 1. Dodajemy import
 
 # ── FIX: Monkey Patch dla kompatybilności WeasyPrint z różnymi wersjami pydyf ──
-# Jeśli `pydyf.Stream` nie ma metody `transform`, dodajemy ją jako
-# bezpieczną nakładkę:
-# - gdy jest `concat` (nowsze pydyf) → delegujemy do `concat`
-# - w pozostałych przypadkach robimy no-op, żeby uniknąć błędów typu AttributeError/TypeError
+# 1) `transform` – używane przy rysowaniu stron PDF
+#    Jeśli `pydyf.Stream` nie ma tej metody, dokładamy bezpieczną nakładkę:
+#    - gdy jest `concat` (nowsze pydyf) → delegujemy do `concat`
+#    - w pozostałych przypadkach robimy no-op, żeby uniknąć błędów
 if not hasattr(pydyf.Stream, "transform"):
     def transform(self, a, b, c, d, e, f):
         concat = getattr(self, "concat", None)
         if callable(concat):
             concat(a, b, c, d, e, f)
         else:
-            # Brak znanej metody transformacji — pomijamy, żeby nie wywalać PDF
             return
 
     pydyf.Stream.transform = transform
+
+# 2) `text_matrix` – używane przy rysowaniu tekstu
+#    W nowszych wersjach pydyf może nazywać się inaczej (np. `set_text_matrix` / `set_matrix`),
+#    więc jeśli jej nie ma, dokładamy kompatybilną wersję lub no-op.
+if not hasattr(pydyf.Stream, "text_matrix"):
+    def text_matrix(self, *values):
+        # Spróbuj użyć metody z aktualnego pydyf, jeśli istnieje
+        set_text_matrix = getattr(self, "set_text_matrix", None)
+        if callable(set_text_matrix):
+            set_text_matrix(*values)
+            return
+
+        set_matrix = getattr(self, "set_matrix", None)
+        Matrix = getattr(pydyf, "Matrix", None)
+        if callable(set_matrix) and Matrix is not None:
+            # WeasyPrint przekazuje 6 wartości (a, b, c, d, e, f)
+            try:
+                m = Matrix(*values)
+                set_matrix(m)
+            except Exception:
+                # W razie problemów wolimy no-op niż crash serwera
+                return
+        # Jeśli żadna z powyższych opcji nie jest dostępna – no-op
+        return
+
+    pydyf.Stream.text_matrix = text_matrix
 
 from weasyprint import HTML, CSS
 from app.schemas.report import ReportData
