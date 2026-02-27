@@ -1,10 +1,8 @@
 // frontend/src/components/ReportButton.jsx
 
 import React, { useState } from 'react';
-import axios from 'axios';
 import { FileText, Loader2 } from 'lucide-react';
-
-const API_URL = "/api";
+import { api } from '../../api/client';
 
 const ReportButton = ({ formData, results, inputFacet }) => {
   const [loading, setLoading]         = useState(false);
@@ -95,7 +93,7 @@ const ReportButton = ({ formData, results, inputFacet }) => {
 
       setLoadingStep("Generuję PDF...");
 
-      const pdfRes = await axios.post(`/report/pdf`, payload, {
+      const pdfRes = await api.post(`/calculator/report/pdf`, payload, {
         responseType: "blob",
       });
 
