@@ -1,47 +1,48 @@
-
-/* frontend/src/index.css */
-/* WAŻNE: @import musi być PIERWSZĄ linią — przed komentarzami */
-
 @import "tailwindcss";
 
 /* ─────────────────────────────────────────────────────────────────────────────
    PALETA — identyczna z backend/app/core/report_generator.py:
-   C_PRIMARY   = #1B4F72  (granatowy — nagłówki, badge Standard)
-   C_ACCENT    = #2E86C1  (niebieski — akcenty, linki)
-   C_GREEN     = #1E8449  (zielony   — Economy, werdykt TAK)
-   C_YELLOW    = #D4AC0D  (żółty     — werdykt WARUNKOWO)
-   C_RED       = #C0392B  (czerwony  — werdykt NIE, błędy)
-   C_DARK_TEXT = #2C3E50  (ciemny tekst)
-   C_MUTED     = #7F8C8D  (szary muted)
+   C_PRIMARY   = #1B4F72  (granatowy)
+   C_ACCENT    = #2E86C1  (niebieski)
+   C_GREEN     = #1E8449  (zielony)
+   C_YELLOW    = #D4AC0D  (żółty)
+   C_RED       = #C0392B  (czerwony)
 ───────────────────────────────────────────────────────────────────────────── */
 
 @theme {
-  --color-pv-primary:       #1B4F72;
-  --color-pv-primary-light: #D6EAF8;
-  --color-pv-accent:        #2E86C1;
-  --color-pv-green:         #1E8449;
-  --color-pv-green-light:   #D5F5E3;
-  --color-pv-yellow:        #D4AC0D;
-  --color-pv-yellow-light:  #FEF9E7;
-  --color-pv-red:           #C0392B;
-  --color-pv-red-light:     #FDEDEC;
-  --color-pv-dark:          #2C3E50;
-  --color-pv-muted:         #7F8C8D;
+  --color-pv-primary:        #1B4F72;
+  --color-pv-primary-light:  #D6EAF8;
+  --color-pv-accent:         #2E86C1;
+  --color-pv-green:          #1E8449;
+  --color-pv-green-light:    #D5F5E3;
+  --color-pv-yellow:         #D4AC0D;
+  --color-pv-yellow-light:   #FEF9E7;
+  --color-pv-red:            #C0392B;
+  --color-pv-red-light:      #FDEDEC;
+  --color-pv-dark:           #2C3E50;
+  --color-pv-muted:          #7F8C8D;
 }
 
-/* ── Globalne ustawienia bazy ── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes spin-pv {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
 @layer base {
   html {
     font-size: 16px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-
   body {
     color: #2C3E50;
     background-color: #f8fafc;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   }
-
   input[type="text"],
   input[type="number"],
   input[type="email"],
@@ -49,24 +50,33 @@
   textarea {
     font-size: 1rem;
   }
-
   input:focus-visible,
   select:focus-visible,
   textarea:focus-visible {
     outline: 2px solid #2E86C1;
     outline-offset: 2px;
   }
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type=number] { -moz-appearance: textfield; }
 }
 
-/* ── Klasy pomocnicze — bez @apply, czysty CSS (bezpieczne w Tailwind v4) ── */
 @layer utilities {
 
-  /* Gradient nagłówka */
+  .animate-fadeIn {
+    animation: fadeIn 0.3s ease-out both;
+  }
+  .animate-spin-slow {
+    animation: spin-pv 0.8s linear infinite;
+  }
+
   .bg-pv-header {
     background: linear-gradient(135deg, #1B4F72 0%, #2E86C1 100%);
   }
 
-  /* Sekcja formularza z lewym akcentem — jak PDF section_header */
   .pv-section-block {
     background-color: #ffffff;
     border: 1px solid #e5e7eb;
@@ -75,20 +85,17 @@
     padding: 1.5rem;
   }
 
-  /* Aktywna karta wyboru (radio/checkbox) */
   .pv-option-active {
     border: 2px solid #1B4F72;
     background-color: #ffffff;
     box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   }
-
   .pv-option-inactive {
     border: 2px solid #e5e7eb;
     background-color: #f9fafb;
     opacity: 0.7;
   }
 
-  /* Input z PV focus */
   .pv-input {
     width: 100%;
     padding: 0.75rem 1rem;
@@ -96,6 +103,7 @@
     border-radius: 0.75rem;
     font-size: 1rem;
     color: #1f2937;
+    background: #ffffff;
     transition: border-color 0.15s, box-shadow 0.15s;
   }
   .pv-input:focus {
@@ -103,8 +111,11 @@
     outline: none;
     box-shadow: 0 0 0 3px rgba(46, 134, 193, 0.15);
   }
+  .pv-input:disabled {
+    background: #f3f4f6;
+    opacity: 0.6;
+  }
 
-  /* Przycisk główny CTA */
   .pv-btn-primary {
     width: 100%;
     padding: 1rem 1.5rem;
@@ -117,16 +128,33 @@
     cursor: pointer;
     transition: background-color 0.15s, box-shadow 0.15s, transform 0.1s;
     box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    user-select: none;
   }
   .pv-btn-primary:hover {
     background-color: #154360;
     box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
   }
-  .pv-btn-primary:active {
-    transform: scale(0.98);
-  }
+  .pv-btn-primary:active { transform: scale(0.98); }
   .pv-btn-primary:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    transform: none;
+  }
+
+  .badge-premium  { background: #1B4F72; color: #fff; padding: 0.15rem 0.6rem; border-radius: 999px; font-size: 0.7rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; }
+  .badge-standard { background: #2E86C1; color: #fff; padding: 0.15rem 0.6rem; border-radius: 999px; font-size: 0.7rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; }
+  .badge-economy  { background: #1E8449; color: #fff; padding: 0.15rem 0.6rem; border-radius: 999px; font-size: 0.7rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; }
+
+  .verdict-yes   { background-color: #D5F5E3; color: #1E8449; border: 1px solid #A9DFBF; }
+  .verdict-maybe { background-color: #FEF9E7; color: #D4AC0D; border: 1px solid #F9E79F; }
+  .verdict-no    { background-color: #FDEDEC; color: #C0392B; border: 1px solid #FADBD8; }
+
+  .pv-spinner {
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 3px solid #e5e7eb;
+    border-top: 3px solid #2E86C1;
+    border-radius: 50%;
+    animation: spin-pv 0.8s linear infinite;
   }
 }
