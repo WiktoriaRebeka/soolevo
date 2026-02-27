@@ -15,7 +15,7 @@
 
 import React, { useState } from 'react';
 import { FileText, Loader2 } from 'lucide-react';
-import { api } from '../api/client';
+import { api } from '../../api/client';
 
 const ReportButton = ({ formData, results, inputFacet }) => {
   const [loading, setLoading]         = useState(false);
