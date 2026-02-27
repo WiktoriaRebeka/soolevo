@@ -96,21 +96,49 @@ def create_report(
 
         # TRYB DEV — BEZ BAZY DANYCH
     # Generujemy token i PDF bez zapisu do DB
-    from uuid import uuid4
-    report_token = str(uuid4())
+    from app.core.report_generator import ReportGenerator
+    from app.schemas.report import ReportData
 
-    try:
-        pdf_path = generate_mock_pdf(report_token)
-    except Exception as e:
-        logger.error(f"Błąd generowania PDF: {e}")
-        pdf_path = None
+    generator = ReportGenerator()
+
+    from app.core.engine import calculate_scenarios_engine
+    from app.core.report_generator import ReportGenerator
+    from app.schemas.report import ReportData
+    import uuid
+
+    # 1. Uruchamiamy kalkulator
+    from app.schemas.scenarios import ScenariosRequest
+
+    scenarios_request = ScenariosRequest(**req.input_json)
+    results = calculate_scenarios_engine(scenarios_request)
+
+    # 2. Tworzymy obiekt ReportData
+
+    report_data = ReportData(
+        input_request=req.input_json,
+        input_data_summary=results.input_data_summary,
+        all_scenarios_results={
+            s.scenario_name: s.model_dump()
+            for s in results.scenarios
+        },
+        warnings_and_confirmations=results.warnings or []
+    )
+
+    # 3. Generujemy PDF
+    generator = ReportGenerator()
+    pdf_bytes = generator.generate(report_data)
+
+    # 4. Zapisujemy PDF
+    token = str(uuid.uuid4())
+    os.makedirs(PDF_REPORTS_DIR, exist_ok=True)
+    pdf_path = os.path.join(PDF_REPORTS_DIR, f"{token}.pdf")
+
+    with open(pdf_path, "wb") as f:
+        f.write(pdf_bytes)
 
     return {
-        "report_token": report_token,
-        "status": "generated",
-        "pdf_ready": pdf_path is not None,
-        "pdf_path": pdf_path,
-        "price_pln": 0.0,
+        "report_token": token,
+        "pdf_ready": True
     }
 
 
