@@ -30,15 +30,15 @@ const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
     <div className="bg-white border border-gray-200 rounded-xl shadow-lg p-3 text-sm">
-      <p className="font-bold text-gray-800 mb-2">Godzina {label}:00</p>
+      <p className="font-bold text-gray-500 mb-2">Godzina {label}:00</p>
       {payload.map((entry) => (
         <div key={entry.dataKey} className="flex items-center gap-2 py-0.5">
           <span
             className="inline-block w-3 h-3 rounded-sm shrink-0"
             style={{ backgroundColor: entry.color }}
           />
-          <span className="text-gray-800">{entry.name}:</span>
-          <span className="font-bold text-gray-800">
+          <span className="text-gray-500">{entry.name}:</span>
+          <span className="font-bold text-gray-500">
             {entry.dataKey === "soc"
               ? `${entry.value}%`
               : `${Number(entry.value).toFixed(2)} kW`}
@@ -57,7 +57,7 @@ export default function EnergyFlowChart({ data, id }) {
         style={{ height: 260 }}
         className="w-full flex items-center justify-center bg-gray-50 rounded-xl border border-dashed border-gray-200"
       >
-        <p className="text-gray-800 text-sm">Brak danych dobowego przepływu energii.</p>
+        <p className="text-gray-500 text-sm">Brak danych dobowego przepływu energii.</p>
       </div>
     );
   }

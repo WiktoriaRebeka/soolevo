@@ -44,7 +44,7 @@ export default function Header() {
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   active
                     ? "bg-teal-50 text-teal-700 font-semibold"
-                    : "text-gray-800 hover:text-gray-900 hover:bg-gray-50"
+                    : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
                 }`}
               >
                 {label}
@@ -54,10 +54,10 @@ export default function Header() {
 
           {user ? (
             <div className="flex items-center gap-2 ml-2 pl-2 border-l border-gray-200">
-              <span className="text-xs text-gray-800">{user.email}</span>
+              <span className="text-xs text-gray-500">{user.email}</span>
               <button
                 onClick={logout}
-                className="px-3 py-1.5 text-xs text-gray-800 hover:text-red-600 transition-colors"
+                className="px-3 py-1.5 text-xs text-gray-500 hover:text-red-600 transition-colors"
               >
                 Wyloguj
               </button>
@@ -93,7 +93,7 @@ export default function Header() {
             <Link
               key={to}
               to={to}
-              className="block py-3 text-sm font-medium text-gray-700 border-b border-gray-50 last:border-0"
+              className="block py-3 text-sm font-medium text-gray-500 border-b border-gray-50 last:border-0"
               onClick={() => setMenuOpen(false)}
             >
               {label}

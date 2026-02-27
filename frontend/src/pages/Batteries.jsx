@@ -36,7 +36,7 @@ function BatteryCard({ battery }) {
           {battery.tags.map((tag) => (
             <span
               key={tag}
-              className="px-2 py-0.5 bg-gray-100 text-gray-800 text-xs rounded-full font-medium"
+              className="px-2 py-0.5 bg-gray-100 text-gray-500 text-xs rounded-full font-medium"
             >
               {tag}
             </span>
@@ -55,15 +55,15 @@ function BatteryCard({ battery }) {
           ["Sprawność", battery.efficiency_percent ? `${battery.efficiency_percent}%` : "—"],
         ].map(([label, value]) => (
           <div key={label} className="bg-gray-50 rounded-lg px-3 py-2">
-            <div className="text-[10px] text-gray-800 uppercase font-bold tracking-wide">{label}</div>
-            <div className="font-bold text-gray-800 text-sm">{value}</div>
+            <div className="text-[10px] text-gray-500 uppercase font-bold tracking-wide">{label}</div>
+            <div className="font-bold text-gray-500 text-sm">{value}</div>
           </div>
         ))}
       </div>
 
       {/* Opis */}
       {battery.description && (
-        <p className="text-xs text-gray-800 mb-4 leading-relaxed">{battery.description}</p>
+        <p className="text-xs text-gray-500 mb-4 leading-relaxed">{battery.description}</p>
       )}
 
       {/* Cena + CTA */}
@@ -71,13 +71,13 @@ function BatteryCard({ battery }) {
         <div>
           {battery.price_pln ? (
             <>
-              <div className="text-xs text-gray-800">Cena orientacyjna</div>
+              <div className="text-xs text-gray-500">Cena orientacyjna</div>
               <div className="font-black text-gray-900 text-lg">
                 ~{battery.price_pln.toLocaleString()} zł
               </div>
             </>
           ) : (
-            <div className="text-sm text-gray-800">Cena na zapytanie</div>
+            <div className="text-sm text-gray-500">Cena na zapytanie</div>
           )}
         </div>
         <button
@@ -134,7 +134,7 @@ export default function Batteries() {
               <h1 className="text-3xl font-black text-gray-900 mb-1">
                 🔋 Porównywarka magazynów energii
               </h1>
-              <p className="text-gray-800">
+              <p className="text-gray-500">
                 Porównaj {batteries.length} produktów — pojemność, cena, technologia, gwarancja.
               </p>
             </div>
@@ -186,7 +186,7 @@ export default function Batteries() {
 
         {/* Grid magazynów */}
         {loading && (
-          <div className="text-center py-16 text-gray-800">
+          <div className="text-center py-16 text-gray-500">
             <div className="text-4xl mb-3">⏳</div>
             Ładowanie…
           </div>
@@ -196,7 +196,7 @@ export default function Batteries() {
         )}
         {!loading && !error && (
           <>
-            <div className="text-sm text-gray-800 mb-4">
+            <div className="text-sm text-gray-500 mb-4">
               Znaleziono: <strong>{filtered.length}</strong> produktów
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -205,7 +205,7 @@ export default function Batteries() {
               ))}
             </div>
             {filtered.length === 0 && (
-              <div className="text-center py-16 text-gray-800">
+              <div className="text-center py-16 text-gray-500">
                 Brak wyników dla podanych filtrów.
               </div>
             )}

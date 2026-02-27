@@ -129,8 +129,8 @@ const ReportButton = ({ formData, results, inputFacet }) => {
           <FileText className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h3 className="text-base font-black text-gray-800">Pobierz pełny raport PDF</h3>
-          <p className="text-sm text-gray-800 mt-0.5">
+          <h3 className="text-base font-black text-gray-500">Pobierz pełny raport PDF</h3>
+          <p className="text-sm text-gray-500 mt-0.5">
             Szczegółowa analiza wszystkich 3 scenariuszy · 9 sekcji · gotowy do druku
           </p>
         </div>

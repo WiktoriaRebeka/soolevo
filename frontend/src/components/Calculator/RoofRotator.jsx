@@ -4,7 +4,7 @@ import React from 'react';
 const RoofRotator = ({ rotation, setRotation }) => {
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-6">
-      <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
+      <h3 className="text-lg font-bold text-gray-500 mb-4 flex items-center">
         <span className="mr-2">🏠</span> Orientacja budynku względem stron świata
       </h3>
       
@@ -31,7 +31,7 @@ const RoofRotator = ({ rotation, setRotation }) => {
           className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-teal-600"
         />
         
-        <div className="flex justify-between w-full mt-2 text-xs font-bold text-gray-800">
+        <div className="flex justify-between w-full mt-2 text-xs font-bold text-gray-500">
           <span>N (0°)</span>
           <span>E (90°)</span>
           <span>S (180°)</span>
@@ -39,7 +39,7 @@ const RoofRotator = ({ rotation, setRotation }) => {
           <span>N (360°)</span>
         </div>
         
-        <p className="mt-4 text-sm text-gray-800">
+        <p className="mt-4 text-sm text-gray-500">
           Obecny azymut frontu: <span className="font-bold text-teal-600">{rotation}°</span> 
           ({rotation > 135 && rotation < 225 ? 'Południe' : 'Inny kierunek'})
         </p>

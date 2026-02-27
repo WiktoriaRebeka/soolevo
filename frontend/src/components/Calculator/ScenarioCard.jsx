@@ -78,7 +78,7 @@ const TIER_COLORS = {
 // Zastępuje text-[10px] → text-sm dla czytelności 50+
 function SectionLabel({ icon, children }) {
   return (
-    <h4 className="flex items-center gap-2 text-sm font-black text-gray-800 uppercase tracking-wider mb-3">
+    <h4 className="flex items-center gap-2 text-sm font-black text-gray-500 uppercase tracking-wider mb-3">
       <span>{icon}</span>
       <span>{children}</span>
     </h4>
@@ -91,8 +91,8 @@ function ProgressBar({ value, color = "bg-blue-500", label, sublabel }) {
   return (
     <div>
       <div className="flex justify-between items-baseline mb-1.5">
-        <span className="text-sm font-semibold text-gray-800">{label}</span>
-        <span className="text-lg font-black text-gray-800">{pct}%</span>
+        <span className="text-sm font-semibold text-gray-500">{label}</span>
+        <span className="text-lg font-black text-gray-500">{pct}%</span>
       </div>
       <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
         <div
@@ -101,7 +101,7 @@ function ProgressBar({ value, color = "bg-blue-500", label, sublabel }) {
         />
       </div>
       {sublabel && (
-        <p className="text-xs text-gray-800 mt-1">{sublabel}</p>
+        <p className="text-xs text-gray-500 mt-1">{sublabel}</p>
       )}
     </div>
   );
@@ -112,13 +112,13 @@ function ParamRow({ label, value, highlight = false, purple = false }) {
   return (
     <div
       className={`flex justify-between items-center py-2.5 px-1 border-b border-gray-100 last:border-0 ${
-        highlight ? "font-bold text-gray-800" : "text-gray-800"
+        highlight ? "font-bold text-gray-500" : "text-gray-500"
       }`}
     >
       <span className="text-sm">{label}</span>
       <span
         className={`text-sm font-semibold text-right max-w-[55%] ${
-          purple ? "text-purple-700" : highlight ? "text-gray-900" : "text-gray-700"
+          purple ? "text-purple-700" : highlight ? "text-gray-900" : "text-gray-500"
         }`}
       >
         {value}
@@ -200,7 +200,7 @@ function ScenarioCard({ scenario, inputData }) {
           <h3 className={`text-2xl md:text-3xl font-black ${c.heading} leading-tight mb-1`}>
             {scenario.label}
           </h3>
-          <p className="text-sm text-gray-800 leading-snug">{scenario.description}</p>
+          <p className="text-sm text-gray-500 leading-snug">{scenario.description}</p>
         </div>
       </div>
 
@@ -212,7 +212,7 @@ function ScenarioCard({ scenario, inputData }) {
           {/* Karta: Sama PV */}
           <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 flex items-center justify-between gap-4">
             <div>
-              <div className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-1">
+              <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">
                 ☀️ Tylko panele PV
               </div>
               <div className="text-2xl md:text-3xl font-black text-gray-900">
@@ -220,7 +220,7 @@ function ScenarioCard({ scenario, inputData }) {
               </div>
             </div>
             <div className="text-right shrink-0">
-              <div className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-1">
+              <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">
                 Zwrot
               </div>
               <div className={`text-base font-black ${c.accent}`}>
@@ -246,7 +246,7 @@ function ScenarioCard({ scenario, inputData }) {
                 <div className="absolute top-0 left-0 right-0 h-1 bg-purple-500" />
               )}
               <div>
-                <div className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-1">
+                <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">
                   {batJustified ? "🔋 PV + Magazyn energii (zalecany)" : "🔋 Magazyn (opcjonalny)"}
                 </div>
                 <div className="text-2xl md:text-3xl font-black text-gray-900">
@@ -254,12 +254,12 @@ function ScenarioCard({ scenario, inputData }) {
                 </div>
               </div>
               <div className="text-right shrink-0">
-                <div className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-1">
+                <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">
                   Zwrot
                 </div>
                 <div
                   className={`text-base font-black ${
-                    batJustified ? "text-purple-700" : "text-gray-800"
+                    batJustified ? "text-purple-700" : "text-gray-500"
                   }`}
                 >
                   {renderPaybackRange(
@@ -280,14 +280,14 @@ function ScenarioCard({ scenario, inputData }) {
 
         <div className={`grid gap-3 ${bat25y > 0 ? "grid-cols-2" : "grid-cols-1"}`}>
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
-            <div className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-2">
+            <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
               Sama PV
             </div>
             <div className={`text-xl md:text-2xl font-black ${c.accent}`}>
               {fmtPLN(pv25y)}
             </div>
             {savings1y > 0 && (
-              <div className="text-xs text-gray-800 mt-1">
+              <div className="text-xs text-gray-500 mt-1">
                 ok. {fmtPLN(savings1y)} / rok 1
               </div>
             )}
@@ -295,7 +295,7 @@ function ScenarioCard({ scenario, inputData }) {
 
           {bat25y > 0 && (
             <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 text-center">
-              <div className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-2">
+              <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
                 PV + Magazyn
               </div>
               <div className="text-xl md:text-2xl font-black text-purple-700">
@@ -378,7 +378,7 @@ function ScenarioCard({ scenario, inputData }) {
         {/* Dwie liczby wyróżnione */}
         <div className="grid grid-cols-2 gap-3 mb-3">
           <div className={`${c.softBox} border rounded-xl p-4 text-center`}>
-            <div className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-1">
+            <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">
               Moc systemu
             </div>
             <div className={`text-xl font-black ${c.accent}`}>
@@ -386,7 +386,7 @@ function ScenarioCard({ scenario, inputData }) {
             </div>
           </div>
           <div className={`${c.softBox} border rounded-xl p-4 text-center`}>
-            <div className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-1">
+            <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">
               Produkcja roczna
             </div>
             <div className={`text-xl font-black ${c.accent}`}>
@@ -481,12 +481,12 @@ function ScenarioCard({ scenario, inputData }) {
                   border: `2px solid ${item.border}`,
                 }}
               />
-              <span className="text-sm text-gray-800 font-medium">{item.label}</span>
+              <span className="text-sm text-gray-500 font-medium">{item.label}</span>
             </div>
           ))}
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-800">
-              Paneli: <strong className="text-gray-800">{allPanels.length} szt.</strong>
+            <span className="text-sm text-gray-500">
+              Paneli: <strong className="text-gray-500">{allPanels.length} szt.</strong>
             </span>
           </div>
         </div>
@@ -499,12 +499,12 @@ function ScenarioCard({ scenario, inputData }) {
           className="w-full flex items-center justify-between px-4 py-3 bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-xl text-left transition-colors"
         >
           <SectionLabel icon="📊">
-            <span className="normal-case font-bold text-gray-800 tracking-normal">
+            <span className="normal-case font-bold text-gray-500 tracking-normal">
               Analiza energetyczna (wykresy)
             </span>
           </SectionLabel>
           <span
-            className={`text-gray-800 text-lg transition-transform duration-300 ml-2 shrink-0 ${
+            className={`text-gray-500 text-lg transition-transform duration-300 ml-2 shrink-0 ${
               showCharts ? "rotate-180" : ""
             }`}
           >

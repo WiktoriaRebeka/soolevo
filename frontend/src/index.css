@@ -1,9 +1,134 @@
 /* src/index.css */
 @import "tailwindcss";
 
-/* Twoje globalne style opcjonalnie poniżej */
-:root {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background-color: #0f172a;
-  color: #e5e7eb;
+/* frontend/src/index.css */
+/* WAŻNE: @import musi być PIERWSZĄ linią — przed komentarzami */
+
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   PALETA — identyczna z backend/app/core/report_generator.py:
+   C_PRIMARY   = #1B4F72  (granatowy — nagłówki, badge Standard)
+   C_ACCENT    = #2E86C1  (niebieski — akcenty, linki)
+   C_GREEN     = #1E8449  (zielony   — Economy, werdykt TAK)
+   C_YELLOW    = #D4AC0D  (żółty     — werdykt WARUNKOWO)
+   C_RED       = #C0392B  (czerwony  — werdykt NIE, błędy)
+   C_DARK_TEXT = #2C3E50  (ciemny tekst)
+   C_MUTED     = #7F8C8D  (szary muted)
+───────────────────────────────────────────────────────────────────────────── */
+
+@theme {
+  --color-pv-primary:       #1B4F72;
+  --color-pv-primary-light: #D6EAF8;
+  --color-pv-accent:        #2E86C1;
+  --color-pv-green:         #1E8449;
+  --color-pv-green-light:   #D5F5E3;
+  --color-pv-yellow:        #D4AC0D;
+  --color-pv-yellow-light:  #FEF9E7;
+  --color-pv-red:           #C0392B;
+  --color-pv-red-light:     #FDEDEC;
+  --color-pv-dark:          #2C3E50;
+  --color-pv-muted:         #7F8C8D;
+}
+
+/* ── Globalne ustawienia bazy ── */
+@layer base {
+  html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    color: #2C3E50;
+    background-color: #f8fafc;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  select,
+  textarea {
+    font-size: 1rem;
+  }
+
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid #2E86C1;
+    outline-offset: 2px;
+  }
+}
+
+/* ── Klasy pomocnicze — bez @apply, czysty CSS (bezpieczne w Tailwind v4) ── */
+@layer utilities {
+
+  /* Gradient nagłówka */
+  .bg-pv-header {
+    background: linear-gradient(135deg, #1B4F72 0%, #2E86C1 100%);
+  }
+
+  /* Sekcja formularza z lewym akcentem — jak PDF section_header */
+  .pv-section-block {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-left: 4px solid #1B4F72;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+  }
+
+  /* Aktywna karta wyboru (radio/checkbox) */
+  .pv-option-active {
+    border: 2px solid #1B4F72;
+    background-color: #ffffff;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  }
+
+  .pv-option-inactive {
+    border: 2px solid #e5e7eb;
+    background-color: #f9fafb;
+    opacity: 0.7;
+  }
+
+  /* Input z PV focus */
+  .pv-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.75rem;
+    font-size: 1rem;
+    color: #1f2937;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .pv-input:focus {
+    border-color: #2E86C1;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(46, 134, 193, 0.15);
+  }
+
+  /* Przycisk główny CTA */
+  .pv-btn-primary {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 900;
+    font-size: 1.125rem;
+    color: #ffffff;
+    background-color: #1B4F72;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.15s, box-shadow 0.15s, transform 0.1s;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  }
+  .pv-btn-primary:hover {
+    background-color: #154360;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  }
+  .pv-btn-primary:active {
+    transform: scale(0.98);
+  }
+  .pv-btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }

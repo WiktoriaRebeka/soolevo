@@ -1,7 +1,7 @@
 // frontend/src/components/Footer.jsx
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-gray-800 py-10 mt-auto">
+    <footer className="bg-gray-900 text-gray-500 py-10 mt-auto">
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between gap-8">
           <div>

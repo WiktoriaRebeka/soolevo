@@ -39,7 +39,7 @@ function AuthForm() {
         <h2 className="text-2xl font-black text-gray-900 mb-2">
           {mode === "login" ? "Zaloguj się" : "Utwórz konto"}
         </h2>
-        <p className="text-gray-800 text-sm mb-6">
+        <p className="text-gray-500 text-sm mb-6">
           {mode === "login"
             ? "Zaloguj się, aby zobaczyć historię raportów."
             : "Konto pozwoli Ci zapisywać i pobierać raporty."}
@@ -47,7 +47,7 @@ function AuthForm() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Email</label>
+            <label className="block text-sm font-semibold text-gray-500 mb-1">Email</label>
             <input
               type="email"
               required
@@ -58,7 +58,7 @@ function AuthForm() {
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Hasło</label>
+            <label className="block text-sm font-semibold text-gray-500 mb-1">Hasło</label>
             <input
               type="password"
               required
@@ -85,7 +85,7 @@ function AuthForm() {
           </button>
         </form>
 
-        <div className="mt-4 text-center text-sm text-gray-800">
+        <div className="mt-4 text-center text-sm text-gray-500">
           {mode === "login" ? (
             <>Nie masz konta?{" "}
               <button onClick={() => setMode("register")} className="text-teal-600 font-semibold hover:underline">
@@ -113,7 +113,7 @@ function StatusBadge({ status }) {
     generated: { label: "Gotowy do pobrania", cls: "bg-green-50 text-green-700" },
     failed:    { label: "Błąd generowania", cls: "bg-red-50 text-red-700" },
   };
-  const { label, cls } = map[status] || { label: status, cls: "bg-gray-100 text-gray-800" };
+  const { label, cls } = map[status] || { label: status, cls: "bg-gray-100 text-gray-500" };
   return (
     <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${cls}`}>{label}</span>
   );
@@ -153,12 +153,12 @@ function Dashboard() {
       {/* Info o koncie */}
       <div className="bg-white rounded-3xl p-6 shadow-sm flex items-center justify-between">
         <div>
-          <div className="text-xs text-gray-800 uppercase font-bold tracking-wide mb-1">Zalogowany jako</div>
+          <div className="text-xs text-gray-500 uppercase font-bold tracking-wide mb-1">Zalogowany jako</div>
           <div className="font-bold text-gray-900">{user.email}</div>
         </div>
         <button
           onClick={logout}
-          className="px-4 py-2 text-sm text-gray-800 hover:text-red-600 border border-gray-200 rounded-xl transition-colors"
+          className="px-4 py-2 text-sm text-gray-500 hover:text-red-600 border border-gray-200 rounded-xl transition-colors"
         >
           Wyloguj
         </button>
@@ -168,12 +168,12 @@ function Dashboard() {
       <div className="bg-white rounded-3xl p-6 shadow-sm">
         <h2 className="font-black text-gray-900 text-xl mb-4">Historia raportów</h2>
 
-        {loading && <div className="text-gray-800 text-sm">Ładowanie…</div>}
+        {loading && <div className="text-gray-500 text-sm">Ładowanie…</div>}
 
         {!loading && reports.length === 0 && (
           <div className="text-center py-10">
             <div className="text-5xl mb-3">📄</div>
-            <p className="text-gray-800 text-sm">Nie masz jeszcze żadnych raportów.</p>
+            <p className="text-gray-500 text-sm">Nie masz jeszcze żadnych raportów.</p>
             <a href="/kalkulator" className="mt-4 inline-block px-5 py-2.5 bg-teal-500 text-white font-bold rounded-xl text-sm hover:bg-teal-600 transition-colors">
               Oblicz pierwszy raport →
             </a>
@@ -188,14 +188,14 @@ function Dashboard() {
                 className="flex items-center justify-between p-4 border border-gray-100 rounded-2xl hover:border-teal-200 transition-colors"
               >
                 <div>
-                  <div className="text-xs text-gray-800 mb-1">
+                  <div className="text-xs text-gray-500 mb-1">
                     {new Date(report.created_at).toLocaleDateString("pl-PL", {
                       year: "numeric", month: "long", day: "numeric",
                     })}
                   </div>
                   <StatusBadge status={report.status} />
                   {report.amount_pln && (
-                    <span className="ml-2 text-xs text-gray-800">{report.amount_pln} zł</span>
+                    <span className="ml-2 text-xs text-gray-500">{report.amount_pln} zł</span>
                   )}
                 </div>
 
@@ -211,12 +211,12 @@ function Dashboard() {
                   ) : report.status === "pending" ? (
                     <a
                       href="/kalkulator"
-                      className="px-4 py-2 text-sm text-gray-800 border border-gray-200 rounded-xl hover:border-teal-300 transition-colors"
+                      className="px-4 py-2 text-sm text-gray-500 border border-gray-200 rounded-xl hover:border-teal-300 transition-colors"
                     >
                       Opłać raport
                     </a>
                   ) : (
-                    <span className="text-xs text-gray-800">Trwa generowanie…</span>
+                    <span className="text-xs text-gray-500">Trwa generowanie…</span>
                   )}
                 </div>
               </div>
@@ -235,7 +235,7 @@ export default function Account() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#EEF9F7] flex items-center justify-center">
-        <div className="text-gray-800">Ładowanie…</div>
+        <div className="text-gray-500">Ładowanie…</div>
       </div>
     );
   }

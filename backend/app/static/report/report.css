@@ -55,8 +55,8 @@ body {
 
 .font-bold  { font-weight: 700; }
 .font-black { font-weight: 900; }
-.text-gray-800 { color: var(--gray-700); }
-.text-gray-800 { color: var(--gray-400); }
+.text-gray-500 { color: var(--gray-700); }
+.text-gray-500 { color: var(--gray-400); }
 
 /* ═══════════════════════════════════════════════
    LAYOUT — SPACING

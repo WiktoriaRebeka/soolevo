@@ -360,7 +360,7 @@ export default function Calculator() {
             <h1 className="text-4xl font-black mb-3" style={{ color: '#1B4F72' }}>
               Kalkulator Fotowoltaiki
             </h1>
-            <p className="text-gray-800 text-base">
+            <p className="text-gray-500 text-base">
               Oblicz opłacalność instalacji PV w 3 wersjach: Premium, Standard, Economy
             </p>
           </div>
@@ -369,13 +369,13 @@ export default function Calculator() {
 
             {/* ── SEKCJA 1: ZUŻYCIE ENERGII ── */}
             <div className="pv-section-block">
-              <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+              <h3 className="text-xl font-bold text-gray-500 mb-4 flex items-center">
                 <span className="text-2xl mr-2">💡</span>
                 Twoje zużycie energii
               </h3>
 
               {/* Wybór trybu */}
-              <div className="text-xs text-gray-800 mb-3">
+              <div className="text-xs text-gray-500 mb-3">
                 Skąd mamy policzyć ile prądu zużywasz?
                 <span className="inline-block ml-2 align-middle">
                   <Tooltip text="Na podstawie rachunków kalkulator dokładnie wylicza Twoje obecne koszty i dopasowuje moc instalacji. Jeśli dopiero budujesz dom lub nie masz rachunków — oszacujemy zużycie z metrażu." />
@@ -387,8 +387,8 @@ export default function Calculator() {
                     onChange={() => setFormData(prev => ({ ...prev, estimatedConsumptionMode: false }))}
                     className="w-4 h-4 accent-[#1B4F72]" />
                   <div className="flex flex-col">
-                    <span className="font-bold text-gray-800 text-sm">Chcę podać rachunki</span>
-                    <span className="text-xs text-gray-800">Na podstawie obecnych opłat — najdokładniejsza metoda</span>
+                    <span className="font-bold text-gray-500 text-sm">Chcę podać rachunki</span>
+                    <span className="text-xs text-gray-500">Na podstawie obecnych opłat — najdokładniejsza metoda</span>
                   </div>
                 </label>
 
@@ -397,8 +397,8 @@ export default function Calculator() {
                     onChange={() => setFormData(prev => ({ ...prev, estimatedConsumptionMode: true }))}
                     className="w-4 h-4 accent-[#1B4F72]" />
                   <div className="flex flex-col">
-                    <span className="font-bold text-gray-800 text-sm">Nie znam rachunków / Planuję budowę</span>
-                    <span className="text-xs text-gray-800">Szacunek z metrażu — wystarczający do wstępnej analizy</span>
+                    <span className="font-bold text-gray-500 text-sm">Nie znam rachunków / Planuję budowę</span>
+                    <span className="text-xs text-gray-500">Szacunek z metrażu — wystarczający do wstępnej analizy</span>
                   </div>
                 </label>
               </div>
@@ -407,7 +407,7 @@ export default function Calculator() {
                 /* TRYB: ESTYMACJA (METRAŻ) */
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className="block text-sm font-semibold text-gray-500 mb-2">
                       Powierzchnia domu (m²) *
                       <Tooltip text="Podaj całkowitą powierzchnię użytkową domu. Na tej podstawie szacujemy roczne zużycie energii elektrycznej — im większy dom, tym więcej prądu potrzeba do oświetlenia, ogrzewania wody i urządzeń." />
                     </label>
@@ -416,7 +416,7 @@ export default function Calculator() {
                       placeholder="np. 120" required />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className="block text-sm font-semibold text-gray-500 mb-2">
                       Standard budynku
                       <Tooltip text="Nowsze domy są lepiej ocieplone i zużywają mniej energii. WT 2021 = dom budowany po 2021 r. (bardzo niskie zużycie). WT 2014 = budowany 2014–2020. Stary dom = starsze budownictwo z ociepleniem." />
                     </label>
@@ -431,7 +431,7 @@ export default function Calculator() {
                     <label className="flex items-center space-x-3 cursor-pointer bg-white p-3 rounded-lg border border-gray-200 hover:border-[#2E86C1] transition-colors">
                       <input type="checkbox" name="uses_induction" checked={formData.uses_induction} onChange={handleChange}
                         className="w-5 h-5 rounded accent-[#1B4F72]" />
-                      <span className="text-sm font-medium text-gray-700">Używam płyty indukcyjnej (gotowanie na prądzie)</span>
+                      <span className="text-sm font-medium text-gray-500">Używam płyty indukcyjnej (gotowanie na prądzie)</span>
                       <Tooltip text="Zaznacz jeśli gotujesz na prądzie zamiast gazu. Płyta indukcyjna zużywa ok. 500–800 kWh/rok — kalkulator uwzględni to w obliczeniach." />
                     </label>
                   </div>
@@ -444,28 +444,28 @@ export default function Calculator() {
                       <input type="radio" name="billPeriod" checked={!formData.isAnnualBill}
                         onChange={() => setFormData(prev => ({ ...prev, isAnnualBill: false }))}
                         className="w-4 h-4 accent-[#1B4F72]" />
-                      <span className="text-sm font-bold text-gray-700">Rachunek miesięczny</span>
+                      <span className="text-sm font-bold text-gray-500">Rachunek miesięczny</span>
                     </label>
                     <label className={`flex-1 flex items-center gap-2 cursor-pointer p-3 border-2 rounded-lg transition-all ${formData.isAnnualBill ? 'border-[#1B4F72] bg-[#1B4F72]/5' : 'border-gray-200 bg-white opacity-70'}`}>
                       <input type="radio" name="billPeriod" checked={formData.isAnnualBill}
                         onChange={() => setFormData(prev => ({ ...prev, isAnnualBill: true }))}
                         className="w-4 h-4 accent-[#1B4F72]" />
-                      <span className="text-sm font-bold text-gray-700">Rachunek roczny</span>
+                      <span className="text-sm font-bold text-gray-500">Rachunek roczny</span>
                     </label>
                     <Tooltip text="Jeśli Twój operator wystawia rachunki kwartalnie lub rocznie — podaj roczną sumę. Przy rachunkach miesięcznych podaj typowy miesiąc (najlepiej z ostatnich 3 miesięcy, nie letni)." />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      <label className="block text-sm font-semibold text-gray-500 mb-2">
                         Kwota rachunku ({formData.isAnnualBill ? 'PLN / rok' : 'PLN / miesiąc'}) *
                         <Tooltip text="Wpisz łączną kwotę z rachunku za prąd — razem z opłatami dystrybucyjnymi. Znajdziesz ją w podsumowaniu na rachunku od swojego operatora." />
                       </label>
                       <div className="relative">
                         <input type="number" name="bill" value={formData.bill} onChange={handleChange}
-                          className="w-full pl-4 pr-14 py-3 border-2 border-gray-200 rounded-xl focus:border-[#2E86C1] focus:outline-none transition-all text-lg font-bold text-gray-800"
+                          className="w-full pl-4 pr-14 py-3 border-2 border-gray-200 rounded-xl focus:border-[#2E86C1] focus:outline-none transition-all text-lg font-bold text-gray-500"
                           placeholder={formData.isAnnualBill ? "np. 5000" : "np. 450"} required />
-                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-800 font-bold text-sm">PLN</span>
+                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-sm">PLN</span>
                       </div>
                     </div>
                   </div>
@@ -480,7 +480,7 @@ export default function Calculator() {
                         onChange={handleChange}
                         className="w-5 h-5 rounded accent-[#1B4F72]"
                       />
-                      <span className="text-sm font-medium text-gray-700">
+                      <span className="text-sm font-medium text-gray-500">
                         Zamierzam używać płyty indukcyjnej (gotowanie na prądzie)
                       </span>
                       <Tooltip text="Zaznacz jeśli planujesz gotować na prądzie zamiast gazu. Płyta indukcyjna zużywa ok. 500–800 kWh/rok — kalkulator uwzględni to w obliczeniach." />
@@ -493,7 +493,7 @@ export default function Calculator() {
               {/* Operator i taryfa */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-500 mb-2">
                     Operator
                     <Tooltip text="Twój dostawca energii elektrycznej. Znajdziesz go w prawym górnym rogu rachunku za prąd (np. PGE, Tauron, Energa, Enea)." />
                   </label>
@@ -506,7 +506,7 @@ export default function Calculator() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-500 mb-2">
                     Taryfa
                     <Tooltip text="G11 = jedna cena prądu przez całą dobę (najpopularniejsza). G12 = tańszy prąd w nocy i weekendy — jeśli masz licznik dwustrefowy. Sprawdź na rachunku lub w umowie." />
                   </label>
@@ -521,14 +521,14 @@ export default function Calculator() {
 
             {/* ── SEKCJA 2: RODZINA I LOKALIZACJA ── */}
             <div className="bg-gray-50 border-l-4 border-gray-400 rounded-xl p-6">
-              <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+              <h3 className="text-xl font-bold text-gray-500 mb-4 flex items-center">
                 <span className="text-2xl mr-2">🏠</span>
                 Rodzina i lokalizacja
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-500 mb-2">
                     Województwo
                     <Tooltip text="Nasłonecznienie różni się w zależności od regionu Polski — południe kraju produkuje nieco więcej energii niż północ." />
                   </label>
@@ -553,7 +553,7 @@ export default function Calculator() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-500 mb-2">
                     Liczba domowników
                     <Tooltip text="Całkowita liczba osób mieszkających w domu. Wpływa na szacowane roczne zużycie energii elektrycznej." />
                   </label>
@@ -562,7 +562,7 @@ export default function Calculator() {
                     min="1" max="10" />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-500 mb-2">
                     Ile osób jest w domu w dzień?
                     <Tooltip text="Osoby w domu w ciągu dnia (emeryci, dzieci, praca zdalna) zużywają prąd gdy świeci słońce — co zwiększa opłacalność instalacji, bo mniej energii trafia do sieci." />
                   </label>
@@ -575,26 +575,26 @@ export default function Calculator() {
               {/* Urządzenia */}
               <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-8 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
                 <div className="space-y-4">
-                  <div className="text-xs font-black text-gray-800 uppercase tracking-widest flex items-center gap-1">
+                  <div className="text-xs font-black text-gray-500 uppercase tracking-widest flex items-center gap-1">
                     A. Posiadam (wliczone w rachunek)
                     <Tooltip text="Zaznacz urządzenia które już masz w domu — ich zużycie jest już wliczone w Twój rachunek. Kalkulator uwzględni to przy analizie opłacalności i autokonsumpcji." />
                   </div>
                   <div className="flex flex-col gap-3">
                     <label className={`flex items-center justify-between p-3 rounded-lg border-2 transition-all cursor-pointer ${formData.has_heat_pump ? 'border-orange-500 bg-orange-50' : 'border-gray-100 hover:border-orange-200'}`}>
                       <div>
-                        <span className="text-sm font-bold text-gray-700 block">Pompa ciepła</span>
+                        <span className="text-sm font-bold text-gray-500 block">Pompa ciepła</span>
                       </div>
                       <input type="checkbox" name="has_heat_pump" checked={formData.has_heat_pump} onChange={handleChange} className="w-5 h-5 accent-orange-500" />
                     </label>
                     <label className={`flex items-center justify-between p-3 rounded-lg border-2 transition-all cursor-pointer ${formData.has_ac ? 'border-blue-500 bg-blue-50' : 'border-gray-100 hover:border-blue-200'}`}>
                       <div>
-                        <span className="text-sm font-bold text-gray-700 block">Klimatyzacja</span>
+                        <span className="text-sm font-bold text-gray-500 block">Klimatyzacja</span>
                       </div>
                       <input type="checkbox" name="has_ac" checked={formData.has_ac} onChange={handleChange} className="w-5 h-5 accent-blue-500" />
                     </label>
                     <label className={`flex items-center justify-between p-3 rounded-lg border-2 transition-all cursor-pointer ${formData.has_ev ? 'border-green-500 bg-green-50' : 'border-gray-100 hover:border-green-200'}`}>
                       <div>
-                        <span className="text-sm font-bold text-gray-700 block">Samochód elektryczny (EV)</span>
+                        <span className="text-sm font-bold text-gray-500 block">Samochód elektryczny (EV)</span>
                       </div>
                       <input type="checkbox" name="has_ev" checked={formData.has_ev} onChange={handleChange} className="w-5 h-5 accent-green-500" />
                     </label>
@@ -609,19 +609,19 @@ export default function Calculator() {
                   <div className="flex flex-col gap-3">
                     <label className={`flex items-center justify-between p-3 rounded-lg border-2 transition-all cursor-pointer ${formData.planned_heat_pump ? 'border-[#1B4F72] bg-[#1B4F72]/5' : 'border-gray-100 hover:border-[#2E86C1]/50'}`}>
                       <div>
-                        <span className="text-sm font-bold text-gray-700 block">Pompa ciepła</span>
+                        <span className="text-sm font-bold text-gray-500 block">Pompa ciepła</span>
                       </div>
                       <input type="checkbox" name="planned_heat_pump" checked={formData.planned_heat_pump} onChange={handleChange} className="w-5 h-5 accent-[#1B4F72]" />
                     </label>
                     <label className={`flex items-center justify-between p-3 rounded-lg border-2 transition-all cursor-pointer ${formData.planned_ac ? 'border-[#1B4F72] bg-[#1B4F72]/5' : 'border-gray-100 hover:border-[#2E86C1]/50'}`}>
                       <div>
-                        <span className="text-sm font-bold text-gray-700 block">Klimatyzacja</span>
+                        <span className="text-sm font-bold text-gray-500 block">Klimatyzacja</span>
                       </div>
                       <input type="checkbox" name="planned_ac" checked={formData.planned_ac} onChange={handleChange} className="w-5 h-5 accent-[#1B4F72]" />
                     </label>
                     <label className={`flex items-center justify-between p-3 rounded-lg border-2 transition-all cursor-pointer ${formData.planned_ev ? 'border-[#1B4F72] bg-[#1B4F72]/5' : 'border-gray-100 hover:border-[#2E86C1]/50'}`}>
                       <div>
-                        <span className="text-sm font-bold text-gray-700 block">Samochód elektryczny (EV)</span>
+                        <span className="text-sm font-bold text-gray-500 block">Samochód elektryczny (EV)</span>
                       </div>
                       <input type="checkbox" name="planned_ev" checked={formData.planned_ev} onChange={handleChange} className="w-5 h-5 accent-[#1B4F72]" />
                     </label>
@@ -639,7 +639,7 @@ export default function Calculator() {
 
               {/* KROK 1: WYBÓR WIZUALNY */}
               <div className="mb-10">
-                <div className="text-sm font-semibold text-gray-800 mb-4 uppercase tracking-wider flex items-center gap-1">
+                <div className="text-sm font-semibold text-gray-500 mb-4 uppercase tracking-wider flex items-center gap-1">
                   Krok 1: Wybierz rodzaj swojej połaci
                   <Tooltip text="Połać to jedna płaska część dachu. Jeśli Twój dach ma 2 skosy — wybierz Prostokąt (podasz wymiary jednego skosu, od kalenicy do okapu). Dach czterospadowy = Hip. Nie jesteś pewny? Spójrz na swój dach z zewnątrz lub zapytaj instalatora." />
                 </div>
@@ -659,7 +659,7 @@ export default function Calculator() {
                       <div className="aspect-square overflow-hidden rounded-lg mb-2">
                         <img src={roof.img} alt={roof.label} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
                       </div>
-                      <p className={`text-[9px] font-black text-center uppercase ${formData.roofType === roof.id ? 'text-orange-600' : 'text-gray-800'}`}>
+                      <p className={`text-[9px] font-black text-center uppercase ${formData.roofType === roof.id ? 'text-orange-600' : 'text-gray-500'}`}>
                         {roof.label}
                       </p>
                     </div>
@@ -670,7 +670,7 @@ export default function Calculator() {
               {/* KROK 2: WYMIARY TECHNICZNE */}
               {formData.roofType && (
                 <div className="animate-fadeIn">
-                  <p className="text-sm font-semibold text-gray-800 mb-4 uppercase tracking-wider">Krok 2: Podaj wymiary</p>
+                  <p className="text-sm font-semibold text-gray-500 mb-4 uppercase tracking-wider">Krok 2: Podaj wymiary</p>
                   <div className="bg-gray-50 rounded-2xl p-6 border-2 border-gray-100 flex flex-col lg:flex-row gap-8 items-center">
 
                     {/* Schemat SVG */}
@@ -688,7 +688,7 @@ export default function Calculator() {
                       {/* Wybór trybu pomiaru */}
                       {!['flat', 'ground'].includes(formData.roofType) && (
                         <div className="col-span-2 mb-2">
-                          <label className="text-[10px] font-black text-gray-800 uppercase mb-2 flex items-center gap-1 tracking-widest">
+                          <label className="text-[10px] font-black text-gray-500 uppercase mb-2 flex items-center gap-1 tracking-widest">
                             Metoda pomiaru wysokości / długości
                             <Tooltip text="Rzut z góry = podajesz głębokość budynku na mapie (np. z Google Maps lub projektu). Kalkulator sam przeliczy długość połaci dachowej. Wymiar z natury = podajesz zmierzoną taśmą długość samego dachu — od kalenicy do okapu. Ta metoda jest dokładniejsza jeśli masz możliwość pomiaru." />
                           </label>
@@ -696,12 +696,12 @@ export default function Calculator() {
                             <label className={`flex-1 p-3 border-2 rounded-xl cursor-pointer transition-all ${formData.roofMode === 'building_length' ? 'border-[#1B4F72] bg-[#1B4F72]/5 shadow-sm' : 'border-gray-100 bg-white hover:border-[#2E86C1]/50'}`}>
                               <input type="radio" name="roofMode" value="building_length" checked={formData.roofMode === 'building_length'} onChange={handleChange} className="hidden" />
                               <span className="block text-sm font-bold text-center">Rzut z góry</span>
-                              <span className="block text-[9px] text-center text-gray-800 uppercase">System przeliczy długość połaci</span>
+                              <span className="block text-[9px] text-center text-gray-500 uppercase">System przeliczy długość połaci</span>
                             </label>
                             <label className={`flex-1 p-3 border-2 rounded-xl cursor-pointer transition-all ${formData.roofMode === 'real_roof_length' ? 'border-orange-500 bg-orange-50 shadow-sm' : 'border-gray-100 bg-white hover:border-orange-200'}`}>
                               <input type="radio" name="roofMode" value="real_roof_length" checked={formData.roofMode === 'real_roof_length'} onChange={handleChange} className="hidden" />
                               <span className="block text-sm font-bold text-center">Wymiar z natury</span>
-                              <span className="block text-[9px] text-center text-gray-800 uppercase">Podajesz długość połaci dachowej</span>
+                              <span className="block text-[9px] text-center text-gray-500 uppercase">Podajesz długość połaci dachowej</span>
                             </label>
                           </div>
                         </div>
@@ -711,7 +711,7 @@ export default function Calculator() {
                       {['rectangular', 'flat', 'gable', 'hip', 'ground'].includes(formData.roofType) && (
                         <>
                           <div className="space-y-2">
-                            <label className="text-xs font-bold text-gray-800 uppercase flex items-center gap-1">
+                            <label className="text-xs font-bold text-gray-500 uppercase flex items-center gap-1">
                               {formData.roofType === 'ground' ? 'Szerokość terenu (m)' : 'Szerokość dachu — A (m)'}
                               <Tooltip text={formData.roofType === 'ground'
                                 ? "Szerokość działki lub obszaru przeznaczonego pod instalację naziemną. Mierz prostopadle do kierunku południa."
@@ -721,7 +721,7 @@ export default function Calculator() {
                               className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 outline-none font-bold" placeholder="np. 10" />
                           </div>
                           <div className="space-y-2">
-                            <label className="text-xs font-bold text-gray-800 uppercase flex items-center gap-1">
+                            <label className="text-xs font-bold text-gray-500 uppercase flex items-center gap-1">
                               {formData.roofType === 'ground'  ? 'Długość terenu (m)' :
                                formData.roofType === 'flat'    ? 'Długość dachu (m)' :
                                formData.roofMode === 'real_roof_length' ? 'Długość połaci dachowej — h (m)' : 'Głębokość budynku — H (m)'}
@@ -745,7 +745,7 @@ export default function Calculator() {
                           {/* Kalenica dla gable/hip */}
                           {['gable', 'hip'].includes(formData.roofType) && (
                             <div className="space-y-2">
-                              <label className="text-xs font-bold text-gray-800 uppercase flex items-center gap-1">
+                              <label className="text-xs font-bold text-gray-500 uppercase flex items-center gap-1">
                                 Wysokość kalenicy (m)
                                 <Tooltip text="Pionowa odległość od podłogi strychu (lub sufitu najwyższego piętra) do najwyższego punktu kalenicy. Potrzebna do obliczenia kąta nachylenia połaci. Możesz zapytać kierownika budowy lub odczytać z projektu." />
                               </label>
@@ -760,7 +760,7 @@ export default function Calculator() {
                       {formData.roofType === 'triangle' && (
                         <>
                           <div className="space-y-2">
-                            <label className="text-xs font-bold text-gray-800 uppercase flex items-center gap-1">
+                            <label className="text-xs font-bold text-gray-500 uppercase flex items-center gap-1">
                               Podstawa — b (m)
                               <Tooltip text="Długość dolnej krawędzi trójkątnej połaci — mierzona wzdłuż okapu. To szerokość dachu w najniższym punkcie." />
                             </label>
@@ -768,7 +768,7 @@ export default function Calculator() {
                               className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 outline-none font-bold" placeholder="np. 12" />
                           </div>
                           <div className="space-y-2">
-                            <label className="text-xs font-bold text-gray-800 uppercase flex items-center gap-1">
+                            <label className="text-xs font-bold text-gray-500 uppercase flex items-center gap-1">
                               {formData.roofMode === 'real_roof_length' ? 'Długość połaci dachowej — H (m)' : 'Wysokość rzutu — H (m)'}
                               <Tooltip text={formData.roofMode === 'real_roof_length'
                                 ? "Długość zmierzona taśmą wzdłuż powierzchni dachu — od okapu do szczytu (wierzchołka trójkąta)."
@@ -789,7 +789,7 @@ export default function Calculator() {
                       {['trapezoid', 'trapezoid_right'].includes(formData.roofType) && (
                         <>
                           <div className="space-y-2">
-                            <label className="text-xs font-bold text-gray-800 uppercase flex items-center gap-1">
+                            <label className="text-xs font-bold text-gray-500 uppercase flex items-center gap-1">
                               Krawędź dłuższa — A (m)
                               <Tooltip text="Długość dłuższej krawędzi równoległobocznej połaci — zazwyczaj dolna krawędź (okap). Mierz wzdłuż najdłuższego boku trapezu." />
                             </label>
@@ -797,7 +797,7 @@ export default function Calculator() {
                               className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 outline-none font-bold" placeholder="np. 12" />
                           </div>
                           <div className="space-y-2">
-                            <label className="text-xs font-bold text-gray-800 uppercase flex items-center gap-1">
+                            <label className="text-xs font-bold text-gray-500 uppercase flex items-center gap-1">
                               Krawędź krótsza — B (m)
                               <Tooltip text="Długość krótszej krawędzi trapezu — zazwyczaj górna (przy kalenicy). Jeśli trapez jest symetryczny, oba boki równoległe są do siebie." />
                             </label>
@@ -805,7 +805,7 @@ export default function Calculator() {
                               className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 outline-none font-bold" placeholder="np. 6" />
                           </div>
                           <div className="col-span-2 space-y-2">
-                            <label className="text-xs font-bold text-gray-800 uppercase flex items-center gap-1">
+                            <label className="text-xs font-bold text-gray-500 uppercase flex items-center gap-1">
                               {formData.roofMode === 'real_roof_length' ? 'Długość połaci dachowej — h (m)' : 'Wysokość rzutu — h (m)'}
                               <Tooltip text={formData.roofMode === 'real_roof_length'
                                 ? "Długość zmierzona taśmą prostopadle do krawędzi — od dolnego okapu do górnej krawędzi trapezu."
@@ -826,7 +826,7 @@ export default function Calculator() {
                       {formData.roofType === 'rhombus' && (
                         <>
                           <div className="space-y-2">
-                            <label className="text-xs font-bold text-gray-800 uppercase flex items-center gap-1">
+                            <label className="text-xs font-bold text-gray-500 uppercase flex items-center gap-1">
                               Podstawa — A (m)
                               <Tooltip text="Długość poziomej podstawy równoległoboku — dolna krawędź połaci mierzona wzdłuż okapu." />
                             </label>
@@ -834,7 +834,7 @@ export default function Calculator() {
                               className="w-full p-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 outline-none font-bold" placeholder="np. 10" />
                           </div>
                           <div className="space-y-2">
-                            <label className="text-xs font-bold text-gray-800 uppercase flex items-center gap-1">
+                            <label className="text-xs font-bold text-gray-500 uppercase flex items-center gap-1">
                               {formData.roofMode === 'real_roof_length' ? 'Długość połaci dachowej — h (m)' : 'Wysokość rzutu — H (m)'}
                               <Tooltip text={formData.roofMode === 'real_roof_length'
                                 ? "Długość połaci zmierzona taśmą prostopadle do dolnej krawędzi — od okapu do górnej krawędzi."
@@ -849,7 +849,7 @@ export default function Calculator() {
                             )}
                           </div>
                           <div className="col-span-2 space-y-2">
-                            <label className="text-xs font-bold text-gray-800 uppercase flex items-center gap-1">
+                            <label className="text-xs font-bold text-gray-500 uppercase flex items-center gap-1">
                               Bok skośny — b (m)
                               <Tooltip text="Długość skośnej krawędzi równoległoboku — bok który nie jest poziomy. Mierz wzdłuż nachylonej krawędzi połaci. Musi być dłuższy niż połowa wysokości rzutu." />
                             </label>
@@ -862,7 +862,7 @@ export default function Calculator() {
                       {/* Wspólne: kąt, kierunek */}
                       <div className="col-span-2 grid grid-cols-2 gap-4 border-t pt-4 mt-2">
                         <div className="space-y-2">
-                          <label className="text-xs font-bold text-gray-800 uppercase flex items-center gap-1">
+                          <label className="text-xs font-bold text-gray-500 uppercase flex items-center gap-1">
                             Kąt nachylenia (°)
                             <Tooltip text="Kąt między połacią a poziomem. Typowe dachy: 30–45°. Możesz zapytać wykonawcę lub zmierzyć kątomierzem. Optymalny dla Polski to ok. 35°." />
                           </label>
@@ -870,14 +870,14 @@ export default function Calculator() {
                             value={formData.roofType === 'flat' ? 15 : (formData.roofType === 'ground' ? 35 : formData.angle)}
                             onChange={handleChange}
                             disabled={['flat', 'ground'].includes(formData.roofType)}
-                            className={`w-full p-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 outline-none ${['flat', 'ground'].includes(formData.roofType) ? 'bg-gray-100 text-gray-800 cursor-not-allowed' : ''}`}
+                            className={`w-full p-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 outline-none ${['flat', 'ground'].includes(formData.roofType) ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
                           />
                           {['flat', 'ground'].includes(formData.roofType) && (
                             <p className="text-[9px] font-bold uppercase mt-1" style={{ color: '#1B4F72' }}>Kąt stały dla stelaży</p>
                           )}
                         </div>
                         <div className="space-y-2">
-                          <label className="text-xs font-bold text-gray-800 uppercase flex items-center gap-1">
+                          <label className="text-xs font-bold text-gray-500 uppercase flex items-center gap-1">
                             Orientacja połaci
                             <Tooltip text="Kierunek na który &quot;patrzy&quot; połać dachowa. Południe = maksimum energii. Odchylenie o 45° (Płd-Wschód/Płd-Zachód) zmniejsza produkcję o ok. 5–10%." />
                           </label>
@@ -900,14 +900,14 @@ export default function Calculator() {
 
             {/* ── SEKCJA 4: NASŁONECZNIENIE ── */}
             <div className="mb-6 bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded-xl">
-              <h4 className="text-lg font-bold text-gray-800 mb-3">
+              <h4 className="text-lg font-bold text-gray-500 mb-3">
                 Warunki nasłonecznienia
               </h4>
               <div className="mb-4">
                 <label className="flex items-center space-x-3 cursor-pointer">
                   <input type="checkbox" name="hasShading" checked={formData.hasShading} onChange={handleChange}
                     className="w-5 h-5 accent-yellow-500 rounded" />
-                  <span className="text-gray-700 font-semibold">
+                  <span className="text-gray-500 font-semibold">
                     Dach jest zacieniony przez drzewo lub budynek
                   </span>
                   <Tooltip text="Zacienienie nawet przez kilka godzin dziennie może obniżyć produkcję energii o 10–30%. Przy silnym zacienieniu kalkulator uwzględni to w obliczeniach i może zalecić mikroinwertery zamiast centralnego falownika." />
@@ -915,7 +915,7 @@ export default function Calculator() {
               </div>
               {formData.hasShading && (
                 <div className="mt-4 ml-8">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1">
+                  <label className="block text-sm font-semibold text-gray-500 mb-2 flex items-center gap-1">
                     Z której strony pada cień?
                     <Tooltip text="Cień od południa jest najgroźniejszy — słońce jest najwyżej właśnie od południa, więc blokuje najwięcej produkcji. Cień od północy prawie nie wpływa na instalację (słońce nigdy nie świeci od północy)." />
                   </label>
@@ -927,7 +927,7 @@ export default function Calculator() {
                     <option value="west">Od zachodu</option>
                     <option value="north">Od północy (najmniejszy wpływ)</option>
                   </select>
-                  <p className="text-xs text-gray-800 mt-2">
+                  <p className="text-xs text-gray-500 mt-2">
                     Przy silnym zacienieniu możemy rekomendować mikroinwertery
                   </p>
                 </div>
@@ -985,8 +985,8 @@ export default function Calculator() {
                       <span className="text-white text-lg">🔒</span>
                     </div>
                     <div>
-                      <h3 className="text-base font-black text-gray-800">Raport Premium — 49 zł</h3>
-                      <p className="text-sm text-gray-800 mt-0.5">
+                      <h3 className="text-base font-black text-gray-500">Raport Premium — 49 zł</h3>
+                      <p className="text-sm text-gray-500 mt-0.5">
                         Zapisany na koncie · Możliwość ponownego pobrania
                       </p>
                     </div>

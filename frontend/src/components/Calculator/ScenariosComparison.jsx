@@ -95,7 +95,7 @@ function VerdictBanner({ standard, economy }) {
         </div>
 
         {/* Uzasadnienie */}
-        <p className="text-gray-700 text-base md:text-lg leading-relaxed mb-6">
+        <p className="text-gray-500 text-base md:text-lg leading-relaxed mb-6">
           Instalacja zwróci się w{' '}
           <strong className={cfg.titleColor}>{paybackRange}</strong> i przyniesie{' '}
           <strong className={cfg.titleColor}>
@@ -111,7 +111,7 @@ function VerdictBanner({ standard, economy }) {
         {/* Trzy kluczowe liczby */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center">
-            <div className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-1">
+            <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">
               Zwrot inwestycji
             </div>
             <div className={`text-xl font-black ${cfg.titleColor}`}>
@@ -119,7 +119,7 @@ function VerdictBanner({ standard, economy }) {
             </div>
           </div>
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center">
-            <div className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-1">
+            <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">
               Zysk po 25 latach
             </div>
             <div className={`text-xl font-black ${cfg.titleColor}`}>
@@ -127,7 +127,7 @@ function VerdictBanner({ standard, economy }) {
             </div>
           </div>
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center">
-            <div className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-1">
+            <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">
               Oszczędności rok 1
             </div>
             <div className={`text-xl font-black ${cfg.titleColor}`}>
@@ -184,18 +184,18 @@ function CollapsedAlternative({ scenario, isOpen, onToggle, inputData }) {
           </span>
           <div>
             <div className={`text-lg font-black ${c.text}`}>{scenario.label}</div>
-            <div className="text-sm text-gray-800 mt-0.5">
+            <div className="text-sm text-gray-500 mt-0.5">
               {fmtPLN(pvCost)} · zwrot {paybackRange}
             </div>
           </div>
         </div>
 
         <div className="flex items-center gap-3 ml-4 shrink-0">
-          <span className="text-sm text-gray-800 hidden sm:block">
+          <span className="text-sm text-gray-500 hidden sm:block">
             {isOpen ? 'Zwiń' : 'Rozwiń szczegóły'}
           </span>
           <span
-            className={`text-xl text-gray-800 transition-transform duration-300 ${
+            className={`text-xl text-gray-500 transition-transform duration-300 ${
               isOpen ? 'rotate-180' : ''
             }`}
           >
@@ -313,7 +313,7 @@ function ScenariosComparison({ data, inputFacet }) {
       <div>
         <div className="flex items-center gap-3 mb-3">
           <div className="h-px flex-1 bg-gray-200" />
-          <span className="text-xs font-black text-gray-800 uppercase tracking-widest px-3">
+          <span className="text-xs font-black text-gray-500 uppercase tracking-widest px-3">
             Scenariusz rekomendowany
           </span>
           <div className="h-px flex-1 bg-gray-200" />
@@ -347,7 +347,7 @@ function ScenariosComparison({ data, inputFacet }) {
       <div>
         <div className="flex items-center gap-3 mb-3">
           <div className="h-px flex-1 bg-gray-200" />
-          <span className="text-xs font-black text-gray-800 uppercase tracking-widest px-3">
+          <span className="text-xs font-black text-gray-500 uppercase tracking-widest px-3">
             Alternatywne scenariusze
           </span>
           <div className="h-px flex-1 bg-gray-200" />
@@ -379,8 +379,8 @@ function ScenariosComparison({ data, inputFacet }) {
       />
 
       {/* ── 6. STOPKA Z ZASTRZEŻENIAMI ────────────────────────────────────── */}
-      <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 text-sm text-gray-800">
-        <p className="font-semibold text-gray-800 mb-2">📋 Ważne informacje:</p>
+      <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 text-sm text-gray-500">
+        <p className="font-semibold text-gray-500 mb-2">📋 Ważne informacje:</p>
         <ul className="space-y-1 list-disc list-inside leading-relaxed">
           <li>Obliczenia zakładają bazową inflację cen energii na poziomie 4% rocznie</li>
           <li>Net-billing: nadwyżki rozliczane wg stawki RCEm (~30% ceny detalicznej)</li>
@@ -484,7 +484,7 @@ function ComparisonTable({ premium, standard, economy, fmtNum, renderPaybackRang
           <table className="w-full text-sm border-collapse">
             <thead>
               <tr className="bg-gray-100 border-b border-gray-200">
-                <th className="text-left px-4 py-3 font-bold text-gray-800 min-w-[160px]">
+                <th className="text-left px-4 py-3 font-bold text-gray-500 min-w-[160px]">
                   Parametr
                 </th>
                 {headers.map((h) => (
@@ -503,7 +503,7 @@ function ComparisonTable({ premium, standard, economy, fmtNum, renderPaybackRang
                   key={row.label}
                   className={`border-b border-gray-100 ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
                 >
-                  <td className="px-4 py-3 font-semibold text-gray-800">{row.label}</td>
+                  <td className="px-4 py-3 font-semibold text-gray-500">{row.label}</td>
                   {row.vals.map((val, j) => (
                     <td
                       key={j}
