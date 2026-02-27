@@ -5,12 +5,23 @@ from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
 import pydyf  # <--- 1. Dodajemy import
 
-# ── FIX: Monkey Patch dla kompatybilności WeasyPrint z nowym pydyf ──
-# Naprawia błąd: AttributeError: 'super' object has no attribute 'transform'
-if not hasattr(pydyf.Stream, 'transform'):
+# ── FIX: Monkey Patch dla kompatybilności WeasyPrint z różnymi wersjami pydyf ──
+# Scenariusze:
+# - starsze pydyf: ma metodę `ctm`, nie ma `transform` ani `concat`
+# - pośrednie pydyf: ma `concat`, ale nie ma `transform`
+# - nowsze pydyf: ma już `transform` — wtedy nic nie robimy
+if not hasattr(pydyf.Stream, "transform"):
     def transform(self, a, b, c, d, e, f):
-        # W nowych wersjach pydyf używamy 'concat' zamiast 'ctm'
-        self.concat(a, b, c, d, e, f)
+        if hasattr(self, "concat"):
+            # nowe wersje pydyf
+            self.concat(a, b, c, d, e, f)
+        elif hasattr(self, "ctm"):
+            # starsze wersje pydyf
+            self.ctm(a, b, c, d, e, f)
+        else:
+            # brak znanych metod — bezpieczny no-op
+            return
+
     pydyf.Stream.transform = transform
 
 from weasyprint import HTML, CSS
