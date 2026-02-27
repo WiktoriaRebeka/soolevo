@@ -18,7 +18,8 @@ python-jose[cryptography]
 email-validator
 python-dotenv
 stripe
-
+weasyprint==62.3
+pydyf==0.10.0
 # Additional utilities
 requests
 typing-extensions
