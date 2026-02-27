@@ -116,7 +116,7 @@ export default function Home() {
               className={`flex-1 py-4 font-semibold text-sm transition-colors ${
                 activeTab === "kalkulator"
                   ? "text-gray-900 border-b-2 border-teal-500 bg-white"
-                  : "text-gray-400 bg-gray-50 hover:text-gray-600"
+                  : "text-gray-800 bg-gray-50 hover:text-gray-600"
               }`}
             >
               Kalkulator PV
@@ -126,7 +126,7 @@ export default function Home() {
               className={`flex-1 py-4 font-semibold text-sm transition-colors ${
                 activeTab === "magazyny"
                   ? "text-gray-900 border-b-2 border-teal-500 bg-white"
-                  : "text-gray-400 bg-gray-50 hover:text-gray-600"
+                  : "text-gray-800 bg-gray-50 hover:text-gray-600"
               }`}
             >
               Porównywarka Magazynów
@@ -139,11 +139,11 @@ export default function Home() {
               <div className="flex flex-col md:flex-row gap-6 items-center">
                 <div className="flex-1 space-y-4">
                   <div className="space-y-3">
-                    <div className="flex items-center gap-3 p-3.5 border border-gray-200 rounded-xl text-gray-400 text-sm">
+                    <div className="flex items-center gap-3 p-3.5 border border-gray-200 rounded-xl text-gray-800 text-sm">
                       <span className="text-gray-300">○</span>
                       Adres inwestycji
                     </div>
-                    <div className="flex items-center gap-3 p-3.5 border border-gray-200 rounded-xl text-gray-400 text-sm">
+                    <div className="flex items-center gap-3 p-3.5 border border-gray-200 rounded-xl text-gray-800 text-sm">
                       <span className="text-gray-300">○</span>
                       Roczne zużycie (kWh)
                     </div>

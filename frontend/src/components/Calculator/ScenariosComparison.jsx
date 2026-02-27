@@ -111,7 +111,7 @@ function VerdictBanner({ standard, economy }) {
         {/* Trzy kluczowe liczby */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center">
-            <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
+            <div className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-1">
               Zwrot inwestycji
             </div>
             <div className={`text-xl font-black ${cfg.titleColor}`}>
@@ -119,7 +119,7 @@ function VerdictBanner({ standard, economy }) {
             </div>
           </div>
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center">
-            <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
+            <div className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-1">
               Zysk po 25 latach
             </div>
             <div className={`text-xl font-black ${cfg.titleColor}`}>
@@ -127,7 +127,7 @@ function VerdictBanner({ standard, economy }) {
             </div>
           </div>
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 text-center">
-            <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
+            <div className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-1">
               Oszczędności rok 1
             </div>
             <div className={`text-xl font-black ${cfg.titleColor}`}>
@@ -191,11 +191,11 @@ function CollapsedAlternative({ scenario, isOpen, onToggle, inputData }) {
         </div>
 
         <div className="flex items-center gap-3 ml-4 shrink-0">
-          <span className="text-sm text-gray-400 hidden sm:block">
+          <span className="text-sm text-gray-800 hidden sm:block">
             {isOpen ? 'Zwiń' : 'Rozwiń szczegóły'}
           </span>
           <span
-            className={`text-xl text-gray-400 transition-transform duration-300 ${
+            className={`text-xl text-gray-800 transition-transform duration-300 ${
               isOpen ? 'rotate-180' : ''
             }`}
           >
@@ -313,7 +313,7 @@ function ScenariosComparison({ data, inputFacet }) {
       <div>
         <div className="flex items-center gap-3 mb-3">
           <div className="h-px flex-1 bg-gray-200" />
-          <span className="text-xs font-black text-gray-400 uppercase tracking-widest px-3">
+          <span className="text-xs font-black text-gray-800 uppercase tracking-widest px-3">
             Scenariusz rekomendowany
           </span>
           <div className="h-px flex-1 bg-gray-200" />
@@ -347,7 +347,7 @@ function ScenariosComparison({ data, inputFacet }) {
       <div>
         <div className="flex items-center gap-3 mb-3">
           <div className="h-px flex-1 bg-gray-200" />
-          <span className="text-xs font-black text-gray-400 uppercase tracking-widest px-3">
+          <span className="text-xs font-black text-gray-800 uppercase tracking-widest px-3">
             Alternatywne scenariusze
           </span>
           <div className="h-px flex-1 bg-gray-200" />

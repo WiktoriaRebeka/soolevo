@@ -648,7 +648,7 @@ const RoofSchemaDisplay = ({ roofType, roofMode = 'building_length', azimuthDeg 
 
       {/* Legenda wymiarów */}
       <div className="px-3 py-2 border-t border-gray-100 bg-white space-y-1.5">
-        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Co mierzyć:</p>
+        <p className="text-[10px] font-bold text-gray-800 uppercase tracking-wider">Co mierzyć:</p>
         {Object.entries(dims).map(([sym, desc], i) => (
           <div key={sym} className="flex items-start gap-2">
             <span

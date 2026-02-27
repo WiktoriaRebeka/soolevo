@@ -89,7 +89,7 @@ export default function ReportPaywall({ calculatorData }) {
         disabled={loading || !calculatorData}
         className={`w-full flex items-center justify-center gap-2 py-3 px-5 rounded-xl font-bold text-sm transition-all duration-200 ${
           loading || !calculatorData
-            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+            ? "bg-gray-100 text-gray-800 cursor-not-allowed"
             : "bg-teal-500 hover:bg-teal-600 text-white shadow hover:shadow-md"
         }`}
       >
@@ -106,7 +106,7 @@ export default function ReportPaywall({ calculatorData }) {
       </button>
 
       {!user && !loading && (
-        <p className="text-xs text-gray-400 text-center mt-1">
+        <p className="text-xs text-gray-800 text-center mt-1">
           Wymagane{" "}
           <button
             onClick={() => navigate("/konto")}

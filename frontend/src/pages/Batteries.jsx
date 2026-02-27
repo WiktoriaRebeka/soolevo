@@ -55,7 +55,7 @@ function BatteryCard({ battery }) {
           ["Sprawność", battery.efficiency_percent ? `${battery.efficiency_percent}%` : "—"],
         ].map(([label, value]) => (
           <div key={label} className="bg-gray-50 rounded-lg px-3 py-2">
-            <div className="text-[10px] text-gray-400 uppercase font-bold tracking-wide">{label}</div>
+            <div className="text-[10px] text-gray-800 uppercase font-bold tracking-wide">{label}</div>
             <div className="font-bold text-gray-800 text-sm">{value}</div>
           </div>
         ))}
@@ -71,13 +71,13 @@ function BatteryCard({ battery }) {
         <div>
           {battery.price_pln ? (
             <>
-              <div className="text-xs text-gray-400">Cena orientacyjna</div>
+              <div className="text-xs text-gray-800">Cena orientacyjna</div>
               <div className="font-black text-gray-900 text-lg">
                 ~{battery.price_pln.toLocaleString()} zł
               </div>
             </>
           ) : (
-            <div className="text-sm text-gray-400">Cena na zapytanie</div>
+            <div className="text-sm text-gray-800">Cena na zapytanie</div>
           )}
         </div>
         <button
@@ -186,7 +186,7 @@ export default function Batteries() {
 
         {/* Grid magazynów */}
         {loading && (
-          <div className="text-center py-16 text-gray-400">
+          <div className="text-center py-16 text-gray-800">
             <div className="text-4xl mb-3">⏳</div>
             Ładowanie…
           </div>
@@ -205,7 +205,7 @@ export default function Batteries() {
               ))}
             </div>
             {filtered.length === 0 && (
-              <div className="text-center py-16 text-gray-400">
+              <div className="text-center py-16 text-gray-800">
                 Brak wyników dla podanych filtrów.
               </div>
             )}

@@ -129,7 +129,7 @@ function CashflowChart25({ scenario }) {
         </AreaChart>
       </ResponsiveContainer>
 
-      <p className="text-xs text-gray-400 mt-2 text-center">
+      <p className="text-xs text-gray-800 mt-2 text-center">
         Założenie: inflacja cen energii +4% rocznie · Net-billing
       </p>
     </div>
@@ -159,7 +159,7 @@ function EnergyCharts({ scenario }) {
             className={`flex items-center gap-1.5 px-4 py-2 rounded-t-xl text-sm font-bold border-b-2 transition-colors ${
               activeTab === "summer"
                 ? "border-amber-400 text-amber-700 bg-amber-50"
-                : "border-transparent text-gray-400 hover:text-gray-600"
+                : "border-transparent text-gray-800 hover:text-gray-600"
             }`}
           >
             ☀️ Szczyt letni
@@ -171,7 +171,7 @@ function EnergyCharts({ scenario }) {
               className={`flex items-center gap-1.5 px-4 py-2 rounded-t-xl text-sm font-bold border-b-2 transition-colors ${
                 activeTab === "winter"
                   ? "border-blue-400 text-blue-700 bg-blue-50"
-                  : "border-transparent text-gray-400 hover:text-gray-600"
+                  : "border-transparent text-gray-800 hover:text-gray-600"
               }`}
             >
               ❄️ Minimum zimowe
@@ -183,7 +183,7 @@ function EnergyCharts({ scenario }) {
         </div>
 
         {/* Opis aktywnej zakładki */}
-        <p className="text-xs text-gray-400 italic mb-3">
+        <p className="text-xs text-gray-800 italic mb-3">
           {activeTab === "summer"
             ? "Czerwiec — wysoka irradiancja. Magazyn gromadzi nadwyżki na wieczór."
             : "Styczeń — niska produkcja. PV pokrywa tylko bazowe potrzeby dzienne."}
@@ -199,7 +199,7 @@ function EnergyCharts({ scenario }) {
 
         {/* Fallback gdy brak danych letnich */}
         {activeTab === "summer" && !summerData && (
-          <div className="bg-gray-50 border border-dashed border-gray-200 rounded-xl p-8 text-center text-gray-400 text-sm">
+          <div className="bg-gray-50 border border-dashed border-gray-200 rounded-xl p-8 text-center text-gray-800 text-sm">
             Brak danych dobowych dla tego scenariusza.
           </div>
         )}

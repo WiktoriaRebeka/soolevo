@@ -153,7 +153,7 @@ function Dashboard() {
       {/* Info o koncie */}
       <div className="bg-white rounded-3xl p-6 shadow-sm flex items-center justify-between">
         <div>
-          <div className="text-xs text-gray-400 uppercase font-bold tracking-wide mb-1">Zalogowany jako</div>
+          <div className="text-xs text-gray-800 uppercase font-bold tracking-wide mb-1">Zalogowany jako</div>
           <div className="font-bold text-gray-900">{user.email}</div>
         </div>
         <button
@@ -168,7 +168,7 @@ function Dashboard() {
       <div className="bg-white rounded-3xl p-6 shadow-sm">
         <h2 className="font-black text-gray-900 text-xl mb-4">Historia raportów</h2>
 
-        {loading && <div className="text-gray-400 text-sm">Ładowanie…</div>}
+        {loading && <div className="text-gray-800 text-sm">Ładowanie…</div>}
 
         {!loading && reports.length === 0 && (
           <div className="text-center py-10">
@@ -188,14 +188,14 @@ function Dashboard() {
                 className="flex items-center justify-between p-4 border border-gray-100 rounded-2xl hover:border-teal-200 transition-colors"
               >
                 <div>
-                  <div className="text-xs text-gray-400 mb-1">
+                  <div className="text-xs text-gray-800 mb-1">
                     {new Date(report.created_at).toLocaleDateString("pl-PL", {
                       year: "numeric", month: "long", day: "numeric",
                     })}
                   </div>
                   <StatusBadge status={report.status} />
                   {report.amount_pln && (
-                    <span className="ml-2 text-xs text-gray-400">{report.amount_pln} zł</span>
+                    <span className="ml-2 text-xs text-gray-800">{report.amount_pln} zł</span>
                   )}
                 </div>
 
@@ -216,7 +216,7 @@ function Dashboard() {
                       Opłać raport
                     </a>
                   ) : (
-                    <span className="text-xs text-gray-400">Trwa generowanie…</span>
+                    <span className="text-xs text-gray-800">Trwa generowanie…</span>
                   )}
                 </div>
               </div>
@@ -235,7 +235,7 @@ export default function Account() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#EEF9F7] flex items-center justify-center">
-        <div className="text-gray-400">Ładowanie…</div>
+        <div className="text-gray-800">Ładowanie…</div>
       </div>
     );
   }

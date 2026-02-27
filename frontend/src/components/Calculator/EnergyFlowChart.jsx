@@ -17,12 +17,12 @@ import {
 
 // ─── KOLORY — zsynchronizowane z PDF i index.css ──────────────────────────────
 const COLORS = {
-  pv:              "#D4AC0D",   // C_YELLOW — produkcja PV (żółty jak słońce)
-  gridImport:      "#C0392B",   // C_RED    — pobór z sieci (koszt)
-  consumption:     "#2E86C1",   // C_ACCENT — zużycie domu (niebieski)
-  batteryCharge:   "#1E8449",   // C_GREEN  — ładowanie baterii
-  batteryDischarge:"#8b5cf6",   // fiolet   — rozładowanie (brak w PDF, własny)
-  soc:             "#1B4F72",   // C_PRIMARY — poziom baterii
+  pv:               "#D4AC0D",   // Pozostawiam 'gold' z Twojej palety (spójność z natStr)
+  gridImport:       "#E57373",   // Łagodniejszy, pastelowy czerwony (pasuje do s1/s2)
+  consumption:      "#2E86C1",   // Twoje 'stroke' – idealnie spaja wykres z UI
+  batteryCharge:    "#66BB6A",   // Świeża, "energetyczna" zieleń, ale mniej agresywna
+  batteryDischarge: "#A78BFA",   // Miękki fiolet (lawendowy), pasujący do tonacji błękitów
+  soc:              "#1B4F72",   // Twoje 'ridge' – ciemny błękit dla stabilności
 };
 
 // ─── TOOLTIP WŁASNY — większy font dla 50+ ────────────────────────────────────
@@ -57,7 +57,7 @@ export default function EnergyFlowChart({ data, id }) {
         style={{ height: 260 }}
         className="w-full flex items-center justify-center bg-gray-50 rounded-xl border border-dashed border-gray-200"
       >
-        <p className="text-gray-400 text-sm">Brak danych dobowego przepływu energii.</p>
+        <p className="text-gray-800 text-sm">Brak danych dobowego przepływu energii.</p>
       </div>
     );
   }

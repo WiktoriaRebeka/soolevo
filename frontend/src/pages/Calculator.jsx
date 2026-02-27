@@ -465,7 +465,7 @@ export default function Calculator() {
                         <input type="number" name="bill" value={formData.bill} onChange={handleChange}
                           className="w-full pl-4 pr-14 py-3 border-2 border-gray-200 rounded-xl focus:border-[#2E86C1] focus:outline-none transition-all text-lg font-bold text-gray-800"
                           placeholder={formData.isAnnualBill ? "np. 5000" : "np. 450"} required />
-                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">PLN</span>
+                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-800 font-bold text-sm">PLN</span>
                       </div>
                     </div>
                   </div>
@@ -575,7 +575,7 @@ export default function Calculator() {
               {/* Urządzenia */}
               <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-8 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
                 <div className="space-y-4">
-                  <div className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-1">
+                  <div className="text-xs font-black text-gray-800 uppercase tracking-widest flex items-center gap-1">
                     A. Posiadam (wliczone w rachunek)
                     <Tooltip text="Zaznacz urządzenia które już masz w domu — ich zużycie jest już wliczone w Twój rachunek. Kalkulator uwzględni to przy analizie opłacalności i autokonsumpcji." />
                   </div>
@@ -659,7 +659,7 @@ export default function Calculator() {
                       <div className="aspect-square overflow-hidden rounded-lg mb-2">
                         <img src={roof.img} alt={roof.label} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
                       </div>
-                      <p className={`text-[9px] font-black text-center uppercase ${formData.roofType === roof.id ? 'text-orange-600' : 'text-gray-400'}`}>
+                      <p className={`text-[9px] font-black text-center uppercase ${formData.roofType === roof.id ? 'text-orange-600' : 'text-gray-800'}`}>
                         {roof.label}
                       </p>
                     </div>
@@ -688,7 +688,7 @@ export default function Calculator() {
                       {/* Wybór trybu pomiaru */}
                       {!['flat', 'ground'].includes(formData.roofType) && (
                         <div className="col-span-2 mb-2">
-                          <label className="text-[10px] font-black text-gray-400 uppercase mb-2 flex items-center gap-1 tracking-widest">
+                          <label className="text-[10px] font-black text-gray-800 uppercase mb-2 flex items-center gap-1 tracking-widest">
                             Metoda pomiaru wysokości / długości
                             <Tooltip text="Rzut z góry = podajesz głębokość budynku na mapie (np. z Google Maps lub projektu). Kalkulator sam przeliczy długość połaci dachowej. Wymiar z natury = podajesz zmierzoną taśmą długość samego dachu — od kalenicy do okapu. Ta metoda jest dokładniejsza jeśli masz możliwość pomiaru." />
                           </label>
@@ -870,7 +870,7 @@ export default function Calculator() {
                             value={formData.roofType === 'flat' ? 15 : (formData.roofType === 'ground' ? 35 : formData.angle)}
                             onChange={handleChange}
                             disabled={['flat', 'ground'].includes(formData.roofType)}
-                            className={`w-full p-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 outline-none ${['flat', 'ground'].includes(formData.roofType) ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : ''}`}
+                            className={`w-full p-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 outline-none ${['flat', 'ground'].includes(formData.roofType) ? 'bg-gray-100 text-gray-800 cursor-not-allowed' : ''}`}
                           />
                           {['flat', 'ground'].includes(formData.roofType) && (
                             <p className="text-[9px] font-bold uppercase mt-1" style={{ color: '#1B4F72' }}>Kąt stały dla stelaży</p>

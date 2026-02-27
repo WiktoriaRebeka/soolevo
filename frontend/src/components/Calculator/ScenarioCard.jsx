@@ -101,7 +101,7 @@ function ProgressBar({ value, color = "bg-blue-500", label, sublabel }) {
         />
       </div>
       {sublabel && (
-        <p className="text-xs text-gray-400 mt-1">{sublabel}</p>
+        <p className="text-xs text-gray-800 mt-1">{sublabel}</p>
       )}
     </div>
   );
@@ -212,7 +212,7 @@ function ScenarioCard({ scenario, inputData }) {
           {/* Karta: Sama PV */}
           <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 flex items-center justify-between gap-4">
             <div>
-              <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
+              <div className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-1">
                 ☀️ Tylko panele PV
               </div>
               <div className="text-2xl md:text-3xl font-black text-gray-900">
@@ -220,7 +220,7 @@ function ScenarioCard({ scenario, inputData }) {
               </div>
             </div>
             <div className="text-right shrink-0">
-              <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
+              <div className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-1">
                 Zwrot
               </div>
               <div className={`text-base font-black ${c.accent}`}>
@@ -246,7 +246,7 @@ function ScenarioCard({ scenario, inputData }) {
                 <div className="absolute top-0 left-0 right-0 h-1 bg-purple-500" />
               )}
               <div>
-                <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
+                <div className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-1">
                   {batJustified ? "🔋 PV + Magazyn energii (zalecany)" : "🔋 Magazyn (opcjonalny)"}
                 </div>
                 <div className="text-2xl md:text-3xl font-black text-gray-900">
@@ -254,7 +254,7 @@ function ScenarioCard({ scenario, inputData }) {
                 </div>
               </div>
               <div className="text-right shrink-0">
-                <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
+                <div className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-1">
                   Zwrot
                 </div>
                 <div
@@ -280,14 +280,14 @@ function ScenarioCard({ scenario, inputData }) {
 
         <div className={`grid gap-3 ${bat25y > 0 ? "grid-cols-2" : "grid-cols-1"}`}>
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
-            <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
+            <div className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-2">
               Sama PV
             </div>
             <div className={`text-xl md:text-2xl font-black ${c.accent}`}>
               {fmtPLN(pv25y)}
             </div>
             {savings1y > 0 && (
-              <div className="text-xs text-gray-400 mt-1">
+              <div className="text-xs text-gray-800 mt-1">
                 ok. {fmtPLN(savings1y)} / rok 1
               </div>
             )}
@@ -295,7 +295,7 @@ function ScenarioCard({ scenario, inputData }) {
 
           {bat25y > 0 && (
             <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 text-center">
-              <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
+              <div className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-2">
                 PV + Magazyn
               </div>
               <div className="text-xl md:text-2xl font-black text-purple-700">
@@ -378,7 +378,7 @@ function ScenarioCard({ scenario, inputData }) {
         {/* Dwie liczby wyróżnione */}
         <div className="grid grid-cols-2 gap-3 mb-3">
           <div className={`${c.softBox} border rounded-xl p-4 text-center`}>
-            <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
+            <div className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-1">
               Moc systemu
             </div>
             <div className={`text-xl font-black ${c.accent}`}>
@@ -386,7 +386,7 @@ function ScenarioCard({ scenario, inputData }) {
             </div>
           </div>
           <div className={`${c.softBox} border rounded-xl p-4 text-center`}>
-            <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
+            <div className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-1">
               Produkcja roczna
             </div>
             <div className={`text-xl font-black ${c.accent}`}>
@@ -485,7 +485,7 @@ function ScenarioCard({ scenario, inputData }) {
             </div>
           ))}
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-400">
+            <span className="text-sm text-gray-800">
               Paneli: <strong className="text-gray-600">{allPanels.length} szt.</strong>
             </span>
           </div>
@@ -504,7 +504,7 @@ function ScenarioCard({ scenario, inputData }) {
             </span>
           </SectionLabel>
           <span
-            className={`text-gray-400 text-lg transition-transform duration-300 ml-2 shrink-0 ${
+            className={`text-gray-800 text-lg transition-transform duration-300 ml-2 shrink-0 ${
               showCharts ? "rotate-180" : ""
             }`}
           >
