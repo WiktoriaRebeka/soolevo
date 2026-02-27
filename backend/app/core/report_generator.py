@@ -403,17 +403,16 @@ class ReportGenerator:
 
         # ── Wyodrębnij scenariusze ────────────────────────────────────────────
         results = report_data.all_scenarios_results
-        from app.schemas.scenarios import ScenarioResult
 
         def _to_obj(name):
             raw = results.get(name) or results.get(name.upper())
             if raw is None:
                 return None
             if isinstance(raw, dict):
-                try:
-                    return ScenarioResult(**raw)
-                except Exception:
-                    return type("Obj", (), raw)()
+                # Tworzymy prosty obiekt z atrybutami zamiast polegać na
+                # konkretnym typie Pydantic (ScenarioResult). Dzięki temu
+                # generator PDF działa niezależnie od definicji schematów.
+                return type("Obj", (), raw)()
             return raw
 
         std  = _to_obj("standard")
