@@ -1,14 +1,15 @@
 # backend/app/core/hourly_engine.py
 """
-HourlyEngine v3.2 — ŹRÓDŁO PRAWDY dla rocznych oszczędności.
+HourlyEngine v3.3 — ŹRÓDŁO PRAWDY dla rocznych oszczędności.
 
-Poprawki v3.2:
+Poprawki v3.3:
 ✅ Realistyczny profil zużycia — szczyt wieczorny, nie dzienny
 ✅ Bateria: charge i discharge NIGDY jednocześnie > 0
 ✅ SOC zawsze w [0, capacity] — bez przepełnienia i ujemnych wartości
 ✅ battery_soc_history zbierany CO GODZINĘ (nie tylko przy nadwyżce)
 ✅ energy_flow_chart_data na poziomie głównej pętli (nie wewnątrz gałęzi)
 ✅ batteryCharge / batteryDischarge zawsze >= 0
+✅ Miesięczne agregaty energii (produkcja, zużycie, autokonsumpcja, nadwyżka, pobór z sieci)
 """
 
 from typing import Dict, Any, List, Optional
@@ -114,6 +115,27 @@ class HourlyEngine:
 
         SUMMER_START = 4032
         WINTER_START = 336
+
+        # ── Mapa godzina → miesiąc (0–11) dla agregatów miesięcznych ─────────
+        DAYS_PER_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+        month_of_hour: List[int] = []
+        for m_idx, days in enumerate(DAYS_PER_MONTH):
+            for _ in range(days * 24):
+                month_of_hour.append(m_idx)
+        # Bez roku przestępnego — 365 dni
+        if len(month_of_hour) != 8760:
+            # awaryjnie dopasuj długość
+            if len(month_of_hour) > 8760:
+                month_of_hour = month_of_hour[:8760]
+            else:
+                month_of_hour += [11] * (8760 - len(month_of_hour))
+
+        monthly_production_kwh: List[float]   = [0.0] * 12
+        monthly_consumption_kwh: List[float]  = [0.0] * 12
+        monthly_autoconsumption: List[float]  = [0.0] * 12
+        monthly_surplus_list: List[float]     = [0.0] * 12
+        monthly_grid_import_list: List[float] = [0.0] * 12
+
         # =====================================================================
         # SYMULACJA GODZINOWA (8760 iteracji)
         # =====================================================================
@@ -123,6 +145,7 @@ class HourlyEngine:
             load_kwh = consumption_profile[hour]
 
             hour_of_day      = hour % 24
+            # stary month (1–12) dla net_billing
             month            = min(12, (hour // 24 // 30) + 1)
             rcem_this_hour   = self.rcem_hourly[hour]
             tariff_this_hour = self.tariff_zones.get(hour_of_day, self.electricity_tariff)
@@ -189,6 +212,13 @@ class HourlyEngine:
             # ── SOC zapisywany CO GODZINĘ — poza if/else ─────────────────────
             battery_soc_history.append(round(battery_soc_kwh, 4))
 
+            # ── Agregacja miesięczna (NOWE) ──────────────────────────────────
+            m_idx = month_of_hour[hour]  # 0–11
+            monthly_production_kwh[m_idx]   += pv_kwh
+            monthly_consumption_kwh[m_idx]  += load_kwh
+            monthly_autoconsumption[m_idx]  += autoconsumption_kwh
+            monthly_surplus_list[m_idx]     += max(0.0, balance)  # nadwyżka brutto
+            monthly_grid_import_list[m_idx] += deficit_kwh
 
             # ── Zapis do wykresów sezonowych (v3.7) ───────────────────────────
             chart_entry = {
@@ -272,6 +302,12 @@ class HourlyEngine:
                 "production_profile":     production_profile,
                 "consumption_profile":    consumption_profile,
                 "soc_profile":            battery_soc_history,
+                # ── NOWE: miesięczne agregaty ────────────────────────────────
+                "monthly_production_kwh":      [round(v, 1) for v in monthly_production_kwh],
+                "monthly_consumption_kwh":     [round(v, 1) for v in monthly_consumption_kwh],
+                "monthly_autoconsumption_kwh": [round(v, 1) for v in monthly_autoconsumption],
+                "monthly_surplus_kwh_list":    [round(v, 1) for v in monthly_surplus_list],
+                "monthly_grid_import_kwh":     [round(v, 1) for v in monthly_grid_import_list],
             },
             "rates": {
                 "autoconsumption_rate":  round(autoconsumption_rate, 3),
@@ -292,7 +328,7 @@ class HourlyEngine:
                 "energy_component_pln_per_kwh":       energy_rate,
                 "distribution_component_pln_per_kwh": distribution_rate,
             },
-            "energy_flow_chart_data": summer_chart_data, # dla kompatybilności wstecznej
+            "energy_flow_chart_data": summer_chart_data,  # dla kompatybilności wstecznej
             "seasonal_charts": {
                 "summer": summer_chart_data,
                 "winter": winter_chart_data
@@ -308,7 +344,7 @@ class HourlyEngine:
         """Paraboliczny profil PV z sezonowością."""
         profile: List[float] = []
         for day in range(365):
-            seasonal = 0.7 + 0.3 * math.sin(2 * math.pi * (day - 80) / 365)
+            seasonal = 0.7 + 0.3 * math.sin(2 * math.pi (day - 80) / 365)
             for h in range(24):
                 hf = (4 * (h - 6) * (18 - h) / 144) if 6 <= h <= 18 else 0.0
                 profile.append((self.annual_production_kwh / 365) * seasonal * hf)
@@ -333,12 +369,12 @@ class HourlyEngine:
         # 2. Wagi godzinowe (Behawioralne)
         HOURLY_WEIGHTS = {
             "at_home": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.8, 1.5, 1.2, 1.0, 2.5, 3.5, 3.0, 2.5, 2.0, 1.5, 2.5, 4.0, 5.0, 4.5, 3.0, 1.5, 0.5, 0.0],
-            "away": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.5, 2.0, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.5, 4.5, 5.5, 4.5, 3.0, 1.5, 0.5, 0.0]
+            "away":    [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.5, 2.0, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.5, 4.5, 5.5, 4.5, 3.0, 1.5, 0.5, 0.0]
         }
 
         # 3. Obliczamy bazę (AGD/RTV)
         base_total = max(0, self.annual_consumption_kwh - self.heating_kwh - self.cooling_kwh)
-        BASE_LOAD_KW = 0.15 # 150W tła (lodówka, standby)
+        BASE_LOAD_KW = 0.15  # 150W tła (lodówka, standby)
         activity_total = max(0, base_total - (365 * 24 * BASE_LOAD_KW))
 
         n_people = max(1, int(self.household_size))
@@ -346,8 +382,6 @@ class HourlyEngine:
         pa = n_people - ph
 
         # FIX: Oblicz rzeczywistą sumę wag dla TEGO konkretnego składu domowników.
-        # Hardcoded 15640 był poprawny tylko dla domyślnego składu i powodował
-        # błędną normalizację (profil sumował się do N×annual_consumption zamiast 1×).
         annual_weight_sum = 0.0
         for _day in range(365):
             _is_weekend = (_day % 7) in [5, 6]
@@ -378,7 +412,6 @@ class HourlyEngine:
                 h_base += BASE_LOAD_KW
                 
                 # B. Grzanie (Płasko w dobie - inercja budynku)
-                                # Pompa pracuje ciężej, gdy spada temperatura (brak słońca)
                 if 9 <= h <= 16:
                     h_heat = (d_heat * 0.35) / 8  # 35% zużycia w 8h słonecznych
                 else:
@@ -388,9 +421,9 @@ class HourlyEngine:
                 h_cool = (d_cool * 0.8 / 6) if 12 <= h <= 18 else (d_cool * 0.2 / 18)
 
                 profile.append(h_base + h_heat + h_cool)
+
         # FIX: Normalizacja końcowa — profil musi sumować się dokładnie
         # do annual_consumption_kwh niezależnie od składu domowników.
-        # Wymagane gdy annual_consumption < BASE_LOAD × 8760 (np. bardzo małe zużycie).
         profile_sum = sum(profile)
         if profile_sum > 0 and abs(profile_sum - self.annual_consumption_kwh) > 1.0:
             scale = self.annual_consumption_kwh / profile_sum
@@ -405,6 +438,7 @@ class HourlyEngine:
         """
         zero_8760 = [0.0] * 8760
         total_cons = sum(consumption_profile)
+        avg_month_cons = total_cons / 12 if total_cons > 0 else 0.0
         
         return {
             "annual_cashflow": {
@@ -413,10 +447,22 @@ class HourlyEngine:
                 "lost_deposit_pln": 0.0, "refund_20pct_pln": 0.0, "distribution_cost_pln": 0.0, "net": 0.0
             },
             "energy_flow": {
-                "total_production_kwh": 0.0, "total_consumption_kwh": round(total_cons, 1),
-                "autoconsumption_kwh": 0.0, "surplus_kwh": 0.0, "grid_import_kwh": round(total_cons, 1),
-                "battery_stored_kwh": 0.0, "battery_discharged_kwh": 0.0,
-                "production_profile": zero_8760, "consumption_profile": consumption_profile, "soc_profile": zero_8760
+                "total_production_kwh": 0.0,
+                "total_consumption_kwh": round(total_cons, 1),
+                "autoconsumption_kwh": 0.0,
+                "surplus_kwh": 0.0,
+                "grid_import_kwh": round(total_cons, 1),
+                "battery_stored_kwh": 0.0,
+                "battery_discharged_kwh": 0.0,
+                "production_profile": zero_8760,
+                "consumption_profile": consumption_profile,
+                "soc_profile": zero_8760,
+                # miesięczne — sensowny fallback
+                "monthly_production_kwh":      [0.0] * 12,
+                "monthly_consumption_kwh":     [round(avg_month_cons, 1)] * 12,
+                "monthly_autoconsumption_kwh": [0.0] * 12,
+                "monthly_surplus_kwh_list":    [0.0] * 12,
+                "monthly_grid_import_kwh":     [round(avg_month_cons, 1)] * 12,
             },
             "rates": {"autoconsumption_rate": 0.0, "self_sufficiency_rate": 0.0},
             "net_billing": {

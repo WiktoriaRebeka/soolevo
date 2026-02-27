@@ -11,7 +11,7 @@ v3.1 - WSZYSTKIE POPRAWKI:
 ✅ Wymiana falownika w ROI
 """
 
-from dataclasses import dataclass
+
 from typing import Dict, Any, Optional, List
 from app.core.hourly_engine import HourlyEngine
 from app.core.battery_engine import BatteryEngine
@@ -26,17 +26,18 @@ from app.data.energy_rates import (
 )
 from app.core.facet_geometry import compute_facet_area_and_length
 from app.core.consumption_engine import decompose_consumption
-@dataclass
-class ScenarioResult:
-    """Wynik obliczeń dla pojedynczego scenariusza."""
+from pydantic import BaseModel
+from typing import Optional, List, Any, Dict
+
+class ScenarioResult(BaseModel):
     scenario_name: str
     panels_count: int
     panel_model: str
-    panel_power_wp: int 
+    panel_power_wp: int
     total_power_kwp: float
     inverter_model: str
     inverter_power_kw: float
-    facet_layouts: List[Any] 
+    facet_layouts: List[Any]
     annual_production_kwh: float
     annual_consumption_kwh: float
     pv_cost_gross_pln: float
@@ -68,6 +69,9 @@ class ScenarioResult:
     shading_loss_percent: float = 0.0
     hourly_result_without_battery: Optional[Dict[str, Any]] = None
     hourly_result_with_battery: Optional[Dict[str, Any]] = None
+
+    class Config:
+        arbitrary_types_allowed = True
 
 class ScenarioRunner:
     """Orkiestruje obliczenia dla pojedynczego scenariusza (premium/standard/economy)."""
@@ -228,6 +232,50 @@ class ScenarioRunner:
         
         # Nakładamy stratę zacienienia na roczną produkcję
         annual_production_kwh = yield_result["annual_kwh"] * (1 - shading_loss)
+        # ── Buduj godzinowy profil produkcji z realnych danych miesięcznych ──
+        def _expand_monthly_to_hourly_production(
+            monthly_kwh_dict: dict,
+            annual_total_kwh: float,
+        ) -> List[float]:
+            """
+            Rozszerza miesięczne dane irradiancji do 8760-godzinowego profilu.
+            Zakłada paraboliczny profil dzienny (6:00-18:00) z sezonową amplitudą.
+            """
+            DAYS_PER_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+            MONTH_KEYS = ["styczeń","luty","marzec","kwiecień","maj","czerwiec",
+                        "lipiec","sierpień","wrzesień","październik","listopad","grudzień"]
+            ALT_KEYS = ["january","february","march","april","may","june",
+                        "july","august","september","october","november","december"]
+
+            monthly_vals = []
+            for k1, k2 in zip(MONTH_KEYS, ALT_KEYS):
+                val = monthly_kwh_dict.get(k1) or monthly_kwh_dict.get(k2) or 0.0
+                monthly_vals.append(float(val))
+
+            profile = []
+            for m_idx, (days, monthly_kwh) in enumerate(zip(DAYS_PER_MONTH, monthly_vals)):
+                daily_kwh = monthly_kwh / days if days > 0 else 0.0
+
+                sun_hours_start = max(5, min(9, int(9 - 4 * math.sin(math.pi * m_idx / 11))))
+                sun_hours_end   = min(21, int(15 + 4 * math.sin(math.pi * m_idx / 11)))
+
+                for d in range(days):
+                    for h in range(24):
+                        if sun_hours_start <= h <= sun_hours_end:
+                            span = sun_hours_end - sun_hours_start
+                            mid  = (sun_hours_start + sun_hours_end) / 2
+                            hf = max(0.0, 1 - ((h - mid) / (span / 2)) ** 2)
+                        else:
+                            hf = 0.0
+                        profile.append(daily_kwh * hf)
+
+            total = sum(profile)
+            if total > 0 and annual_total_kwh > 0:
+                profile = [p * annual_total_kwh / total for p in profile]
+
+            return profile[:8760]
+        prod_monthly = yield_result["monthly_kwh"]
+        real_production_profile = _expand_monthly_to_hourly_production(prod_monthly, annual_production_kwh)
  # =====================================================================
         # KROK 3: PRZYGOTOWANIE PARAMETRÓW TARYFOWYCH (v3.2 - Real Data)
         # =====================================================================
@@ -264,7 +312,8 @@ class ScenarioRunner:
         
         # Rozbijamy zużycie na kubły sezonowe (Base, Heating, Cooling)
         buckets = decompose_consumption(annual_consumption_kwh, self.context["request"])
-        
+        # ── Buduj godzinowy profil produkcji z realnych danych miesięcznych ──
+
         hourly_engine_no_batt = HourlyEngine(
             annual_production_kwh=annual_production_kwh,
             annual_consumption_kwh=annual_consumption_kwh,
@@ -272,15 +321,18 @@ class ScenarioRunner:
             rcem_hourly=rcem_hourly,
             tariff_type=tariff_type,
             tariff_zones=tariff_zones,
-            heating_kwh=buckets["heating_kwh"], # NOWY PARAMETR
-            cooling_kwh=buckets["cooling_kwh"], # NOWY PARAMETR
+            heating_kwh=buckets["heating_kwh"],
+            cooling_kwh=buckets["cooling_kwh"],
             battery_config={
                 "operator": operator,
                 "household_size": self.context.get("household_size", 3),
                 "people_home_weekday": self.context.get("people_home_weekday", 1),
             },
         )
-        hourly_result_no_batt = hourly_engine_no_batt.run_hourly_simulation()
+
+        hourly_result_no_batt = hourly_engine_no_batt.run_hourly_simulation(
+            production_profile=real_production_profile
+        )
         
         # ŹRÓDŁO PRAWDY dla oszczędności PV-only
         pv_savings_pln = hourly_result_no_batt["annual_cashflow"]["net"]
