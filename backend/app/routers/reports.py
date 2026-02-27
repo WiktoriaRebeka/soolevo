@@ -24,7 +24,6 @@ PDF_REPORTS_DIR = os.getenv("PDF_REPORTS_DIR", "/app/reports")
 
 
 def ensure_tables_exist():
-    """Tworzy tabele jeśli nie istnieją — bezpieczne dla dev bez migracji."""
     try:
         Base.metadata.create_all(bind=engine)
         logger.info("Tabele DB zweryfikowane / utworzone")
@@ -33,7 +32,6 @@ def ensure_tables_exist():
 
 
 def generate_mock_pdf(report_token: str) -> str:
-    """Generuje prosty PDF w trybie deweloperskim."""
     try:
         from reportlab.pdfgen import canvas as rl_canvas
 
@@ -64,8 +62,6 @@ def generate_mock_pdf(report_token: str) -> str:
         return pdf_path
 
 
-# ── Schematy ──────────────────────────────────────────────────
-
 class CreateReportRequest(BaseModel):
     input_json: dict
 
@@ -79,8 +75,6 @@ class ReportSummary(BaseModel):
     amount_pln: Optional[float]
 
 
-# ── Endpointy ─────────────────────────────────────────────────
-
 @router.post("/create")
 def create_report(
     req: CreateReportRequest,
@@ -89,24 +83,20 @@ def create_report(
 ):
     ensure_tables_exist()
 
-    # Importy lokalne
+    from app.schemas.scenarios import ScenariosRequest, RoofFacet
     from app.core.engine import (
         calculate_scenarios_engine,
         _prepare_context_from_facet,
         _compute_annual_consumption
     )
-    from app.schemas.scenarios import ScenariosRequest, RoofFacet
+    from app.core.warnings_engine import WarningEngine
     from app.core.report_generator import ReportGenerator
     from app.schemas.report import ReportData
     import uuid
 
-    # 1. Zamieniamy dict → ScenariosRequest
     scenarios_request = ScenariosRequest(**req.input_json)
-
-    # 2. Uruchamiamy kalkulator
     results = calculate_scenarios_engine(scenarios_request)
 
-    # 3. Przygotowujemy dane wejściowe (tak samo jak w /report/data)
     first_facet_raw = scenarios_request.facets[0]
     first_facet = RoofFacet(**first_facet_raw) if isinstance(first_facet_raw, dict) else first_facet_raw
 
@@ -132,7 +122,16 @@ def create_report(
         "roof_type": first_facet.roof_type,
     }
 
-    # 4. Budujemy ReportData
+    standard_scenario = next(
+        (s for s in results.scenarios if s.scenario_name == "standard"),
+        results.scenarios[0]
+    )
+
+    warnings_list = WarningEngine(context).generate_warnings(
+        standard_scenario,
+        context
+    )
+
     report_data = ReportData(
         input_request=scenarios_request,
         input_data_summary=input_data_summary,
@@ -140,14 +139,12 @@ def create_report(
             s.scenario_name: s.model_dump()
             for s in results.scenarios
         },
-        warnings_and_confirmations=results.warnings or []
+        warnings_and_confirmations=warnings_list
     )
 
-    # 5. Generujemy PDF
     generator = ReportGenerator()
     pdf_bytes = generator.generate(report_data)
 
-    # 6. Zapisujemy PDF
     token = str(uuid.uuid4())
     os.makedirs(PDF_REPORTS_DIR, exist_ok=True)
     pdf_path = os.path.join(PDF_REPORTS_DIR, f"{token}.pdf")
