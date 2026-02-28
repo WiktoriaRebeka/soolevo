@@ -1,184 +1,146 @@
-{# ═══════════════════════════════════════════════════════════════════════════
-   S3 — WYKRESY ENERGETYCZNE (Strona 4 — część 2 z 2)
-   NOWY PLIK: s3_charts_p2.html
-   Wykresy: daily_flow + roof_panels
-   Klucze w dict charts{} (z report_generator.py):
-     charts.daily_flow   → PNG base64 (dobowy profil energii)
-     charts.roof_panels  → PNG/SVG base64 (schemat rozmieszczenia paneli na dachu)
-   Obrazy: max-height 350px, data:image/png;base64
-   Strona wymuszona przez page-break w base.html przed tym include.
-═══════════════════════════════════════════════════════════════════════════ #}
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Raport Fotowoltaiczny — Soolevo</title>
+    <style>{{ css_content | safe }}</style>
+</head>
 
-{# ══════════════════════════════════════════════════════════
-   NAGŁÓWEK (kontynuacja S3 bez nowego numeru)
-══════════════════════════════════════════════════════════ #}
-<div class="section-header avoid-break" style="margin-bottom:18px;">
-    <div class="section-header-num">S3</div>
-    <div class="section-header-body">
-        <div class="section-header-title">Wizualizacje energetyczne — cd.</div>
-        <div class="section-header-sub">
-            Dobowy profil obciążenia · schemat instalacji na dachu
-        </div>
-    </div>
-</div>
+<body>
 
+    {# ── Element niewidoczny — przekazuje datę do CSS string() dla stopki @page ── #}
+    <span class="pdf-generation-date" aria-hidden="true">{{ generation_date }}</span>
 
-{# ══════════════════════════════════════════════════════════
-   WYKRES 3 — Dobowy profil przepływu energii
-══════════════════════════════════════════════════════════ #}
-<div class="card avoid-break" style="margin-bottom:16px; padding:18px 20px;
-     page-break-inside:avoid;">
+    {# ════════════════════════════════════════════════════════════════════════
+       OKŁADKA (strona 1)
+       Celowo poza .page-section — zajmuje pełną stronę bez marginesów @page.
+       @page :first usuwa stopkę/nagłówek z tej strony.
+    ════════════════════════════════════════════════════════════════════════ #}
+    <div class="cover-page">
 
-    {# Pasek tytułowy wewnątrz karty #}
-    <div style="
-        display:       flex;
-        align-items:   center;
-        gap:           10px;
-        margin-bottom: 14px;
-        padding-bottom:10px;
-        border-bottom: 1px solid var(--gray-200);
-    ">
-        <div style="
-            width:         4px;
-            height:        22px;
-            background:    #F59E0B;
-            border-radius: 2px;
-            flex-shrink:   0;
-        "></div>
-        <div>
-            <div style="font-size:var(--fs-h3); font-weight:700; color:var(--c-primary); line-height:1.2;">
-                Dobowy profil przepływu energii
+        {# Hero banner — ciemne tło, białe litery #}
+        <div class="cover-hero">
+
+            {# Logo #}
+            <div class="cover-logo">☀ Soolevo<span>.com</span></div>
+
+            {# Tytuł #}
+            <div class="cover-title">Raport<br>Fotowoltaiczny</div>
+            <div class="cover-subtitle">
+                Pełna analiza opłacalności instalacji PV
+                {% if standard and standard.total_power_kwp %}
+                    &nbsp;·&nbsp; System {{ "%.1f"|format(standard.total_power_kwp) }} kWp
+                {% endif %}
             </div>
-            <div style="font-size:var(--fs-xs); color:var(--gray-500);">
-                Produkcja PV · zużycie · autokonsumpcja · eksport/import · typowy dzień letni
+
+            {# Pasek 4 kluczowych statystyk #}
+            <div class="cover-stats-bar">
+                <div class="cover-stat">
+                    <div class="cover-stat-label">Moc systemu</div>
+                    <div class="cover-stat-value">
+                        {% if standard and standard.total_power_kwp %}
+                            {{ "%.1f"|format(standard.total_power_kwp) }} kWp
+                        {% else %}—{% endif %}
+                    </div>
+                </div>
+                <div class="cover-stat">
+                    <div class="cover-stat-label">Koszt instalacji</div>
+                    <div class="cover-stat-value">
+                        {% if standard and standard.pv_cost_gross_pln %}
+                            {{ standard.pv_cost_gross_pln | format_pln }}
+                        {% else %}—{% endif %}
+                    </div>
+                </div>
+                <div class="cover-stat">
+                    <div class="cover-stat-label">Zwrot inwestycji</div>
+                    <div class="cover-stat-value">
+                        {% if standard and standard.pv_payback_years %}
+                            ok. {{ standard.pv_payback_years | round(1) }} lat
+                        {% else %}—{% endif %}
+                    </div>
+                </div>
+                <div class="cover-stat">
+                    <div class="cover-stat-label">Oszczędności 25 lat</div>
+                    <div class="cover-stat-value">
+                        {% if standard and standard.pv_total_savings_25y_pln %}
+                            ok. {{ standard.pv_total_savings_25y_pln | format_pln }}
+                        {% else %}—{% endif %}
+                    </div>
+                </div>
             </div>
-        </div>
+
+        </div>{# /cover-hero #}
+
+
+
+    </div>{# /cover-page #}
+
+
+    {# ════════════════════════════════════════════════════════════════════════
+       STRONA 2+: WŁAŚCIWA TREŚĆ RAPORTU
+       Od tej strony aktywują się nagłówki/stopki z @page.
+    ════════════════════════════════════════════════════════════════════════ #}
+
+    {# S0 — Dane wejściowe + S1 — Werdykt + S2 — Scenariusz główny #}
+    <div class="page-section">
+        {% include "report/s0_inputs.html" %}
+        {% include "report/s1_verdict.html" %}
+        {% include "report/s2_main_scenario.html" %}
     </div>
 
-    {# Obraz wykresu #}
-    {% if charts and charts.daily_flow %}
-    <div style="text-align:center;">
-        <img
-            src="data:image/png;base64,{{ charts.daily_flow }}"
-            alt="Dobowy profil przepływu energii"
-            style="max-width:100%; max-height:350px; height:auto; display:block; margin:0 auto;
-                   border-radius: 8px;"
-        />
+    {# S3 — Wykresy energetyczne (naturalnie dołącza, bez page-break przed) #}
+    <div class="page-section">
+        {% include "report/s3_charts.html" %}
     </div>
-    {% else %}
-    <div style="
-        background:    var(--gray-50);
-        border:        1px dashed var(--gray-300);
-        border-radius: var(--r-md);
-        padding:       40px 20px;
-        text-align:    center;
-        color:         var(--gray-400);
-        font-size:     var(--fs-sm);
-    ">
-        Wykres niedostępny
+
+    <div class="page-break"></div>
+
+    {# S4 — Porównanie wariantów #}
+    <div class="page-section">
+        {% include "report/s4_alternatives.html" %}
+    </div>
+
+    {# S5 — Ostrzeżenia (warunkowo) #}
+    {% if warnings and warnings | length > 0 %}
+    <div class="page-section" style="margin-top: 20px;">
+        {% include "report/s5_warnings.html" %}
     </div>
     {% endif %}
 
-    {# Opis pod wykresem #}
-    <p class="text-xs text-muted" style="margin-top:10px; line-height:1.6;">
-        Wykres godzinowy dla typowego dnia letniego (czerwiec). Żółty obszar — produkcja PV,
-        niebieska linia — zużycie domowe. Zielony obszar to energia autokonsumowana bezpośrednio.
-        Strzałki w górę — eksport nadwyżek do sieci (net-billing), w dół — import energii z sieci
-        w godzinach bez słońca.
-    </p>
+    <div class="page-break"></div>
 
-</div>
+    {# S6 — Dotacje i dofinansowania #}
+    <div class="page-section">
+        {% include "report/s6_subsidies.html" %}
+    </div>
 
+    <div class="page-break"></div>
 
-{# ══════════════════════════════════════════════════════════
-   WYKRES 4 — Schemat rozmieszczenia paneli na dachu
-══════════════════════════════════════════════════════════ #}
-<div class="card avoid-break" style="padding:18px 20px; page-break-inside:avoid;">
+    {# S7 — Przewodnik po procesie zakupu #}
+    <div class="page-section">
+        {% include "report/s7_guide.html" %}
+    </div>
 
-    {# Pasek tytułowy wewnątrz karty #}
-    <div style="
-        display:       flex;
-        align-items:   center;
-        gap:           10px;
-        margin-bottom: 14px;
-        padding-bottom:10px;
-        border-bottom: 1px solid var(--gray-200);
-    ">
-        <div style="
-            width:         4px;
-            height:        22px;
-            background:    var(--c-primary);
-            border-radius: 2px;
-            flex-shrink:   0;
-        "></div>
-        <div>
-            <div style="font-size:var(--fs-h3); font-weight:700; color:var(--c-primary); line-height:1.2;">
-                Schemat rozmieszczenia paneli
-            </div>
-            <div style="font-size:var(--fs-xs); color:var(--gray-500);">
-                Wizualizacja instalacji na połaci dachu · Scenariusz Standard
-            </div>
+    <div class="page-break"></div>
+
+    {# S8 — Następne kroki #}
+    <div class="page-section">
+        {% include "report/s8_next_steps.html" %}
+    </div>
+
+    {# S9 — Zastrzeżenia prawne + stopka wewnętrzna #}
+    <div class="page-section" style="margin-top: 20px;">
+        {% include "report/s9_disclaimer.html" %}
+    </div>
+
+    {# Stopka wewnątrz treści — ostatnia strona #}
+    <div class="report-footer-block avoid-break">
+        <div class="report-footer-brand">☀ Soolevo</div>
+        <div class="report-footer-meta">
+            Wygenerowano {{ generation_date }}<br>
+            Raport fotowoltaiczny v{{ version }}
         </div>
     </div>
 
-    {# Obraz schematu — może być PNG lub SVG base64 #}
-    {% if charts and charts.roof_panels %}
-    <div style="text-align:center;">
-        <img
-            src="data:image/png;base64,{{ charts.roof_panels }}"
-            alt="Schemat rozmieszczenia paneli fotowoltaicznych na dachu"
-            style="max-width:100%; max-height:350px; height:auto; display:block; margin:0 auto;
-                   border-radius: 8px;"
-        />
-    </div>
-    {% else %}
-    <div style="
-        background:    var(--gray-50);
-        border:        1px dashed var(--gray-300);
-        border-radius: var(--r-md);
-        padding:       40px 20px;
-        text-align:    center;
-        color:         var(--gray-400);
-        font-size:     var(--fs-sm);
-    ">
-        Schemat niedostępny — podaj wymiary dachu w kalkulatorze
-    </div>
-    {% endif %}
-
-    {# Dane techniczne pod schematem #}
-    {% if standard %}
-    <div style="
-        display:               grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap:                   10px;
-        margin-top:            14px;
-        padding-top:           12px;
-        border-top:            1px solid var(--gray-200);
-    ">
-        <div style="text-align:center;">
-            <div class="label-sm">Panele</div>
-            <div class="value-base text-primary">
-                {{ standard.panels_count | default("—") }} szt.
-            </div>
-            {% if standard.panel_power_wp %}
-            <div class="text-xs text-muted">{{ standard.panel_power_wp }} Wp / szt.</div>
-            {% endif %}
-        </div>
-        <div style="text-align:center;">
-            <div class="label-sm">Moc systemu</div>
-            <div class="value-base text-accent">
-                {{ "%.2f"|format(standard.total_power_kwp | default(0)) }} kWp
-            </div>
-            <div class="text-xs text-muted">Scenariusz Standard</div>
-        </div>
-        <div style="text-align:center;">
-            <div class="label-sm">Produkcja roczna</div>
-            <div class="value-base text-green">
-                {{ standard.annual_production_kwh | default(0) | round | int | format_num }} kWh
-            </div>
-            <div class="text-xs text-muted">szac. / rok</div>
-        </div>
-    </div>
-    {% endif %}
-
-</div>
+</body>
+</html>
