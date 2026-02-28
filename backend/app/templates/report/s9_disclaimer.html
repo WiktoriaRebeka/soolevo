@@ -1,41 +1,144 @@
-<div class="avoid-break mb-6">
+{# ═══════════════════════════════════════════════════════════════════════════
+   S9 — NOTA PRAWNA I ZASTRZEŻENIA KOŃCOWE
+   Wymogi:
+     • font-size: 9pt (mały druk)
+     • kolor: var(--gray-500) — szary, nieagresywny
+     • wzmianka o KC (Kodeks cywilny)
+     • brak @page — sekcja inline, nie wymaga nowej strony
+   Zmienne: generation_date, version, standard (do kwot)
+═══════════════════════════════════════════════════════════════════════════ #}
 
-    <!-- Nagłówek S9 — bez emotikony -->
-    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-        <div style="background: var(--gray-400); color: white; font-size: 10px; font-weight: 800;
-                    padding: 4px 12px; border-radius: 6px; text-transform: uppercase;
-                    letter-spacing: .05em; flex-shrink: 0;">S9</div>
-        <div style="font-size: 15px; font-weight: 700; color: var(--gray-700);">
-            Zastrzeżenia i informacje końcowe
-        </div>
+{# ══════════════════════════════════════════════════════════
+   SEPARATOR WIZUALNY
+══════════════════════════════════════════════════════════ #}
+<div style="
+    border-top:  2px solid var(--gray-200);
+    margin:      8px 0 20px;
+"></div>
+
+{# ══════════════════════════════════════════════════════════
+   NAGŁÓWEK S9 — przyciemniony, mniejszy niż inne sekcje
+══════════════════════════════════════════════════════════ #}
+<div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;" class="avoid-break">
+    <div style="
+        background:    var(--gray-400);
+        color:         white;
+        font-size:     8pt;
+        font-weight:   800;
+        padding:       3px 10px;
+        border-radius: var(--r-sm);
+        text-transform:uppercase;
+        letter-spacing:.05em;
+        flex-shrink:   0;
+    ">S9</div>
+    <div style="font-size:10pt; font-weight:700; color:var(--gray-500);">
+        Nota prawna i zastrzeżenia końcowe
     </div>
+</div>
 
-    <div class="card" style="border-color: var(--gray-200);">
+{# ══════════════════════════════════════════════════════════
+   TREŚĆ — mały druk 9pt, szary
+══════════════════════════════════════════════════════════ #}
+<div class="avoid-break" style="
+    background:    var(--gray-50);
+    border:        1px solid var(--gray-200);
+    border-radius: var(--r-md);
+    padding:       16px 20px;
+    font-size:     9pt;
+    color:         var(--gray-500);
+    line-height:   1.7;
+">
 
-        <p class="text-base text-muted" style="margin-bottom: 12px; line-height: 1.65;">
-            Niniejszy raport został przygotowany na podstawie danych podanych przez użytkownika
-            oraz dostępnych modeli produkcji energii dla instalacji fotowoltaicznych.
-            Wyniki mają charakter szacunkowy i mogą różnić się od rzeczywistych wartości.
-        </p>
+    {# ── Akapit 1: Charakter raportu #}
+    <p style="margin:0 0 10px;">
+        <strong style="color:var(--gray-700);">1. Charakter dokumentu.</strong>
+        Niniejszy raport fotowoltaiczny (dalej: „Raport") został wygenerowany
+        automatycznie przez system Soolevo na podstawie danych podanych przez użytkownika.
+        <strong style="color:var(--gray-700);">Raport stanowi wyłącznie symulację
+        komputerową i nie stanowi oferty handlowej w rozumieniu art. 66 ustawy
+        z dnia 23 kwietnia 1964 r. — Kodeks cywilny</strong> (Dz.U. 1964 Nr 16 poz. 93
+        z późn. zm.). Raport nie jest także ekspertyzą techniczną, audytem energetycznym
+        ani dokumentacją projektową w rozumieniu przepisów prawa budowlanego.
+    </p>
 
-        <p class="text-base text-muted" style="margin-bottom: 12px; line-height: 1.65;">
-            Produkcja energii zależy od wielu czynników, takich jak warunki pogodowe,
-            zacienienie, stan techniczny instalacji oraz sposób użytkowania energii.
-            Przed podjęciem decyzji inwestycyjnej zaleca się konsultację z certyfikowanym instalatorem.
-        </p>
+    {# ── Akapit 2: Szacunkowy charakter wyników #}
+    <p style="margin:0 0 10px;">
+        <strong style="color:var(--gray-700);">2. Szacunkowy charakter wyników.</strong>
+        Wszelkie wartości liczbowe zawarte w Raporcie — w szczególności roczna produkcja energii,
+        oszczędności, czas zwrotu inwestycji oraz zysk po 25 latach — mają charakter
+        <strong style="color:var(--gray-700);">szacunkowy i poglądowy</strong>.
+        Rzeczywiste wyniki mogą różnić się od przedstawionych prognoz w zależności od:
+        warunków atmosferycznych i nasłonecznienia w danym roku,
+        stopnia zacieniowania dachu przez przeszkody terenowe,
+        tempa wzrostu cen energii elektrycznej,
+        faktycznego zużycia energii przez domowników,
+        stanu technicznego instalacji, degradacji paneli oraz sprawności falownika.
+        Obliczenia oparto na modelu godzinowej symulacji dla województwa
+        <strong style="color:var(--gray-700);">{{ req.province | capitalize }}</strong>
+        i standardowych wskaźnikach produkcji dla tej strefy klimatycznej Polski.
+    </p>
 
-        <p class="text-base text-muted" style="margin-bottom: 12px; line-height: 1.65;">
-            Informacje dotyczące dotacji i ulg podatkowych mogą ulegać zmianom.
-            Aktualne zasady i warunki należy każdorazowo weryfikować w oficjalnych źródłach
-            (nfosigw.gov.pl, wfosigw.pl, udt.gov.pl).
-        </p>
+    {# ── Akapit 3: Dotacje i przepisy #}
+    <p style="margin:0 0 10px;">
+        <strong style="color:var(--gray-700);">3. Informacje o dotacjach.</strong>
+        Dane dotyczące programów dofinansowania (Mój Prąd, Czyste Powietrze, Grant OZE,
+        Energia dla Wsi) są aktualne na dzień
+        <strong style="color:var(--gray-700);">{{ generation_date }}</strong>
+        i mogą ulec zmianie bez uprzedzenia wskutek decyzji organów administracji rządowej
+        lub wyczerpania środków. Autorzy Raportu nie ponoszą odpowiedzialności za zmiany
+        zasad przyznawania dofinansowań zaistniałe po dacie wygenerowania Raportu.
+        Aktualne warunki należy każdorazowo weryfikować na stronach
+        <em>nfosigw.gov.pl</em>, <em>czystepowietrze.gov.pl</em> i regionalnych WFOŚiGW.
+    </p>
 
-        <p class="text-base text-muted" style="margin: 0; line-height: 1.65;">
-            Raport ma charakter informacyjny i nie stanowi oferty handlowej w rozumieniu
-            Kodeksu cywilnego. Autorzy nie ponoszą odpowiedzialności za decyzje
-            podjęte wyłącznie na jego podstawie.
-        </p>
+    {# ── Akapit 4: Odpowiedzialność #}
+    <p style="margin:0 0 10px;">
+        <strong style="color:var(--gray-700);">4. Ograniczenie odpowiedzialności.</strong>
+        Soolevo sp. z o.o. (operator systemu) dokłada wszelkich starań, aby informacje
+        zawarte w Raporcie były rzetelne i oparte na aktualnych danych. Operator nie ponosi
+        jednak odpowiedzialności za decyzje inwestycyjne podjęte wyłącznie na podstawie
+        niniejszego Raportu, szkody wynikłe z rozbieżności między prognozowanymi
+        a rzeczywistymi parametrami instalacji, ani za błędy wynikłe z podania
+        przez użytkownika nieprawdziwych lub niepełnych danych wejściowych.
+        Przed zawarciem umowy z instalatorem zalecana jest weryfikacja parametrów technicznych
+        przez certyfikowanego projektanta OZE posiadającego aktualne uprawnienia UDT.
+    </p>
 
+    {# ── Akapit 5: Ochrona danych i własność #}
+    <p style="margin:0 0 10px;">
+        <strong style="color:var(--gray-700);">5. Własność intelektualna.</strong>
+        Metodologia obliczeń, algorytmy symulacji oraz szata graficzna Raportu
+        stanowią własność Soolevo sp. z o.o. i podlegają ochronie na podstawie
+        ustawy z dnia 4 lutego 1994 r. o prawie autorskim i prawach pokrewnych.
+        Raport przeznaczony jest wyłącznie do użytku osobistego odbiorcy i nie może
+        być powielany ani udostępniany publicznie bez zgody Operatora.
+    </p>
+
+    {# ── Metadane dokumentu #}
+    <div style="
+        margin-top:  12px;
+        padding-top: 10px;
+        border-top:  1px solid var(--gray-200);
+        display:     flex;
+        flex-wrap:   wrap;
+        gap:         4px 16px;
+        font-size:   8pt;
+        color:       var(--gray-400);
+    ">
+        <span>Wygenerowano: <strong style="color:var(--gray-500);">{{ generation_date }}</strong></span>
+        <span>&nbsp;·&nbsp;</span>
+        <span>Wersja raportu: <strong style="color:var(--gray-500);">{{ version }}</strong></span>
+        <span>&nbsp;·&nbsp;</span>
+        <span>Scenariusz: <strong style="color:var(--gray-500);">Standard</strong></span>
+        <span>&nbsp;·&nbsp;</span>
+        <span>Województwo: <strong style="color:var(--gray-500);">{{ req.province | capitalize }}</strong></span>
+        <span>&nbsp;·&nbsp;</span>
+        <span>Moc: <strong style="color:var(--gray-500);">{{ "%.2f" | format(standard.total_power_kwp | default(0)) }} kWp</strong></span>
+        <span style="flex-basis:100%; margin-top:4px;">
+            Dokument ma charakter informacyjny.
+            Nie stanowi oferty w rozumieniu KC art. 66.
+            Soolevo &copy; {{ generation_date[:4] }}
+        </span>
     </div>
 
 </div>
