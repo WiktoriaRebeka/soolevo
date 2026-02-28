@@ -12,105 +12,97 @@
     <span class="pdf-generation-date" aria-hidden="true">{{ generation_date }}</span>
 
     {# ════════════════════════════════════════════════════════════════════════
-       STRONA 1: DASHBOARD — Okładka + Dane wejściowe + Werdykt
-       Okładka NIE ma page-break-after — S0 i S1 dołączają na tej samej stronie.
-       @page :first usuwa stopkę/nagłówek z pierwszej strony.
+       OKŁADKA (strona 1)
+       Celowo poza .page-section — zajmuje pełną stronę bez marginesów @page.
+       @page :first usuwa stopkę/nagłówek z tej strony.
+    ════════════════════════════════════════════════════════════════════════ #}
+    <div class="cover-page">
+
+        {# Hero banner — ciemne tło, białe litery #}
+        <div class="cover-hero">
+
+            {# Logo #}
+            <div class="cover-logo">☀ Soolevo<span>.com</span></div>
+
+            {# Tytuł #}
+            <div class="cover-title">Raport<br>Fotowoltaiczny</div>
+            <div class="cover-subtitle">
+                Pełna analiza opłacalności instalacji PV
+                {% if standard and standard.total_power_kwp %}
+                    &nbsp;·&nbsp; System {{ "%.1f"|format(standard.total_power_kwp) }} kWp
+                {% endif %}
+            </div>
+
+            {# Pasek 4 kluczowych statystyk #}
+            <div class="cover-stats-bar">
+                <div class="cover-stat">
+                    <div class="cover-stat-label">Moc systemu</div>
+                    <div class="cover-stat-value">
+                        {% if standard and standard.total_power_kwp %}
+                            {{ "%.1f"|format(standard.total_power_kwp) }} kWp
+                        {% else %}—{% endif %}
+                    </div>
+                </div>
+                <div class="cover-stat">
+                    <div class="cover-stat-label">Koszt instalacji</div>
+                    <div class="cover-stat-value">
+                        {% if standard and standard.pv_cost_gross_pln %}
+                            {{ standard.pv_cost_gross_pln | format_pln }}
+                        {% else %}—{% endif %}
+                    </div>
+                </div>
+                <div class="cover-stat">
+                    <div class="cover-stat-label">Zwrot inwestycji</div>
+                    <div class="cover-stat-value">
+                        {% if standard and standard.pv_payback_years %}
+                            ok. {{ standard.pv_payback_years | round(1) }} lat
+                        {% else %}—{% endif %}
+                    </div>
+                </div>
+                <div class="cover-stat">
+                    <div class="cover-stat-label">Oszczędności 25 lat</div>
+                    <div class="cover-stat-value">
+                        {% if standard and standard.pv_total_savings_25y_pln %}
+                            ok. {{ standard.pv_total_savings_25y_pln | format_pln }}
+                        {% else %}—{% endif %}
+                    </div>
+                </div>
+            </div>
+
+        </div>{# /cover-hero #}
+
+
+
+    </div>{# /cover-page #}
+
+
+    {# ════════════════════════════════════════════════════════════════════════
+       STRONA 2+: WŁAŚCIWA TREŚĆ RAPORTU
+       Od tej strony aktywują się nagłówki/stopki z @page.
     ════════════════════════════════════════════════════════════════════════ #}
 
-    {# ── COVER HERO (Dashboard header — premium, ciemne tło) ─────────────── #}
-    <div class="cover-hero-dashboard">
-
-        {# Logo #}
-        <div class="cover-logo">☀ Soolevo<span>.com</span></div>
-
-        {# Tytuł + podtytuł #}
-        <div class="cover-title">Raport<br>Fotowoltaiczny</div>
-        <div class="cover-subtitle">
-            Pełna analiza opłacalności instalacji PV
-            {% if standard and standard.total_power_kwp %}
-                &nbsp;·&nbsp; System {{ "%.1f"|format(standard.total_power_kwp) }} kWp
-            {% endif %}
-            {% if req and req.province %}
-                &nbsp;·&nbsp; Woj.&nbsp;<strong style="color:white;">{{ req.province | capitalize }}</strong>
-            {% endif %}
-            &nbsp;·&nbsp; {{ generation_date }}
-        </div>
-
-        {# Pasek 4 kluczowych KPI #}
-        <div class="cover-stats-bar">
-            <div class="cover-stat">
-                <div class="cover-stat-label">Moc systemu</div>
-                <div class="cover-stat-value">
-                    {% if standard and standard.total_power_kwp %}
-                        {{ "%.1f"|format(standard.total_power_kwp) }} kWp
-                    {% else %}—{% endif %}
-                </div>
-            </div>
-            <div class="cover-stat">
-                <div class="cover-stat-label">Koszt instalacji</div>
-                <div class="cover-stat-value">
-                    {% if standard and standard.pv_cost_gross_pln %}
-                        {{ standard.pv_cost_gross_pln | format_pln }}
-                    {% else %}—{% endif %}
-                </div>
-            </div>
-            <div class="cover-stat">
-                <div class="cover-stat-label">Zwrot inwestycji</div>
-                <div class="cover-stat-value">
-                    {% if standard and standard.pv_payback_years %}
-                        ok. {{ standard.pv_payback_years | round(1) }} lat
-                    {% else %}—{% endif %}
-                </div>
-            </div>
-            <div class="cover-stat">
-                <div class="cover-stat-label">Oszczędności 25 lat</div>
-                <div class="cover-stat-value">
-                    {% if standard and standard.pv_total_savings_25y_pln %}
-                        ok. {{ standard.pv_total_savings_25y_pln | format_pln }}
-                    {% else %}—{% endif %}
-                </div>
-            </div>
-        </div>
-
-    </div>{# /cover-hero-dashboard #}
-
-    {# ── S0 + S1 bez page-break — kontynuacja na stronie 1 ──────────────── #}
-    <div class="page-section" style="margin-top: 14px;">
+    {# S0 — Dane wejściowe + S1 — Werdykt + S2 — Scenariusz główny #}
+    <div class="page-section">
         {% include "report/s0_inputs.html" %}
         {% include "report/s1_verdict.html" %}
+        {% include "report/s2_main_scenario.html" %}
     </div>
 
-    {# ════════════════════════════════════════════════════════════════════════
-       STRONA 2: S4 — Porównanie wariantów (awans z dawnej strony 4)
-    ════════════════════════════════════════════════════════════════════════ #}
-    <div class="page-break"></div>
-
-    <div class="page-section">
-        {% include "report/s4_alternatives.html" %}
-    </div>
-
-    {# ════════════════════════════════════════════════════════════════════════
-       STRONA 3: S3 — Wykresy (monthly_balance + cashflow_25)
-    ════════════════════════════════════════════════════════════════════════ #}
-    <div class="page-break"></div>
-
+    {# S3 — Wykresy energetyczne (naturalnie dołącza, bez page-break przed) #}
     <div class="page-section">
         {% include "report/s3_charts.html" %}
     </div>
 
-    {# ════════════════════════════════════════════════════════════════════════
-       STRONA 4: S3 cd. — Wykresy (daily_flow + roof_panels)
-    ════════════════════════════════════════════════════════════════════════ #}
     <div class="page-break"></div>
 
+    {# S4 — Porównanie wariantów #}
     <div class="page-section">
-        {% include "report/s3_charts_p2.html" %}
+        {% include "report/s4_alternatives.html" %}
     </div>
 
-    {# S5 — Ostrzeżenia (warunkowo, po wykresach) #}
+    {# S5 — Ostrzeżenia (warunkowo) #}
     {% if warnings and warnings | length > 0 %}
-    <div class="page-break"></div>
-    <div class="page-section">
+    <div class="page-section" style="margin-top: 20px;">
         {% include "report/s5_warnings.html" %}
     </div>
     {% endif %}
