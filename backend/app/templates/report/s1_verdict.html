@@ -1,69 +1,238 @@
-{% set payback = standard.pv_payback_years %}
-{% set profit25 = standard.pv_total_savings_25y_pln %}
-{% set savings1y = standard.pv_savings_pln %}
+{# ═══════════════════════════════════════════════════════════════════════════
+   S1 — WERDYKT
+   Zmienne: standard (ScenarioResponseItem dict)
+   Pola:  pv_payback_years, pv_total_savings_25y_pln, pv_savings_pln,
+          coverage_percent, autoconsumption_rate, self_sufficiency_rate,
+          total_power_kwp, annual_production_kwh
+   Filtry: format_pln
+═══════════════════════════════════════════════════════════════════════════ #}
 
-{# Logika werdyktu #}
-{% if payback and payback < 12 and profit25 > 0 %}
-    {% set verdict_type = "positive" %}
-    {% set verdict_badge = "TAK" %}
-    {% set verdict_title = "Fotowoltaika jest opłacalna" %}
-    {% set verdict_color_class = "text-green" %}
-{% elif payback and payback < 20 %}
-    {% set verdict_type = "warning" %}
-    {% set verdict_badge = "WARUNKOWO" %}
-    {% set verdict_title = "Sprawdź zastrzeżenia przed decyzją" %}
-    {% set verdict_color_class = "text-yellow" %}
+{% set payback   = standard.pv_payback_years        | default(0) %}
+{% set profit25  = standard.pv_total_savings_25y_pln | default(0) %}
+{% set savings1y = standard.pv_savings_pln           | default(0) %}
+
+{# ── Skala 5-stopniowa opłacalności (bardziej granularna niż stara 3-stan) ── #}
+{% if payback > 0 and payback <= 8 and profit25 > 0 %}
+    {% set vtype  = "positive" %}
+    {% set vbadge = "DOSKONALE" %}
+    {% set vtitle = "Bardzo wysoka opłacalność" %}
+    {% set vdesc  = "Instalacja zwróci się wyjątkowo szybko. To jedna z najlepszych inwestycji dostępnych na rynku." %}
+    {% set vcolor = "var(--c-green)" %}
+    {% set vbg    = "var(--light-green)" %}
+    {% set vborder= "var(--c-green)" %}
+    {% set vstar  = "★★★★★" %}
+
+{% elif payback > 8 and payback <= 12 and profit25 > 0 %}
+    {% set vtype  = "positive" %}
+    {% set vbadge = "TAK" %}
+    {% set vtitle = "Fotowoltaika jest opłacalna" %}
+    {% set vdesc  = "Zwrot inwestycji mieści się w standardowym, dobrym przedziale. Zdecydowanie rekomendujemy." %}
+    {% set vcolor = "var(--c-green)" %}
+    {% set vbg    = "var(--light-green)" %}
+    {% set vborder= "var(--c-green)" %}
+    {% set vstar  = "★★★★☆" %}
+
+{% elif payback > 12 and payback <= 16 %}
+    {% set vtype  = "warning" %}
+    {% set vbadge = "WARUNKOWO" %}
+    {% set vtitle = "Opłacalność umiarkowana" %}
+    {% set vdesc  = "Inwestycja zwróci się w dłuższym horyzoncie. Sprawdź ostrzeżenia i rozważ dotacje." %}
+    {% set vcolor = "var(--c-yellow)" %}
+    {% set vbg    = "var(--light-yellow)" %}
+    {% set vborder= "var(--c-yellow)" %}
+    {% set vstar  = "★★★☆☆" %}
+
+{% elif payback > 16 and payback <= 22 %}
+    {% set vtype  = "warning" %}
+    {% set vbadge = "RYZYKOWNE" %}
+    {% set vtitle = "Długi okres zwrotu — przeanalizuj uważnie" %}
+    {% set vdesc  = "Czas zwrotu przekracza 16 lat. Opłacalność zależy w dużym stopniu od wzrostu cen energii." %}
+    {% set vcolor = "var(--c-yellow)" %}
+    {% set vbg    = "var(--light-yellow)" %}
+    {% set vborder= "var(--c-yellow)" %}
+    {% set vstar  = "★★☆☆☆" %}
+
 {% else %}
-    {% set verdict_type = "danger" %}
-    {% set verdict_badge = "NIE" %}
-    {% set verdict_title = "Inwestycja może być nieopłacalna" %}
-    {% set verdict_color_class = "text-red" %}
+    {% set vtype  = "danger" %}
+    {% set vbadge = "NIE" %}
+    {% set vtitle = "Inwestycja potencjalnie nieopłacalna" %}
+    {% set vdesc  = "Przy obecnych parametrach zwrot przekraczałby 22 lata lub dane są niewystarczające. Skonsultuj się z instalatorem." %}
+    {% set vcolor = "var(--c-red)" %}
+    {% set vbg    = "var(--light-red)" %}
+    {% set vborder= "var(--c-red)" %}
+    {% set vstar  = "★☆☆☆☆" %}
 {% endif %}
 
-<div class="verdict-card {{ verdict_type }} avoid-break mb-6">
+{# ══════════════════════════════════════════════════════════
+   KARTA WERDYKTU
+══════════════════════════════════════════════════════════ #}
+<div class="avoid-break" style="
+    background:    {{ vbg }};
+    border:        2px solid {{ vborder }};
+    border-radius: var(--r-lg);
+    margin-bottom: 16px;
+    overflow:      hidden;
+">
 
-    <!-- Nagłówek -->
-    <div class="flex-row gap-16 mb-4" style="align-items: center;">
-        <div class="verdict-badge verdict-badge-{{ verdict_type }}">{{ verdict_badge }}</div>
-        <h2 class="verdict-title {{ verdict_color_class }}" style="margin: 0;">
-            {{ verdict_title }}
-        </h2>
-    </div>
+    {# Pasek kolorowy na górze — identyczny z premium card z JSX #}
+    <div style="height:4px; background:{{ vcolor }};"></div>
 
-    <!-- Opis -->
-    <p class="text-base mb-6" style="color: var(--gray-700); line-height: 1.65;">
-        Szacowany czas zwrotu instalacji wynosi około
-        <strong class="{{ verdict_color_class }}">{{ payback | round(1) }} lat</strong>.
-        W ciągu 25 lat eksploatacji możliwy zysk to około
-        <strong class="{{ verdict_color_class }}">{{ profit25 | format_pln }}</strong>.
-        Prognozowane oszczędności w pierwszym roku wynoszą około
-        <strong class="{{ verdict_color_class }}">{{ savings1y | format_pln }}</strong>.
-        Wartości te zależą od warunków atmosferycznych, zmian cen energii oraz faktycznego zużycia.
-    </p>
+    <div style="padding: 20px 22px;">
 
-    <!-- Trzy kafelki -->
-    <div class="grid-3">
+        {# ── WIERSZ: badge + gwiazdki + tytuł ─────────────────────── #}
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px; flex-wrap:wrap;">
+            <span style="
+                background:    {{ vcolor }};
+                color:         white;
+                font-size:     var(--fs-badge);
+                font-weight:   900;
+                letter-spacing:.08em;
+                text-transform:uppercase;
+                padding:       4px 12px;
+                border-radius: var(--r-pill);
+                white-space:   nowrap;
+            ">{{ vbadge }}</span>
 
-        <div class="stat-box">
-            <div class="label-sm">Zwrot inwestycji</div>
-            <div class="value-xl {{ verdict_color_class }}">
-                ok. {{ payback | round(1) }} lat
-            </div>
+            <span style="font-size:11pt; color:{{ vcolor }}; letter-spacing:2px;">
+                {{ vstar }}
+            </span>
+
+            <h2 style="
+                font-size:   var(--fs-h2);
+                font-weight: 900;
+                color:       {{ vcolor }};
+                margin:      0;
+                line-height: 1.2;
+            ">{{ vtitle }}</h2>
         </div>
 
-        <div class="stat-box">
-            <div class="label-sm">Szacowany zysk po 25 latach</div>
-            <div class="value-xl {{ verdict_color_class }}">
-                ok. {{ profit25 | format_pln }}
-            </div>
-        </div>
+        {# ── Opis słowny ───────────────────────────────────────────── #}
+        <p style="
+            font-size:   var(--fs-body);
+            color:       var(--gray-700);
+            line-height: 1.65;
+            margin:      0 0 18px;
+        ">
+            {{ vdesc }}
+            Szacowany czas zwrotu to około
+            <strong style="color:{{ vcolor }};">{{ payback | round(1) }} lat</strong>.
+            Łączny zysk przez 25 lat wyniesie ok.
+            <strong style="color:{{ vcolor }};">{{ profit25 | format_pln }}</strong>,
+            a już w pierwszym roku zaoszczędzisz ok.
+            <strong style="color:{{ vcolor }};">{{ savings1y | format_pln }}</strong>.
+        </p>
 
-        <div class="stat-box">
-            <div class="label-sm">Oszczędności — rok 1</div>
-            <div class="value-xl {{ verdict_color_class }}">
-                ok. {{ savings1y | format_pln }}
-            </div>
-        </div>
+        {# ── Trzy KPI ──────────────────────────────────────────────── #}
+        <div class="grid-3" style="gap:12px;">
 
-    </div>
+            {# KPI 1: Zwrot #}
+            <div style="
+                background:    white;
+                border:        1px solid {{ vborder }};
+                border-radius: var(--r-md);
+                padding:       13px 14px;
+                text-align:    center;
+            ">
+                <div class="label-sm" style="margin-bottom:6px;">Zwrot inwestycji</div>
+                <div style="font-size:var(--fs-h1); font-weight:900; color:{{ vcolor }}; line-height:1.1;">
+                    {{ payback | round(1) }}
+                    <span style="font-size:var(--fs-body); font-weight:700;">lat</span>
+                </div>
+                <div style="font-size:var(--fs-xs); color:var(--gray-500); margin-top:3px;">
+                    {% if standard.pv_payback_optimistic_years and standard.pv_payback_pessimistic_years %}
+                        {{ standard.pv_payback_optimistic_years | round(1) }}–{{ standard.pv_payback_pessimistic_years | round(1) }} lat (przedział)
+                    {% endif %}
+                </div>
+            </div>
+
+            {# KPI 2: Zysk 25 lat #}
+            <div style="
+                background:    white;
+                border:        1px solid {{ vborder }};
+                border-radius: var(--r-md);
+                padding:       13px 14px;
+                text-align:    center;
+            ">
+                <div class="label-sm" style="margin-bottom:6px;">Zysk po 25 latach</div>
+                <div style="font-size:var(--fs-h2); font-weight:900; color:{{ vcolor }}; line-height:1.15;">
+                    ok. {{ profit25 | format_pln }}
+                </div>
+                <div style="font-size:var(--fs-xs); color:var(--gray-500); margin-top:3px;">
+                    po odjęciu kosztów instalacji
+                </div>
+            </div>
+
+            {# KPI 3: Oszczędności rok 1 #}
+            <div style="
+                background:    white;
+                border:        1px solid {{ vborder }};
+                border-radius: var(--r-md);
+                padding:       13px 14px;
+                text-align:    center;
+            ">
+                <div class="label-sm" style="margin-bottom:6px;">Oszczędności — rok 1</div>
+                <div style="font-size:var(--fs-h2); font-weight:900; color:{{ vcolor }}; line-height:1.15;">
+                    ok. {{ savings1y | format_pln }}
+                </div>
+                <div style="font-size:var(--fs-xs); color:var(--gray-500); margin-top:3px;">
+                    autokonsumpcja + net-billing
+                </div>
+            </div>
+
+        </div>{# /grid-3 #}
+
+        {# ── Pasek efektywności (coverage + autoconsumption) ───────── #}
+        {% set cov_pct = (standard.coverage_percent | default(0)) | round | int %}
+        {% set ac_pct  = ((standard.autoconsumption_rate | default(0)) * 100) | round | int %}
+        {% set ss_pct  = ((standard.self_sufficiency_rate | default(0)) * 100) | round | int %}
+
+        {% if cov_pct > 0 or ac_pct > 0 %}
+        <div style="margin-top:18px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
+
+            {# Pokrycie zapotrzebowania #}
+            <div>
+                <div class="progress-header">
+                    <span class="progress-title">Pokrycie zużycia</span>
+                    <span class="progress-value" style="color:{{ vcolor }};">{{ cov_pct }}%</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill progress-fill--standard"
+                         style="width:{{ [cov_pct, 100] | min }}%;
+                                background:{{ vcolor }};"></div>
+                </div>
+                <div class="progress-sublabel">Ile zużycia PV pokrywa rocznie</div>
+            </div>
+
+            {# Autokonsumpcja #}
+            <div>
+                <div class="progress-header">
+                    <span class="progress-title">Autokonsumpcja</span>
+                    <span class="progress-value" style="color:{{ vcolor }};">{{ ac_pct }}%</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill"
+                         style="width:{{ [ac_pct, 100] | min }}%;
+                                background:{{ vcolor }};"></div>
+                </div>
+                <div class="progress-sublabel">Produkcja zużyta bezpośrednio</div>
+            </div>
+
+            {# Samowystarczalność #}
+            <div>
+                <div class="progress-header">
+                    <span class="progress-title">Samowystarczalność</span>
+                    <span class="progress-value" style="color:{{ vcolor }};">{{ ss_pct }}%</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill"
+                         style="width:{{ [ss_pct, 100] | min }}%;
+                                background:{{ vcolor }};"></div>
+                </div>
+                <div class="progress-sublabel">Potrzeby domu pokryte przez PV</div>
+            </div>
+
+        </div>
+        {% endif %}
+
+    </div>{# /padding #}
 </div>
