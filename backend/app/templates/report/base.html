@@ -12,97 +12,149 @@
     <span class="pdf-generation-date" aria-hidden="true">{{ generation_date }}</span>
 
     {# ════════════════════════════════════════════════════════════════════════
-       OKŁADKA (strona 1)
-       Celowo poza .page-section — zajmuje pełną stronę bez marginesów @page.
-       @page :first usuwa stopkę/nagłówek z tej strony.
+       STRONA 1 — DASHBOARD
+       Hero banner NIE ma break-after:page — S0 i S1 kontynuują na tej samej stronie.
+       Używamy inline style zamiast klas cover-page/cover-hero
+       żeby uniknąć CSS break-after:always z raportu.
     ════════════════════════════════════════════════════════════════════════ #}
-    <div class="cover-page">
+    <div style="
+        background:     linear-gradient(155deg, #1B4F72 0%, #154360 45%, #0E2A45 100%);
+        padding:        22mm 16mm 0 16mm;
+        margin:         -18mm -16mm 18px -16mm;
+        position:       relative;
+        overflow:       hidden;
+        border-radius:  0 0 12px 12px;
+        page-break-inside: avoid;
+        break-inside:   avoid;
+    ">
+        {# Dekoracyjne kule w tle #}
+        <div style="position:absolute; top:-30mm; right:-20mm; width:80mm; height:80mm;
+                    border-radius:50%; background:rgba(46,134,193,0.25);"></div>
+        <div style="position:absolute; bottom:-10mm; right:10mm; width:40mm; height:40mm;
+                    border-radius:50%; background:rgba(46,134,193,0.15);"></div>
 
-        {# Hero banner — ciemne tło, białe litery #}
-        <div class="cover-hero">
+        {# Logo #}
+        <div style="font-size:14pt; font-weight:900; color:white; letter-spacing:-0.01em;
+                    margin-bottom:8mm; position:relative; z-index:1;">
+            ☀ Soolevo<span style="color:#5DADE2;">.com</span>
+        </div>
 
-            {# Logo #}
-            <div class="cover-logo">☀ Soolevo<span>.com</span></div>
+        {# Tytuł #}
+        <div style="font-size:28pt; font-weight:900; color:white; line-height:1.1;
+                    margin-bottom:3mm; position:relative; z-index:1;">
+            Raport<br>Fotowoltaiczny
+        </div>
 
-            {# Tytuł #}
-            <div class="cover-title">Raport<br>Fotowoltaiczny</div>
-            <div class="cover-subtitle">
-                Pełna analiza opłacalności instalacji PV
-                {% if standard and standard.total_power_kwp %}
-                    &nbsp;·&nbsp; System {{ "%.1f"|format(standard.total_power_kwp) }} kWp
-                {% endif %}
+        {# Podtytuł #}
+        <div style="font-size:10pt; color:#AED6F1; font-weight:400;
+                    position:relative; z-index:1; margin-bottom:0;">
+            Pełna analiza opłacalności instalacji PV
+            {% if standard and standard.total_power_kwp %}
+                &nbsp;·&nbsp; System {{ "%.1f"|format(standard.total_power_kwp) }} kWp
+            {% endif %}
+            {% if req and req.province %}
+                &nbsp;·&nbsp; Woj.&nbsp;<strong style="color:white;">{{ req.province | capitalize }}</strong>
+            {% endif %}
+            &nbsp;·&nbsp; {{ generation_date }}
+        </div>
+
+        {# Pasek 4 KPI #}
+        <div style="
+            display:               grid;
+            grid-template-columns: repeat(4, 1fr);
+            background:            rgba(255,255,255,0.07);
+            border-top:            1px solid rgba(255,255,255,0.12);
+            position:              relative;
+            z-index:               1;
+            margin-top:            8mm;
+        ">
+            <div style="padding:10px 14px; text-align:center;
+                        border-right:1px solid rgba(255,255,255,0.12);">
+                <div style="font-size:7pt; font-weight:700; color:#AED6F1;
+                            text-transform:uppercase; letter-spacing:0.07em; margin-bottom:3px;">
+                    Moc systemu
+                </div>
+                <div style="font-size:12pt; font-weight:900; color:white;">
+                    {% if standard and standard.total_power_kwp %}
+                        {{ "%.1f"|format(standard.total_power_kwp) }} kWp
+                    {% else %}—{% endif %}
+                </div>
             </div>
-
-            {# Pasek 4 kluczowych statystyk #}
-            <div class="cover-stats-bar">
-                <div class="cover-stat">
-                    <div class="cover-stat-label">Moc systemu</div>
-                    <div class="cover-stat-value">
-                        {% if standard and standard.total_power_kwp %}
-                            {{ "%.1f"|format(standard.total_power_kwp) }} kWp
-                        {% else %}—{% endif %}
-                    </div>
+            <div style="padding:10px 14px; text-align:center;
+                        border-right:1px solid rgba(255,255,255,0.12);">
+                <div style="font-size:7pt; font-weight:700; color:#AED6F1;
+                            text-transform:uppercase; letter-spacing:0.07em; margin-bottom:3px;">
+                    Koszt instalacji
                 </div>
-                <div class="cover-stat">
-                    <div class="cover-stat-label">Koszt instalacji</div>
-                    <div class="cover-stat-value">
-                        {% if standard and standard.pv_cost_gross_pln %}
-                            {{ standard.pv_cost_gross_pln | format_pln }}
-                        {% else %}—{% endif %}
-                    </div>
-                </div>
-                <div class="cover-stat">
-                    <div class="cover-stat-label">Zwrot inwestycji</div>
-                    <div class="cover-stat-value">
-                        {% if standard and standard.pv_payback_years %}
-                            ok. {{ standard.pv_payback_years | round(1) }} lat
-                        {% else %}—{% endif %}
-                    </div>
-                </div>
-                <div class="cover-stat">
-                    <div class="cover-stat-label">Oszczędności 25 lat</div>
-                    <div class="cover-stat-value">
-                        {% if standard and standard.pv_total_savings_25y_pln %}
-                            ok. {{ standard.pv_total_savings_25y_pln | format_pln }}
-                        {% else %}—{% endif %}
-                    </div>
+                <div style="font-size:12pt; font-weight:900; color:white;">
+                    {% if standard and standard.pv_cost_gross_pln %}
+                        {{ standard.pv_cost_gross_pln | format_pln }}
+                    {% else %}—{% endif %}
                 </div>
             </div>
+            <div style="padding:10px 14px; text-align:center;
+                        border-right:1px solid rgba(255,255,255,0.12);">
+                <div style="font-size:7pt; font-weight:700; color:#AED6F1;
+                            text-transform:uppercase; letter-spacing:0.07em; margin-bottom:3px;">
+                    Zwrot inwestycji
+                </div>
+                <div style="font-size:12pt; font-weight:900; color:white;">
+                    {% if standard and standard.pv_payback_years %}
+                        ok. {{ standard.pv_payback_years | round(1) }} lat
+                    {% else %}—{% endif %}
+                </div>
+            </div>
+            <div style="padding:10px 14px; text-align:center;">
+                <div style="font-size:7pt; font-weight:700; color:#AED6F1;
+                            text-transform:uppercase; letter-spacing:0.07em; margin-bottom:3px;">
+                    Oszczędności 25 lat
+                </div>
+                <div style="font-size:12pt; font-weight:900; color:white;">
+                    {% if standard and standard.pv_total_savings_25y_pln %}
+                        ok. {{ standard.pv_total_savings_25y_pln | format_pln }}
+                    {% else %}—{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>{# /hero-banner #}
 
-        </div>{# /cover-hero #}
-
-
-
-    </div>{# /cover-page #}
-
-
-    {# ════════════════════════════════════════════════════════════════════════
-       STRONA 2+: WŁAŚCIWA TREŚĆ RAPORTU
-       Od tej strony aktywują się nagłówki/stopki z @page.
-    ════════════════════════════════════════════════════════════════════════ #}
-
-    {# S0 — Dane wejściowe + S1 — Werdykt + S2 — Scenariusz główny #}
+    {# ── STRONA 1 cd.: S0 Dane wejściowe + S1 Werdykt ────────────────────── #}
     <div class="page-section">
         {% include "report/s0_inputs.html" %}
         {% include "report/s1_verdict.html" %}
-        {% include "report/s2_main_scenario.html" %}
     </div>
 
-    {# S3 — Wykresy energetyczne (naturalnie dołącza, bez page-break przed) #}
-    <div class="page-section">
-        {% include "report/s3_charts.html" %}
-    </div>
-
+    {# ════════════════════════════════════════════════════════════════════════
+       STRONA 2 — S4 Porównanie wariantów + Magazyn energii
+    ════════════════════════════════════════════════════════════════════════ #}
     <div class="page-break"></div>
 
-    {# S4 — Porównanie wariantów #}
     <div class="page-section">
         {% include "report/s4_alternatives.html" %}
     </div>
 
-    {# S5 — Ostrzeżenia (warunkowo) #}
+    {# ════════════════════════════════════════════════════════════════════════
+       STRONA 3 — Wykresy cz.1: monthly_balance + cashflow 25 lat
+    ════════════════════════════════════════════════════════════════════════ #}
+    <div class="page-break"></div>
+
+    <div class="page-section">
+        {% include "report/s3_charts.html" %}
+    </div>
+
+    {# ════════════════════════════════════════════════════════════════════════
+       STRONA 4 — Wykresy cz.2: daily_flow + roof_panels
+    ════════════════════════════════════════════════════════════════════════ #}
+    <div class="page-break"></div>
+
+    <div class="page-section">
+        {% include "report/s3_charts_p2.html" %}
+    </div>
+
+    {# S5 — Ostrzeżenia (warunkowo, po wykresach) #}
     {% if warnings and warnings | length > 0 %}
-    <div class="page-section" style="margin-top: 20px;">
+    <div class="page-break"></div>
+    <div class="page-section">
         {% include "report/s5_warnings.html" %}
     </div>
     {% endif %}
@@ -128,7 +180,7 @@
         {% include "report/s8_next_steps.html" %}
     </div>
 
-    {# S9 — Zastrzeżenia prawne + stopka wewnętrzna #}
+    {# S9 — Zastrzeżenia prawne #}
     <div class="page-section" style="margin-top: 20px;">
         {% include "report/s9_disclaimer.html" %}
     </div>
