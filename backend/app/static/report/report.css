@@ -1,17 +1,46 @@
+/* ╔══════════════════════════════════════════════════════════════════════════╗
+   ║  SOOLEVO — RAPORT FOTOWOLTAICZNY                                        ║
+   ║  report.css v6.0.0                                                      ║
+   ║  Design Source: ScenarioCard.jsx  ←→  TIER_COLORS                      ║
+   ║  Engine: WeasyPrint (CSS Paged Media Level 3)                           ║
+   ║  Format: A4, 210mm × 297mm                                              ║
+   ╚══════════════════════════════════════════════════════════════════════════╝ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   1. DESIGN TOKENS — jedyne źródło prawdy (zsynchronizowane z JSX)
+   ═══════════════════════════════════════════════════════════════════════════ */
 :root {
-    --c-primary: #1B4F72;
-    --c-accent: #2E86C1;
-    --c-green: #1E8449;
-    --c-yellow: #B7950B;
-    --c-red: #C0392B;
-
+    /* Brand — Standard tier (blue) */
+    --c-primary:  #1B4F72;
+    --c-accent:   #2E86C1;
     --light-blue: #D6EAF8;
-    --light-green: #D5F5E3;
-    --light-yellow: #FEF9E7;
-    --light-red: #FDEDEC;
+    --mid-blue:   #AED6F1;
 
+    /* Economy tier (green) */
+    --c-green:    #1E8449;
+    --light-green:#D5F5E3;
+    --mid-green:  #A9DFBF;
+
+    /* Premium tier (purple) */
+    --purple-900: #4C1D95;
+    --purple-700: #6D28D9;
+    --purple-500: #A855F7;
+    --purple-200: #E9D5FF;
+    --purple-50:  #F5F3FF;
+
+    /* Semantic */
+    --c-yellow:   #B7950B;
+    --light-yellow:#FEF9E7;
+    --amber-200:  #FDE68A;
+    --amber-50:   #FFFBEB;
+    --c-red:      #C0392B;
+    --light-red:  #FDEDEC;
+
+    /* Neutrals (Tailwind gray scale) */
     --gray-900: #111827;
+    --gray-800: #1F2937;
     --gray-700: #374151;
+    --gray-600: #4B5563;
     --gray-500: #6B7280;
     --gray-400: #9CA3AF;
     --gray-300: #D1D5DB;
@@ -19,479 +48,960 @@
     --gray-100: #F3F4F6;
     --gray-50:  #F9FAFB;
 
-    --purple-700: #6D28D9;
-    --purple-500: #A855F7;
-    --purple-200: #E9D5FF;
-    --purple-50:  #F5F3FF;
+    /* Typography scale (pt — print-precise) */
+    --fs-hero:    22pt;
+    --fs-h1:      16pt;
+    --fs-h2:      13pt;
+    --fs-h3:      11pt;
+    --fs-body:    9pt;
+    --fs-sm:      8pt;
+    --fs-xs:      7pt;
+    --fs-badge:   7pt;
+    --fs-label:   7.5pt;
 
-    --amber-200: #FDE68A;
-    --amber-50:  #FFFBEB;
+    /* Spacing */
+    --sp-xs:  4px;
+    --sp-sm:  8px;
+    --sp-md:  16px;
+    --sp-lg:  24px;
+    --sp-xl:  32px;
+
+    /* Radii */
+    --r-sm:   6px;
+    --r-md:   10px;
+    --r-lg:   14px;
+    --r-pill: 100px;
+
+    /* Page geometry */
+    --page-margin-top:    18mm;
+    --page-margin-bottom: 22mm; /* extra space for footer */
+    --page-margin-side:   16mm;
+
+    /* Running header/footer height */
+    --header-h: 14mm;
+    --footer-h: 10mm;
 }
 
-/* ═══════════════════════════════════════════════
-   TYPOGRAFIA
-═══════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   2. CSS PAGED MEDIA — @page, nagłówek bieżący, stopka, numeracja
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@page {
+    size: A4 portrait;
+    margin-top:    var(--page-margin-top);
+    margin-bottom: var(--page-margin-bottom);
+    margin-left:   var(--page-margin-side);
+    margin-right:  var(--page-margin-side);
+
+    /* Linia dekoracyjna na górze każdej strony */
+    @top-left {
+        content:     "";
+        border-top:  3px solid var(--c-primary);
+        width:       100%;
+        height:      4px;
+        margin-top:  0;
+    }
+
+    /* Logo/marka w nagłówku — lewa strona */
+    @top-left-corner {
+        content: "";
+    }
+
+    /* Stopka — lewa: nazwa dokumentu */
+    @bottom-left {
+        content:    "Raport fotowoltaiczny · Soolevo";
+        font-family: Arial, sans-serif;
+        font-size:   7pt;
+        color:       var(--gray-400);
+        padding-top: 6pt;
+        border-top:  1px solid var(--gray-200);
+    }
+
+    /* Stopka — środek: numer strony */
+    @bottom-center {
+        content:    counter(page) " / " counter(pages);
+        font-family: Arial, sans-serif;
+        font-size:   7pt;
+        font-weight: 700;
+        color:       var(--gray-500);
+        padding-top: 6pt;
+        border-top:  1px solid var(--gray-200);
+    }
+
+    /* Stopka — prawa: data */
+    @bottom-right {
+        content:    "Wygenerowano: " string(generation-date);
+        font-family: Arial, sans-serif;
+        font-size:   7pt;
+        color:       var(--gray-400);
+        padding-top: 6pt;
+        border-top:  1px solid var(--gray-200);
+    }
+}
+
+/* Strona 1: bez numeru, bez linii (okładka) */
+@page :first {
+    margin-top: 0;
+
+    @top-left    { border: none; content: ""; }
+    @bottom-left { content: ""; border: none; }
+    @bottom-center { content: ""; border: none; }
+    @bottom-right  { content: ""; border: none; }
+}
+
+/* Przekazanie daty do CSS string() — ustawiamy przez element w body */
+.pdf-generation-date {
+    string-set: generation-date content();
+    position:   absolute;
+    overflow:   hidden;
+    width:      0;
+    height:     0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   3. RESET + BASE TYPOGRAPHY
+   ═══════════════════════════════════════════════════════════════════════════ */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin:     0;
+    padding:    0;
+}
+
+html {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust:         exact;
+}
+
 body {
-    font-family: Inter, Arial, sans-serif;
-    color: var(--gray-900);
-    font-size: 13px;
-    line-height: 1.5;
+    font-family:    Arial, "DejaVu Sans", sans-serif;
+    font-size:      var(--fs-body);
+    line-height:    1.55;
+    color:          var(--gray-800);
+    background:     white;
 }
 
-.h1 { font-size: 24px; font-weight: 700; margin-bottom: 16px; }
-.h2 { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
-.h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px;  }
+h1, h2, h3, h4, h5 {
+    page-break-after:  avoid;
+    break-after:       avoid;
+    orphans:           3;
+    widows:            3;
+}
 
-.text-sm    { font-size: 12px; }
-.text-base  { font-size: 13px; }
-.text-muted { color: var(--gray-500); }
+p { orphans: 2; widows: 2; }
+
+img {
+    max-width: 100%;
+    height:    auto;
+    display:   block;
+}
+
+table {
+    width:           100%;
+    border-collapse: collapse;
+    break-inside:    avoid;
+    page-break-inside: avoid;
+}
+
+tr, td, th { break-inside: avoid; page-break-inside: avoid; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   4. TYPOGRAFIA — KLASY
+   ═══════════════════════════════════════════════════════════════════════════ */
+.h1 { font-size: var(--fs-h1); font-weight: 900; line-height: 1.15; margin-bottom: 10px; color: var(--gray-900); }
+.h2 { font-size: var(--fs-h2); font-weight: 800; line-height: 1.2;  margin-bottom: 8px;  color: var(--gray-900); }
+.h3 { font-size: var(--fs-h3); font-weight: 700; line-height: 1.3;  margin-bottom: 6px;  color: var(--gray-700); }
+
+.text-hero { font-size: var(--fs-hero); font-weight: 900; line-height: 1.1; }
+.text-sm   { font-size: var(--fs-sm);   }
+.text-xs   { font-size: var(--fs-xs);   }
+
+.text-muted   { color: var(--gray-500); }
+.text-dimmed  { color: var(--gray-400); }
 .text-accent  { color: var(--c-accent); }
+.text-primary { color: var(--c-primary); }
+.text-green   { color: var(--c-green);  }
 .text-purple  { color: var(--purple-700); }
-.text-green   { color: var(--c-green); }
 .text-yellow  { color: var(--c-yellow); }
-.text-red     { color: var(--c-red); }
-.text-right   { text-align: right; }
-.text-transform-cap { text-transform: capitalize; }
+.text-red     { color: var(--c-red);    }
+.text-white   { color: white;           }
 
 .font-bold  { font-weight: 700; }
 .font-black { font-weight: 900; }
-.text-gray-500 { color: var(--gray-700); }
-.text-gray-500 { color: var(--gray-400); }
+.text-right  { text-align: right;   }
+.text-center { text-align: center;  }
+.uppercase   { text-transform: uppercase; letter-spacing: 0.05em; }
 
-/* ═══════════════════════════════════════════════
-   LAYOUT — SPACING
-═══════════════════════════════════════════════ */
+/* Etykieta sekcji — odpowiednik SectionLabel z JSX */
+.section-label {
+    font-size:      var(--fs-label);
+    font-weight:    900;
+    color:          var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom:  8px;
+    display:        flex;
+    align-items:    center;
+    gap:            6px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   5. LAYOUT UTILITIES
+   ═══════════════════════════════════════════════════════════════════════════ */
+.flex         { display: flex; }
+.flex-row     { display: flex; flex-direction: row; align-items: center; }
+.flex-col     { display: flex; flex-direction: column; }
+.items-start  { align-items: flex-start; }
+.items-center { align-items: center; }
+.items-end    { align-items: flex-end; }
+.items-baseline { align-items: baseline; }
+.justify-between { justify-content: space-between; }
+.justify-end     { justify-content: flex-end; }
+.flex-1          { flex: 1; }
+.shrink-0        { flex-shrink: 0; }
+.flex-wrap       { flex-wrap: wrap; }
+
+.gap-1  { gap: var(--sp-xs); }
+.gap-2  { gap: var(--sp-sm); }
+.gap-4  { gap: var(--sp-md); }
+.gap-6  { gap: var(--sp-lg); }
+
+.mb-1 { margin-bottom: 4px;  }
 .mb-2 { margin-bottom: 8px;  }
+.mb-3 { margin-bottom: 12px; }
 .mb-4 { margin-bottom: 16px; }
 .mb-6 { margin-bottom: 24px; }
 .mb-8 { margin-bottom: 32px; }
+.mt-1 { margin-top: 4px;  }
 .mt-2 { margin-top: 8px;  }
 .mt-4 { margin-top: 16px; }
 
-/* ═══════════════════════════════════════════════
-   LAYOUT — FLEX / GRID
-═══════════════════════════════════════════════ */
-.flex      { display: flex; }
-.flex-row  { display: flex; flex-direction: row; align-items: center; }
-.flex-col  { display: flex; flex-direction: column; }
+/* Grid — grid zawsze bezpieczniejszy od flex dla WeasyPrint przy łamaniu stron */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr;        gap: 14px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;    }
 
-.items-center    { align-items: center; }
-.justify-between { justify-content: space-between; }
+/* ═══════════════════════════════════════════════════════════════════════════
+   6. KONTROLA ŁAMANIA STRON (kluczowe dla WeasyPrint)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.avoid-break {
+    break-inside:      avoid;
+    page-break-inside: avoid;
+}
 
-.gap-2  { gap: 8px; }
-.gap-4  { gap: 16px; }
-.gap-6  { gap: 24px; }
-.gap-16 { gap: 16px; }
+.page-break {
+    break-before:      page;
+    page-break-before: always;
+    height:            0;
+    display:           block;
+}
 
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr;          gap: 16px; }
-.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr);   gap: 16px; }
-.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr);   gap: 0;    }
+.page-section {
+    margin-bottom: 22px;
+}
 
-/* ═══════════════════════════════════════════════
-   KARTY
-═══════════════════════════════════════════════ */
+/* Nagłówki sekcji zawsze trzymają się z zawartością */
+.section-header + *,
+.section-label  + * {
+    break-before: avoid;
+    page-break-before: avoid;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   7. OKŁADKA (STRONA 1)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.cover-page {
+    min-height:     297mm;
+    display:        flex;
+    flex-direction: column;
+    background:     white;
+    padding:        0;
+    margin:         -18mm -16mm 0; /* kompensuje marginesy @page */
+    break-after:    page;
+    page-break-after: always;
+}
+
+.cover-hero {
+    background:  linear-gradient(155deg, var(--c-primary) 0%, #154360 45%, #0E2A45 100%);
+    padding:     40mm var(--page-margin-side) 24mm;
+    flex:        0 0 auto;
+    position:    relative;
+    overflow:    hidden;
+}
+
+/* Dekoracyjna kropla w tle */
+.cover-hero::before {
+    content:       "";
+    position:      absolute;
+    top:           -30mm;
+    right:         -20mm;
+    width:         80mm;
+    height:        80mm;
+    border-radius: 50%;
+    background:    rgba(46, 134, 193, 0.25);
+}
+
+.cover-hero::after {
+    content:       "";
+    position:      absolute;
+    bottom:        -20mm;
+    right:         10mm;
+    width:         50mm;
+    height:        50mm;
+    border-radius: 50%;
+    background:    rgba(46, 134, 193, 0.15);
+}
+
+.cover-logo {
+    font-size:      14pt;
+    font-weight:    900;
+    color:          white;
+    letter-spacing: -0.01em;
+    margin-bottom:  16mm;
+    position:       relative;
+    z-index:        1;
+}
+
+.cover-logo span {
+    color: var(--mid-blue);
+}
+
+.cover-title {
+    font-size:   var(--fs-hero);
+    font-weight: 900;
+    color:       white;
+    line-height: 1.1;
+    margin-bottom: 4mm;
+    position:    relative;
+    z-index:     1;
+}
+
+.cover-subtitle {
+    font-size:  11pt;
+    color:      var(--mid-blue);
+    font-weight: 400;
+    position:   relative;
+    z-index:    1;
+}
+
+.cover-stats-bar {
+    display:              grid;
+    grid-template-columns: repeat(4, 1fr);
+    background:            rgba(255,255,255,0.07);
+    border-top:            1px solid rgba(255,255,255,0.12);
+    position:              relative;
+    z-index:               1;
+    margin-top:            8mm;
+}
+
+.cover-stat {
+    padding:    10px 14px;
+    text-align: center;
+    border-right: 1px solid rgba(255,255,255,0.12);
+}
+.cover-stat:last-child { border-right: none; }
+
+.cover-stat-label {
+    font-size:      var(--fs-xs);
+    font-weight:    700;
+    color:          #BFD9ED;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom:  3px;
+}
+
+.cover-stat-value {
+    font-size:   12pt;
+    font-weight: 900;
+    color:       white;
+}
+
+.cover-body {
+    padding:    16px var(--page-margin-side) 20mm;
+    flex:       1;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   8. KARTY (ogólne)
+   ═══════════════════════════════════════════════════════════════════════════ */
 .card {
-    background: white;
-    border: 1px solid var(--gray-200);
-    border-radius: 14px;
-    padding: 20px 24px;
+    background:    white;
+    border:        1px solid var(--gray-200);
+    border-radius: var(--r-lg);
+    padding:       18px 22px;
+    break-inside:  avoid;
+    page-break-inside: avoid;
 }
 
 .stat-box {
-    border: 1px solid var(--gray-300);
-    border-radius: 12px;
-    padding: 14px 16px;
+    border:        1px solid var(--gray-200);
+    border-radius: var(--r-md);
+    padding:       12px 14px;
+    break-inside:  avoid;
+    page-break-inside: avoid;
 }
 
-.bg-light-blue   { background: var(--light-blue); }
-.bg-amber-light  { background: var(--amber-50); }
-.bg-purple-light { background: var(--purple-50); }
+/* Warianty tła kart */
+.bg-light-blue   { background: var(--light-blue);  }
+.bg-light-green  { background: var(--light-green); }
+.bg-purple-light { background: var(--purple-50);   }
+.bg-amber-light  { background: var(--amber-50);    }
+.bg-gray         { background: var(--gray-50);     }
 
-.border-accent { border-color: var(--c-accent); }
-.border-amber  { border-color: var(--amber-200); }
-.border-purple { border-color: var(--purple-200); }
+/* Warianty obramowań */
+.border-accent  { border-color: var(--c-accent); }
+.border-green   { border-color: var(--c-green);  }
+.border-purple  { border-color: var(--purple-200); }
+.border-amber   { border-color: var(--amber-200); }
 
-/* ═══════════════════════════════════════════════
-   BADGE
-═══════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   9. KARTY TIER — serce design systemu (ScenarioCard.jsx → TIER_COLORS)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Standard — niebieski */
+.tier-standard {
+    border-left:   4px solid var(--c-accent);
+    border-top:    1px solid var(--mid-blue);
+    border-right:  1px solid var(--gray-200);
+    border-bottom: 1px solid var(--gray-200);
+    border-radius: var(--r-lg);
+    break-inside:  avoid;
+    page-break-inside: avoid;
+}
+
+.tier-standard .tier-heading { color: var(--c-primary); }
+.tier-standard .tier-accent  { color: var(--c-accent);  }
+.tier-standard .tier-bg      { background: var(--light-blue); }
+.tier-standard .tier-soft    { background: var(--light-blue); border-color: var(--mid-blue); }
+
+/* Economy — zielony */
+.tier-economy {
+    border-left:   4px solid var(--c-green);
+    border-top:    1px solid var(--mid-green);
+    border-right:  1px solid var(--gray-200);
+    border-bottom: 1px solid var(--gray-200);
+    border-radius: var(--r-lg);
+    break-inside:  avoid;
+    page-break-inside: avoid;
+}
+
+.tier-economy .tier-heading { color: var(--c-green);   }
+.tier-economy .tier-accent  { color: var(--c-green);   }
+.tier-economy .tier-bg      { background: var(--light-green); }
+.tier-economy .tier-soft    { background: var(--light-green); border-color: var(--mid-green); }
+
+/* Premium — fioletowy */
+.tier-premium {
+    border-left:   4px solid var(--purple-500);
+    border-top:    1px solid var(--purple-200);
+    border-right:  1px solid var(--gray-200);
+    border-bottom: 1px solid var(--gray-200);
+    border-radius: var(--r-lg);
+    break-inside:  avoid;
+    page-break-inside: avoid;
+}
+
+.tier-premium .tier-heading { color: var(--purple-900); }
+.tier-premium .tier-accent  { color: var(--purple-700); }
+.tier-premium .tier-bg      { background: var(--purple-50); }
+.tier-premium .tier-soft    { background: var(--purple-50); border-color: var(--purple-200); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   10. BADGE (pills) — ScenarioCard.jsx: rounded-full + px-3 py-1.5 + font-black
+   ═══════════════════════════════════════════════════════════════════════════ */
 .badge {
-    padding: 3px 10px;
-    border-radius: 8px;
-    font-size: 11px;
-    font-weight: 700;
+    display:        inline-block;
+    padding:        3px 10px;
+    border-radius:  var(--r-pill);
+    font-size:      var(--fs-badge);
+    font-weight:    900;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    white-space:    nowrap;
+    line-height:    1.6;
 }
 
+/* Per-tier badges — zsynchronizowane z TIER_COLORS hex */
+.badge-standard {
+    background: var(--c-primary);   /* #1B4F72 */
+    color:      white;
+}
+
+.badge-economy {
+    background: var(--c-green);     /* #1E8449 */
+    color:      white;
+}
+
+.badge-premium {
+    background: var(--purple-700);  /* #6D28D9 */
+    color:      white;
+}
+
+/* Badge pomocnicze */
 .badge-primary {
     background: var(--light-blue);
-    color: var(--c-primary);
+    color:      var(--c-primary);
 }
 
-/* ═══════════════════════════════════════════════
-   WERDYKT
-═══════════════════════════════════════════════ */
-.verdict-card {
-    border-radius: 16px;
-    padding: 24px;
-    border: 2px solid var(--c-green);
-    background: var(--light-green);
+.badge-warning {
+    background: #FDE68A;
+    color:      #78350F;
 }
 
-.verdict-card.warning {
-    border-color: var(--c-yellow);
-    background: var(--light-yellow);
-}
-
-.verdict-card.danger {
-    border-color: var(--c-red);
+.badge-danger {
     background: var(--light-red);
+    color:      var(--c-red);
 }
 
-/* Zastępuje emotikony — czyste tekstowe oznaczenie */
-.verdict-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 4px 14px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 900;
-    letter-spacing: 0.04em;
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-
-.verdict-badge-positive {
-    background: var(--c-green);
-    color: white;
-}
-
-.verdict-badge-warning {
-    background: var(--c-yellow);
-    color: white;
-}
-
-.verdict-badge-danger {
-    background: var(--c-red);
-    color: white;
-}
-
-.verdict-title {
-    font-size: 20px;
-    font-weight: 800;
-    line-height: 1.2;
-}
-
-/* ═══════════════════════════════════════════════
-   SEKCJE
-═══════════════════════════════════════════════ */
-.section-label {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--c-primary);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    margin-bottom: 10px;
-}
-
+/* ═══════════════════════════════════════════════════════════════════════════
+   11. NAGŁÓWEK SEKCJI — pasek z numerem i tytułem
+   ═══════════════════════════════════════════════════════════════════════════ */
 .section-header {
-    display: flex;
-    align-items: stretch;
-    margin-bottom: 16px;
-    border-radius: 8px;
-    overflow: hidden;
+    display:       flex;
+    align-items:   stretch;
+    margin-bottom: 14px;
+    border-radius: var(--r-md);
+    overflow:      hidden;
+    break-after:   avoid;
+    page-break-after: avoid;
 }
 
 .section-header-num {
-    background: var(--c-primary);
-    color: white;
-    font-weight: 900;
-    font-size: 13px;
-    padding: 10px 14px;
-    display: flex;
-    align-items: center;
+    background:   var(--c-primary);
+    color:        white;
+    font-weight:  900;
+    font-size:    var(--fs-h3);
+    padding:      9px 13px;
+    display:      flex;
+    align-items:  center;
     justify-content: center;
-    min-width: 44px;
+    min-width:    40px;
 }
 
 .section-header-body {
-    background: var(--light-blue);
-    padding: 10px 16px;
+    background:  var(--light-blue);
+    padding:     9px 14px;
     border-left: 3px solid var(--c-accent);
-    flex: 1;
+    flex:        1;
 }
 
 .section-header-title {
-    font-size: 14px;
+    font-size:   var(--fs-h3);
     font-weight: 700;
-    color: var(--c-primary);
-    margin-bottom: 2px;
+    color:       var(--c-primary);
+    margin-bottom: 1px;
 }
 
 .section-header-sub {
-    font-size: 11px;
-    color: var(--c-accent);
+    font-size: var(--fs-xs);
+    color:     var(--c-accent);
 }
 
-/* ═══════════════════════════════════════════════
-   INWESTYCJA
-═══════════════════════════════════════════════ */
-.invest-row {
-    display: flex;
-    justify-content: space-between;
-    border: 1px solid var(--gray-200);
-    border-radius: 12px;
-    padding: 14px 16px;
-    margin-bottom: 10px;
-}
-
+/* ═══════════════════════════════════════════════════════════════════════════
+   12. WARTOŚCI (value boxes)
+   ═══════════════════════════════════════════════════════════════════════════ */
 .label-sm {
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--gray-500);
+    font-size:      var(--fs-label);
+    font-weight:    700;
+    color:          var(--gray-500);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    margin-bottom: 4px;
+    margin-bottom:  4px;
 }
 
+/* Odpowiednik text-2xl font-black z JSX */
 .value-xl {
-    font-size: 20px;
+    font-size:   var(--fs-h1);
+    font-weight: 900;
+    line-height: 1.15;
+}
+
+.value-lg {
+    font-size:   var(--fs-h2);
     font-weight: 800;
     line-height: 1.2;
 }
 
 .value-base {
-    font-size: 14px;
+    font-size:   var(--fs-h3);
     font-weight: 700;
 }
 
 .value-bold {
-    font-size: 13px;
+    font-size:   var(--fs-body);
     font-weight: 700;
 }
 
-/* ═══════════════════════════════════════════════
-   PROGRESS BARY
-═══════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   13. KARTA INWESTYCJI — dwa warianty (ScenarioCard.jsx: invest cards)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.investment-card {
+    background:    var(--gray-50);
+    border:        1px solid var(--gray-200);
+    border-radius: var(--r-md);
+    padding:       13px 15px;
+    margin-bottom: 10px;
+    display:       flex;
+    justify-content: space-between;
+    align-items:   center;
+    gap:           12px;
+    break-inside:  avoid;
+    page-break-inside: avoid;
+}
+
+/* Karta PV + Bateria uzasadniona ekonomicznie — fioletowe wyróżnienie */
+.investment-card--justified {
+    background:    var(--purple-50);
+    border:        2px solid var(--purple-200);
+    border-radius: var(--r-md);
+    padding:       12px 15px;
+    margin-bottom: 10px;
+    display:       flex;
+    justify-content: space-between;
+    align-items:   center;
+    gap:           12px;
+    break-inside:  avoid;
+    page-break-inside: avoid;
+    position:      relative;
+    overflow:      hidden;
+}
+
+/* Pasek akcentowy na górze — odpowiednik div h-1 bg-purple-500 z JSX */
+.investment-card--justified::before {
+    content:  "";
+    position: absolute;
+    top:      0;
+    left:     0;
+    right:    0;
+    height:   3px;
+    background: var(--purple-500);
+}
+
+/* Wariant nieuzasadniony (bat-not-justified) */
+.investment-card--neutral {
+    background:    var(--gray-50);
+    border:        1px solid var(--gray-200);
+    border-radius: var(--r-md);
+    padding:       13px 15px;
+    margin-bottom: 10px;
+    display:       flex;
+    justify-content: space-between;
+    align-items:   center;
+    gap:           12px;
+    break-inside:  avoid;
+    page-break-inside: avoid;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   14. PROGRESS BARS — ScenarioCard.jsx: ProgressBar component
+   ═══════════════════════════════════════════════════════════════════════════ */
 .progress-container {
-    margin-bottom: 12px;
+    margin-bottom: 11px;
+    break-inside:  avoid;
+    page-break-inside: avoid;
 }
 
 .progress-header {
-    display: flex;
+    display:         flex;
     justify-content: space-between;
-    margin-bottom: 4px;
+    align-items:     baseline;
+    margin-bottom:   5px;
 }
 
 .progress-title {
-    font-size: 12px;
+    font-size:  var(--fs-sm);
     font-weight: 600;
-    color: var(--gray-700);
+    color:      var(--gray-700);
 }
 
+/* font-black na wartości — zgodnie z JSX text-lg font-black */
 .progress-value {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--gray-900);
+    font-size:  var(--fs-h3);
+    font-weight: 900;
+    color:      var(--gray-900);
 }
 
 .progress-track {
-    height: 8px;
-    background: var(--gray-200);
-    border-radius: 6px;
-    overflow: hidden;
+    height:        11px;   /* zwiększone z 8px — czytelność na druku */
+    background:    var(--gray-100);
+    border-radius: var(--r-pill);
+    overflow:      hidden;
 }
 
 .progress-fill {
-    height: 8px;
-    border-radius: 6px;
+    height:        11px;
+    border-radius: var(--r-pill);
 }
 
-.bg-accent  { background: var(--c-accent); }
-.bg-purple  { background: var(--purple-500); }
-.bg-green   { background: var(--c-green); }
+/* Kolory wypełnienia per-tier */
+.progress-fill--standard { background: var(--c-accent);    }
+.progress-fill--economy  { background: var(--c-green);     }
+.progress-fill--premium  { background: var(--purple-500);  }
+
+/* Zachowane utility */
+.bg-accent  { background: var(--c-accent);    }
+.bg-green   { background: var(--c-green);     }
+.bg-purple  { background: var(--purple-500);  }
 
 .progress-sublabel {
-    font-size: 10px;
-    color: var(--gray-500);
+    font-size:  var(--fs-xs);
+    color:      var(--gray-500);
     margin-top: 3px;
 }
 
-/* ═══════════════════════════════════════════════
-   PARAMETRY
-═══════════════════════════════════════════════ */
-.box-gray {
-    background: var(--gray-50);
-    border: 1px solid var(--gray-200);
-    border-radius: 12px;
-    padding: 14px 16px;
+/* ═══════════════════════════════════════════════════════════════════════════
+   15. TABELE
+   ═══════════════════════════════════════════════════════════════════════════ */
+.data-table {
+    width:           100%;
+    border-collapse: collapse;
+    font-size:       var(--fs-sm);
+    break-inside:    avoid;
+    page-break-inside: avoid;
 }
 
-.param-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    padding: 7px 0;
-    border-bottom: 1px solid var(--gray-100);
-}
-
-.param-row:last-child {
-    border-bottom: none;
-}
-
-/* ═══════════════════════════════════════════════
-   ALERTY
-═══════════════════════════════════════════════ */
-.alert {
-    border-radius: 12px;
-    padding: 14px 16px;
-    border: 1px solid var(--gray-300);
-    background: var(--gray-50);
-    margin-bottom: 10px;
-}
-
-.alert-red {
-    border-color: #F5B7B1;
-    background: #FDEDEC;
-    border-left: 4px solid var(--c-red);
-}
-
-.alert-yellow {
-    border-color: #F9E79F;
-    background: #FEF9E7;
-    border-left: 4px solid var(--c-yellow);
-}
-
-.alert-green {
-    border-color: #ABEBC6;
-    background: #D5F5E3;
-    border-left: 4px solid var(--c-green);
-}
-
-/* ═══════════════════════════════════════════════
-   HERO STATS (S0)
-═══════════════════════════════════════════════ */
-.hero-stat {
-    padding: 12px 14px;
-    text-align: center;
-}
-
-.hero-stat-label {
-    font-size: 10px;
-    font-weight: 700;
-    color: #BFD9ED;
+.data-table th {
+    background:     var(--c-primary);
+    color:          white;
+    font-weight:    800;
+    font-size:      var(--fs-xs);
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-bottom: 4px;
+    letter-spacing: 0.04em;
+    padding:        8px 10px;
+    text-align:     left;
 }
 
-.hero-stat-value {
-    font-size: 15px;
-    font-weight: 900;
-    color: white;
-    line-height: 1.2;
+.data-table td {
+    padding:     7px 10px;
+    border-bottom: 1px solid var(--gray-100);
+    vertical-align: middle;
+    color:       var(--gray-800);
 }
 
-/* ═══════════════════════════════════════════════
-   TABELE
-═══════════════════════════════════════════════ */
+.data-table tr:last-child td { border-bottom: none; }
+
+.data-table tr:nth-child(even) td { background: var(--gray-50); }
+
+/* Kolumna Standard wyróżniona w tabeli porównania (S4) */
+.comp-table-std {
+    background: var(--light-blue) !important;
+    font-weight: 700;
+}
+
 .chart-table td,
 .chart-table th {
     vertical-align: middle;
 }
 
-/* S4 — kolumna Standard wyróżniona */
-.comp-table-std {
-    background: var(--light-blue) !important;
+/* ═══════════════════════════════════════════════════════════════════════════
+   16. PARAMETRY (param-row)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.box-gray {
+    background:    var(--gray-50);
+    border:        1px solid var(--gray-200);
+    border-radius: var(--r-md);
+    padding:       12px 14px;
+    break-inside:  avoid;
+    page-break-inside: avoid;
 }
 
-/* ═══════════════════════════════════════════════
-   STEPS (S7/S8)
-═══════════════════════════════════════════════ */
+.param-row {
+    display:         flex;
+    justify-content: space-between;
+    align-items:     baseline;
+    padding:         6px 0;
+    border-bottom:   1px solid var(--gray-100);
+}
+
+.param-row:last-child { border-bottom: none; }
+
+/* Wyróżniony wiersz (highlight=true w JSX) */
+.param-row--highlight {
+    font-weight: 700;
+    color:       var(--gray-900);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   17. ALERTY
+   ═══════════════════════════════════════════════════════════════════════════ */
+.alert {
+    border-radius: var(--r-md);
+    padding:       12px 14px;
+    border:        1px solid var(--gray-300);
+    background:    var(--gray-50);
+    margin-bottom: 10px;
+    break-inside:  avoid;
+    page-break-inside: avoid;
+}
+
+.alert-red    { border-color: #F5B7B1; background: #FDEDEC; border-left: 4px solid var(--c-red);    }
+.alert-yellow { border-color: #F9E79F; background: #FEF9E7; border-left: 4px solid var(--c-yellow); }
+.alert-green  { border-color: #ABEBC6; background: #D5F5E3; border-left: 4px solid var(--c-green);  }
+.alert-blue   { border-color: var(--mid-blue); background: var(--light-blue); border-left: 4px solid var(--c-accent); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   18. WERDYKT (S1)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.verdict-card {
+    border-radius: var(--r-lg);
+    padding:       20px 22px;
+    border:        2px solid var(--c-green);
+    background:    var(--light-green);
+    break-inside:  avoid;
+    page-break-inside: avoid;
+}
+
+.verdict-card.warning {
+    border-color: var(--c-yellow);
+    background:   var(--light-yellow);
+}
+
+.verdict-card.danger {
+    border-color: var(--c-red);
+    background:   var(--light-red);
+}
+
+.verdict-badge {
+    display:         inline-flex;
+    align-items:     center;
+    justify-content: center;
+    padding:         4px 13px;
+    border-radius:   var(--r-sm);
+    font-size:       var(--fs-body);
+    font-weight:     900;
+    letter-spacing:  0.04em;
+    white-space:     nowrap;
+    flex-shrink:     0;
+}
+
+.verdict-badge-positive { background: var(--c-green);  color: white; }
+.verdict-badge-warning  { background: var(--c-yellow); color: white; }
+.verdict-badge-danger   { background: var(--c-red);    color: white; }
+
+.verdict-title {
+    font-size:   var(--fs-h2);
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   19. KROKI (S7, S8) — step-row
+   ═══════════════════════════════════════════════════════════════════════════ */
 .step-row {
-    display: flex;
-    gap: 0;
+    display:       flex;
+    gap:           0;
     margin-bottom: 8px;
-    border-radius: 10px;
-    overflow: hidden;
-    border: 1px solid var(--gray-200);
+    border-radius: var(--r-md);
+    overflow:      hidden;
+    border:        1px solid var(--gray-200);
+    break-inside:  avoid;
+    page-break-inside: avoid;
 }
 
 .step-num {
-    background: var(--c-primary);
-    min-width: 48px;
-    display: flex;
-    align-items: center;
+    background:    var(--c-primary);
+    min-width:     44px;
+    display:       flex;
+    align-items:   center;
     justify-content: center;
-    color: white;
-    font-weight: 900;
-    font-size: 18px;
+    color:         white;
+    font-weight:   900;
+    font-size:     var(--fs-h2);
 }
 
 .step-body {
-    background: var(--gray-50);
-    padding: 12px 16px;
-    flex: 1;
+    background:  var(--gray-50);
+    padding:     11px 14px;
+    flex:        1;
     border-left: 3px solid var(--c-accent);
 }
 
-/* ═══════════════════════════════════════════════
-   DIVIDER
-═══════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   20. DIVIDER
+   ═══════════════════════════════════════════════════════════════════════════ */
 .divider {
+    border:  none;
     border-top: 1px solid var(--gray-200);
-    margin: 14px 0;
+    margin: 12px 0;
 }
 
-/* ═══════════════════════════════════════════════
-   PODZIAŁ NA STRONY
-═══════════════════════════════════════════════ */
-.avoid-break {
+/* ═══════════════════════════════════════════════════════════════════════════
+   21. HERO STATS (okładka / S0)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.hero-stat {
+    padding:    11px 13px;
+    text-align: center;
+}
+
+.hero-stat-label {
+    font-size:      var(--fs-xs);
+    font-weight:    700;
+    color:          #BFD9ED;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom:  3px;
+}
+
+.hero-stat-value {
+    font-size:   13pt;
+    font-weight: 900;
+    color:       white;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   22. STOPKA RAPORTU (wewnątrz treści)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.report-footer-block {
+    margin-top:  24px;
+    padding-top: 14px;
+    border-top:  2px solid var(--gray-200);
+    display:     flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.report-footer-brand {
+    font-size:   9pt;
+    font-weight: 900;
+    color:       var(--c-primary);
+}
+
+.report-footer-meta {
+    font-size: var(--fs-xs);
+    color:     var(--gray-400);
+    text-align: right;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   23. NAPRAWA SPECYFICZNYCH PROBLEMÓW WEASYPRINT
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* WeasyPrint i flexbox — fallback grid dla wrappowania */
+@supports not (display: grid) {
+    .grid-2, .grid-3, .grid-4 {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .grid-2 > * { width: calc(50% - 7px); }
+    .grid-3 > * { width: calc(33.33% - 10px); }
+}
+
+/* WeasyPrint nie obsługuje gap na flex — używamy margin */
+.flex-row > * + * { margin-left: 8px; }
+
+/* Zapobieganie błędowi "orphan cell" w gridach na łamaniu stron */
+.grid-2, .grid-3, .grid-4 {
+    break-inside:      avoid;
     page-break-inside: avoid;
-    break-inside: avoid;
 }
 
-
-
-.page-section {
-    margin-bottom: 28px;
-}
-
-/* ═══════════════════════════════════════════════
-   KOLORY DODATKOWE
-═══════════════════════════════════════════════ */
-.light-green { background: var(--light-green); }
-.bg-purple-light { background: var(--purple-50); }
-.border-purple   { border-color: var(--purple-200); }
-
-
-/* Zapobiega łamaniu kart i tabel */
-.avoid-break {
+/* Obrazy wykresów nie mogą być cięte */
+img {
+    break-inside:      avoid;
     page-break-inside: avoid;
-    break-inside: avoid;
 }
 
-/* Naprawa tabel */
-table {
-    page-break-inside: avoid;
-    break-inside: avoid;
-    width: 100%;
-    border-collapse: collapse;
-}
-
-tr, td, th {
-    page-break-inside: avoid;
-    break-inside: avoid;
-}
-
-/* Usunięcie dużych pustych przestrzeni */
 figure {
+    break-inside:      avoid;
     page-break-inside: avoid;
-    break-inside: avoid;
-    margin: 0 0 16px 0;
-}
-
-/* Naprawa nagłówków */
-h1, h2, h3, h4 {
-    page-break-after: avoid;
-    break-after: avoid;
+    margin:            0 0 14px 0;
 }
