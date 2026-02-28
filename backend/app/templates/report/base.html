@@ -2,62 +2,203 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Raport Fotowoltaiczny</title>
+    <title>Raport Fotowoltaiczny — Soolevo</title>
     <style>{{ css_content | safe }}</style>
 </head>
 
 <body>
 
-    <!-- STRONA 1: S0 (dane wejściowe) + S1 (werdykt) + S2 Część A (inwestycja) -->
+    {# ── Element niewidoczny — przekazuje datę do CSS string() dla stopki @page ── #}
+    <span class="pdf-generation-date" aria-hidden="true">{{ generation_date }}</span>
+
+    {# ════════════════════════════════════════════════════════════════════════
+       OKŁADKA (strona 1)
+       Celowo poza .page-section — zajmuje pełną stronę bez marginesów @page.
+       @page :first usuwa stopkę/nagłówek z tej strony.
+    ════════════════════════════════════════════════════════════════════════ #}
+    <div class="cover-page">
+
+        {# Hero banner — ciemne tło, białe litery #}
+        <div class="cover-hero">
+
+            {# Logo #}
+            <div class="cover-logo">☀ Soolevo<span>.pl</span></div>
+
+            {# Tytuł #}
+            <div class="cover-title">Raport<br>Fotowoltaiczny</div>
+            <div class="cover-subtitle">
+                Pełna analiza opłacalności instalacji PV
+                {% if standard and standard.system_power_kwp %}
+                    &nbsp;·&nbsp; System {{ "%.1f"|format(standard.system_power_kwp) }} kWp
+                {% endif %}
+            </div>
+
+            {# Pasek 4 kluczowych statystyk #}
+            <div class="cover-stats-bar">
+                <div class="cover-stat">
+                    <div class="cover-stat-label">Moc systemu</div>
+                    <div class="cover-stat-value">
+                        {% if standard and standard.system_power_kwp %}
+                            {{ "%.1f"|format(standard.system_power_kwp) }} kWp
+                        {% else %}—{% endif %}
+                    </div>
+                </div>
+                <div class="cover-stat">
+                    <div class="cover-stat-label">Koszt instalacji</div>
+                    <div class="cover-stat-value">
+                        {% if standard and standard.pv_cost_gross_pln %}
+                            {{ standard.pv_cost_gross_pln | format_pln }}
+                        {% else %}—{% endif %}
+                    </div>
+                </div>
+                <div class="cover-stat">
+                    <div class="cover-stat-label">Zwrot inwestycji</div>
+                    <div class="cover-stat-value">
+                        {% if standard and standard.pv_payback_years %}
+                            ok. {{ standard.pv_payback_years | round(1) }} lat
+                        {% else %}—{% endif %}
+                    </div>
+                </div>
+                <div class="cover-stat">
+                    <div class="cover-stat-label">Oszczędności 25 lat</div>
+                    <div class="cover-stat-value">
+                        {% if standard and standard.pv_total_savings_25y_pln %}
+                            ok. {{ standard.pv_total_savings_25y_pln | format_pln }}
+                        {% else %}—{% endif %}
+                    </div>
+                </div>
+            </div>
+
+        </div>{# /cover-hero #}
+
+        {# Dolna część okładki — meta-informacje #}
+        <div class="cover-body">
+
+            {# Trzy scenariusze — podgląd (badges) #}
+            <div style="margin-bottom: 18px;">
+                <div class="section-label" style="margin-bottom: 10px;">Analizowane warianty</div>
+                <div class="flex-row flex-wrap gap-2">
+                    {% if standard %}
+                        <span class="badge badge-standard">Standard — {{ "%.1f"|format(standard.system_power_kwp or 0) }} kWp</span>
+                    {% endif %}
+                    {% if economy %}
+                        <span class="badge badge-economy">Economy — {{ "%.1f"|format(economy.system_power_kwp or 0) }} kWp</span>
+                    {% endif %}
+                    {% if premium %}
+                        <span class="badge badge-premium">Premium — {{ "%.1f"|format(premium.system_power_kwp or 0) }} kWp</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# Dane klienta / instalacji #}
+            <div class="card avoid-break" style="padding: 14px 18px;">
+                <div class="section-label" style="margin-bottom: 10px;">Dane analizy</div>
+                <div class="grid-2" style="gap: 0 20px;">
+                    <div class="param-row">
+                        <span class="text-muted">Data raportu</span>
+                        <span class="value-bold">{{ generation_date }}</span>
+                    </div>
+                    <div class="param-row">
+                        <span class="text-muted">Wersja algorytmu</span>
+                        <span class="value-bold">{{ version }}</span>
+                    </div>
+                    <div class="param-row">
+                        <span class="text-muted">Roczne zużycie</span>
+                        <span class="value-bold">
+                            {% if data.annual_consumption_kwh %}
+                                {{ data.annual_consumption_kwh | round(0) | int }} kWh/rok
+                            {% else %}—{% endif %}
+                        </span>
+                    </div>
+                    <div class="param-row">
+                        <span class="text-muted">Typ dachu</span>
+                        <span class="value-bold">
+                            {% if data.roof_type %}{{ data.roof_type | capitalize }}
+                            {% else %}—{% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            {# Disclaimer na okładce #}
+            <div style="margin-top: auto; padding-top: 14px;">
+                <p style="font-size: 6.5pt; color: var(--gray-400); line-height: 1.5;">
+                    Raport ma charakter informacyjny i szacunkowy. Rzeczywiste wyniki zależą od lokalnych
+                    warunków nasłonecznienia, szczegółów instalacji i zmian cen energii.
+                    Soolevo sp. z o.o. nie ponosi odpowiedzialności za decyzje podjęte wyłącznie na
+                    podstawie niniejszego dokumentu.
+                </p>
+            </div>
+
+        </div>{# /cover-body #}
+
+    </div>{# /cover-page #}
+
+
+    {# ════════════════════════════════════════════════════════════════════════
+       STRONA 2+: WŁAŚCIWA TREŚĆ RAPORTU
+       Od tej strony aktywują się nagłówki/stopki z @page.
+    ════════════════════════════════════════════════════════════════════════ #}
+
+    {# S0 — Dane wejściowe + S1 — Werdykt + S2 — Scenariusz główny #}
     <div class="page-section">
         {% include "report/s0_inputs.html" %}
         {% include "report/s1_verdict.html" %}
         {% include "report/s2_main_scenario.html" %}
     </div>
 
-    <!-- S3 — wykresy energetyczne -->
+    {# S3 — Wykresy energetyczne (naturalnie dołącza, bez page-break przed) #}
     <div class="page-section">
         {% include "report/s3_charts.html" %}
     </div>
 
     <div class="page-break"></div>
 
-    <!-- S4 — Porównanie wariantów -->
+    {# S4 — Porównanie wariantów #}
     <div class="page-section">
         {% include "report/s4_alternatives.html" %}
     </div>
 
-    <!-- S5 — Ostrzeżenia -->
-    {% if warnings and warnings|length > 0 %}
-    <div class="page-section" style="margin-top: 24px;">
+    {# S5 — Ostrzeżenia (warunkowo) #}
+    {% if warnings and warnings | length > 0 %}
+    <div class="page-section" style="margin-top: 20px;">
         {% include "report/s5_warnings.html" %}
     </div>
     {% endif %}
 
     <div class="page-break"></div>
 
-    <!-- S6 — Dotacje -->
+    {# S6 — Dotacje i dofinansowania #}
     <div class="page-section">
         {% include "report/s6_subsidies.html" %}
     </div>
 
     <div class="page-break"></div>
 
-    <!-- S7 — Przewodnik -->
+    {# S7 — Przewodnik po procesie zakupu #}
     <div class="page-section">
         {% include "report/s7_guide.html" %}
     </div>
 
     <div class="page-break"></div>
 
-    <!-- S8 — Następne kroki -->
+    {# S8 — Następne kroki #}
     <div class="page-section">
         {% include "report/s8_next_steps.html" %}
     </div>
 
-    <!-- S9 — Zastrzeżenia -->
-    <div class="page-section" style="margin-top: 24px;">
+    {# S9 — Zastrzeżenia prawne + stopka wewnętrzna #}
+    <div class="page-section" style="margin-top: 20px;">
         {% include "report/s9_disclaimer.html" %}
+    </div>
+
+    {# Stopka wewnątrz treści — ostatnia strona #}
+    <div class="report-footer-block avoid-break">
+        <div class="report-footer-brand">☀ Soolevo</div>
+        <div class="report-footer-meta">
+            Wygenerowano {{ generation_date }}<br>
+            Raport fotowoltaiczny v{{ version }}
+        </div>
     </div>
 
 </body>
