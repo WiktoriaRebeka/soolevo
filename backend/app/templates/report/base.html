@@ -16,7 +16,7 @@
        Celowo poza .page-section — zajmuje pełną stronę bez marginesów @page.
        @page :first usuwa stopkę/nagłówek z tej strony.
     ════════════════════════════════════════════════════════════════════════ #}
-    <div class="cover-page">
+    <div class="cover-page" style="page-break-after: always;">
 
         {# Hero banner — ciemne tło, białe litery #}
         <div class="cover-hero">
@@ -33,37 +33,49 @@
                 {% endif %}
             </div>
 
-            {# Pasek 4 kluczowych statystyk #}
-            <div class="cover-stats-bar">
-                <div class="cover-stat">
-                    <div class="cover-stat-label">Moc systemu</div>
-                    <div class="cover-stat-value">
-                        {% if standard and standard.total_power_kwp %}
-                            {{ "%.1f"|format(standard.total_power_kwp) }} kWp
+ 
+                {# 4 statystyki kontekstowe #}
+            <div style="
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                border-top: 1px solid rgba(255,255,255,0.14);
+            ">
+                {# Zużycie roczne #}
+                <div class="hero-stat" style="border-right:1px solid rgba(255,255,255,0.14);">
+                    <div class="hero-stat-label">Zużycie roczne</div>
+                    <div class="hero-stat-value">
+                        {% if data.annual_consumption_kwh %}
+                            {{ data.annual_consumption_kwh | round | int | format_num }} kWh
                         {% else %}—{% endif %}
                     </div>
                 </div>
-                <div class="cover-stat">
-                    <div class="cover-stat-label">Koszt instalacji</div>
-                    <div class="cover-stat-value">
+
+                {# Moc systemu #}
+                <div class="hero-stat" style="border-right:1px solid rgba(255,255,255,0.14);">
+                    <div class="hero-stat-label">Moc systemu (Std)</div>
+                    <div class="hero-stat-value">
+                        {% if standard and standard.total_power_kwp %}
+                            {{ "%.2f" | format(standard.total_power_kwp) }} kWp
+                        {% else %}—{% endif %}
+                    </div>
+                </div>
+
+                {# Koszt instalacji #}
+                <div class="hero-stat" style="border-right:1px solid rgba(255,255,255,0.14);">
+                    <div class="hero-stat-label">Koszt instalacji</div>
+                    <div class="hero-stat-value">
                         {% if standard and standard.pv_cost_gross_pln %}
                             {{ standard.pv_cost_gross_pln | format_pln }}
                         {% else %}—{% endif %}
                     </div>
                 </div>
-                <div class="cover-stat">
-                    <div class="cover-stat-label">Zwrot inwestycji</div>
-                    <div class="cover-stat-value">
+
+                {# Zwrot #}
+                <div class="hero-stat">
+                    <div class="hero-stat-label">Zwrot inwestycji</div>
+                    <div class="hero-stat-value">
                         {% if standard and standard.pv_payback_years %}
                             ok. {{ standard.pv_payback_years | round(1) }} lat
-                        {% else %}—{% endif %}
-                    </div>
-                </div>
-                <div class="cover-stat">
-                    <div class="cover-stat-label">Oszczędności 25 lat</div>
-                    <div class="cover-stat-value">
-                        {% if standard and standard.pv_total_savings_25y_pln %}
-                            ok. {{ standard.pv_total_savings_25y_pln | format_pln }}
                         {% else %}—{% endif %}
                     </div>
                 </div>

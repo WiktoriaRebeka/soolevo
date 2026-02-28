@@ -51,64 +51,6 @@
     margin-bottom: 16px;
 " class="avoid-break">
 
-    {# Nagłówek tekstowy #}
-    <div style="padding: 20px 24px 14px;">
-        <h1 style="color:white; font-size:18pt; font-weight:900; margin:0 0 4px; line-height:1.15;">
-            Raport Fotowoltaiczny
-        </h1>
-        <p style="color:#BFD9ED; font-size:8pt; margin:0; line-height:1.5;">
-            Pełna analiza opłacalności instalacji PV
-            &nbsp;·&nbsp; Woj.&nbsp;<strong style="color:white;">{{ req.province | capitalize }}</strong>
-            &nbsp;·&nbsp; {{ generation_date }}
-        </p>
-    </div>
-
-    {# 4 statystyki kontekstowe #}
-    <div style="
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        border-top: 1px solid rgba(255,255,255,0.14);
-    ">
-        {# Zużycie roczne #}
-        <div class="hero-stat" style="border-right:1px solid rgba(255,255,255,0.14);">
-            <div class="hero-stat-label">Zużycie roczne</div>
-            <div class="hero-stat-value">
-                {% if data.annual_consumption_kwh %}
-                    {{ data.annual_consumption_kwh | round | int | format_num }} kWh
-                {% else %}—{% endif %}
-            </div>
-        </div>
-
-        {# Moc systemu #}
-        <div class="hero-stat" style="border-right:1px solid rgba(255,255,255,0.14);">
-            <div class="hero-stat-label">Moc systemu (Std)</div>
-            <div class="hero-stat-value">
-                {% if standard and standard.total_power_kwp %}
-                    {{ "%.2f" | format(standard.total_power_kwp) }} kWp
-                {% else %}—{% endif %}
-            </div>
-        </div>
-
-        {# Koszt instalacji #}
-        <div class="hero-stat" style="border-right:1px solid rgba(255,255,255,0.14);">
-            <div class="hero-stat-label">Koszt instalacji</div>
-            <div class="hero-stat-value">
-                {% if standard and standard.pv_cost_gross_pln %}
-                    {{ standard.pv_cost_gross_pln | format_pln }}
-                {% else %}—{% endif %}
-            </div>
-        </div>
-
-        {# Zwrot #}
-        <div class="hero-stat">
-            <div class="hero-stat-label">Zwrot inwestycji</div>
-            <div class="hero-stat-value">
-                {% if standard and standard.pv_payback_years %}
-                    ok. {{ standard.pv_payback_years | round(1) }} lat
-                {% else %}—{% endif %}
-            </div>
-        </div>
-    </div>
 </div>
 
 {# ══════════════════════════════════════════════════════════
