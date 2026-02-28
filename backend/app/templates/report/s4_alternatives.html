@@ -1,50 +1,13 @@
 {# ═══════════════════════════════════════════════════════════════════════════
    S4 — PORÓWNANIE WARIANTÓW
-   Zmienne: standard, economy, premium (ScenarioResponseItem dicts, top-level)
+   Layout: Standard → karta featured (pełna szerokość, pozioma)
+           Economy + Premium → dwie kolumny poniżej (duo)
+   Zmienne: standard, economy, premium (ScenarioResponseItem dicts)
    Makro:   render_payback (z _macros.html)
    Filtry:  format_pln, format_num
-   UWAGA:   standard/economy/premium mogą być pustymi dictami {} — wszystkie
-            odwołania owinięte w guard: {% if standard %} / | default(0)
 ═══════════════════════════════════════════════════════════════════════════ #}
 
 {% from 'report/_macros.html' import render_payback %}
-
-{# ── Kolory per-tier (zsynchronizowane z TIER_COLORS w ScenarioCard.jsx) ── #}
-{% set T = {
-    "standard": {
-        "badge_cls":  "badge-standard",
-        "color":      "var(--c-primary)",
-        "accent":     "var(--c-accent)",
-        "bg":         "var(--light-blue)",
-        "border":     "var(--mid-blue)",
-        "bar_cls":    "progress-fill--standard",
-        "left_border":"4px solid var(--c-accent)",
-        "label":      "Standard",
-        "desc":       "Rekomendowany kompromis jakości i ceny"
-    },
-    "economy": {
-        "badge_cls":  "badge-economy",
-        "color":      "var(--c-green)",
-        "accent":     "var(--c-green)",
-        "bg":         "var(--light-green)",
-        "border":     "var(--mid-green)",
-        "bar_cls":    "progress-fill--economy",
-        "left_border":"4px solid var(--c-green)",
-        "label":      "Economy",
-        "desc":       "Najtańsza opcja — komponenty budżetowe"
-    },
-    "premium": {
-        "badge_cls":  "badge-premium",
-        "color":      "var(--purple-700)",
-        "accent":     "var(--purple-700)",
-        "bg":         "var(--purple-50)",
-        "border":     "var(--purple-200)",
-        "bar_cls":    "progress-fill--premium",
-        "left_border":"4px solid var(--purple-500)",
-        "label":      "Premium",
-        "desc":       "Najwyższa jakość — panele premium, pełna gwarancja"
-    }
-} %}
 
 {# ══════════════════════════════════════════════════════════
    NAGŁÓWEK S4
@@ -53,291 +16,517 @@
     <div class="section-header-num">S4</div>
     <div class="section-header-body">
         <div class="section-header-title">Porównanie wariantów</div>
-        <div class="section-header-sub">
-            Economy · Standard (rekomendowany) · Premium
-        </div>
+        <div class="section-header-sub">Economy · Standard (rekomendowany) · Premium</div>
     </div>
 </div>
 
-{# ══════════════════════════════════════════════════════════
-   TRZY PIONOWE KARTY (flex row, równe szerokości)
-══════════════════════════════════════════════════════════ #}
-<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:20px;">
+{# ══════════════════════════════════════════════════════════════════════════
+   KARTA FEATURED — STANDARD (pozioma, pełna szerokość)
+   Lewa połowa: KPI finansowe | Prawa połowa: specyfikacja + progress bary
+══════════════════════════════════════════════════════════════════════════ #}
+{% if standard %}
+<div class="avoid-break" style="
+    background:    var(--light-blue);
+    border:        2px solid var(--mid-blue);
+    border-left:   5px solid var(--c-accent);
+    border-radius: var(--r-lg);
+    overflow:      hidden;
+    margin-bottom: 14px;
+">
 
-    {# ── Makro karty wariantu ── #}
-    {# Jinja2 nie ma makr z blokami, więc używamy pętli #}
-    {% for tier_name, sc in [("economy", economy), ("standard", standard), ("premium", premium)] %}
-    {% set t = T[tier_name] %}
-
+    {# Pasek tytułowy — gradient full-width #}
     <div style="
-        background:    {% if tier_name == 'standard' %}var(--light-blue){% else %}white{% endif %};
-        border:        2px solid {{ t.border }};
-        border-left:   {{ t.left_border }};
-        border-radius: var(--r-lg);
-        overflow:      hidden;
-        break-inside:  avoid;
-        page-break-inside: avoid;
-        position:      relative;
+        background: linear-gradient(135deg, var(--c-primary) 0%, var(--c-accent) 100%);
+        padding:    10px 18px;
+        display:    flex;
+        align-items:center;
+        gap:        12px;
     ">
-        {# Pasek tytułowy #}
-        <div style="
-            background:  {{ t.color }};
-            padding:     12px 16px;
-            display:     flex;
-            align-items: center;
-            gap:         10px;
-        ">
-            <span class="badge {{ t.badge_cls }}">{{ t.label }}</span>
-            {% if tier_name == 'standard' %}
-            <span style="
-                background: white;
-                color:      var(--c-primary);
-                font-size:  var(--fs-badge);
-                font-weight:900;
-                padding:    2px 8px;
-                border-radius: var(--r-pill);
-                text-transform: uppercase;
-                letter-spacing: .06em;
-            ">REKOMENDOWANY</span>
-            {% endif %}
-        </div>
+        <span class="badge badge-standard">Standard</span>
+        <span style="
+            background:    white;
+            color:         var(--c-primary);
+            font-size:     var(--fs-badge);
+            font-weight:   900;
+            padding:       2px 9px;
+            border-radius: var(--r-pill);
+            text-transform:uppercase;
+            letter-spacing:.07em;
+        ">REKOMENDOWANY</span>
+        <span style="color:rgba(255,255,255,0.75); font-size:var(--fs-xs); margin-left:auto;">
+            {{ standard.description | default("Optymalny kompromis jakości i ceny") }}
+        </span>
+    </div>
 
-        <div style="padding:14px 16px;">
+    {# Ciało — dwie kolumny (lewa:finansowe / prawa:tech+bary) #}
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0;">
 
-            {# Opis #}
-            <p class="text-xs text-muted" style="margin-bottom:12px; line-height:1.5;">
-                {% if sc %}{{ sc.description | default(t.desc) }}{% else %}{{ t.desc }}{% endif %}
-            </p>
+        {# ─── LEWA: KPI finansowe ───────────────────────────────── #}
+        <div style="padding:18px 20px; border-right:1px solid var(--mid-blue);">
 
-            {% if sc %}
+            <div class="section-label" style="margin-bottom:10px; color:var(--c-primary);">
+                Parametry finansowe
+            </div>
 
-            {# ── Główna kwota — koszt #}
-            <div style="text-align:center; margin-bottom:14px; padding-bottom:12px;
-                        border-bottom:1px solid var(--gray-200);">
-                <div class="label-sm" style="margin-bottom:4px;">Koszt instalacji PV</div>
+            {# Koszt #}
+            <div style="margin-bottom:14px;">
+                <div class="label-sm">Koszt instalacji PV</div>
                 <div style="
-                    font-size:   var(--fs-h1);
+                    font-size:   var(--fs-hero);
                     font-weight: 900;
-                    color:       {{ t.accent }};
-                    line-height: 1.1;
-                ">
-                    {{ sc.pv_cost_gross_pln | default(0) | format_pln }}
-                </div>
-                {% if sc.battery_recommended and sc.total_cost_with_battery_pln %}
-                <div class="text-xs text-muted" style="margin-top:3px;">
-                    z magazynem: {{ sc.total_cost_with_battery_pln | format_pln }}
+                    color:       var(--c-primary);
+                    line-height: 1.05;
+                ">{{ standard.pv_cost_gross_pln | default(0) | format_pln }}</div>
+                {% if standard.battery_recommended and standard.total_cost_with_battery_pln %}
+                <div class="text-xs text-muted" style="margin-top:2px;">
+                    z magazynem: <strong>{{ standard.total_cost_with_battery_pln | format_pln }}</strong>
                 </div>
                 {% endif %}
             </div>
 
-            {# ── Parametry techniczne #}
+            {# Zwrot + Zysk 25 lat side-by-side #}
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div class="stat-box" style="
+                    background: white;
+                    border-color: var(--mid-blue);
+                    text-align: center;
+                ">
+                    <div class="label-sm" style="margin-bottom:4px;">Zwrot inwestycji</div>
+                    <div style="
+                        font-size:   var(--fs-h2);
+                        font-weight: 900;
+                        color:       var(--c-accent);
+                        line-height: 1.15;
+                    ">
+                        {{ render_payback(
+                            standard.pv_payback_years,
+                            standard.pv_payback_optimistic_years,
+                            standard.pv_payback_pessimistic_years
+                        ) }}
+                    </div>
+                </div>
+                <div class="stat-box" style="
+                    background: white;
+                    border-color: var(--mid-blue);
+                    text-align: center;
+                ">
+                    <div class="label-sm" style="margin-bottom:4px;">Zysk 25 lat</div>
+                    <div style="
+                        font-size:   var(--fs-h3);
+                        font-weight: 900;
+                        color:       var(--c-accent);
+                        line-height: 1.2;
+                    ">
+                        ok. {{ standard.pv_total_savings_25y_pln | default(0) | format_pln }}
+                    </div>
+                    <div class="text-xs text-muted" style="margin-top:2px;">
+                        rok 1: ok. {{ standard.pv_savings_pln | default(0) | format_pln }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# ─── PRAWA: specyfikacja + progress bary ───────────────── #}
+        <div style="padding:18px 20px;">
+
+            <div class="section-label" style="margin-bottom:10px; color:var(--c-primary);">
+                Specyfikacja techniczna
+            </div>
+
             <div class="param-row">
                 <span class="text-muted">Moc systemu</span>
-                <span class="value-bold" style="color:{{ t.accent }};">
-                    {{ "%.2f" | format(sc.total_power_kwp | default(0)) }} kWp
+                <span class="value-bold text-accent">
+                    {{ "%.2f" | format(standard.total_power_kwp | default(0)) }} kWp
                 </span>
             </div>
             <div class="param-row">
                 <span class="text-muted">Liczba paneli</span>
-                <span class="value-bold">{{ sc.panels_count | default(0) }} szt.</span>
+                <span class="value-bold">{{ standard.panels_count | default(0) }} szt.</span>
             </div>
             <div class="param-row">
                 <span class="text-muted">Roczna produkcja</span>
                 <span class="value-bold">
-                    {{ sc.annual_production_kwh | default(0) | round | int | format_num }} kWh
+                    {{ standard.annual_production_kwh | default(0) | round | int | format_num }} kWh
                 </span>
             </div>
             <div class="param-row">
                 <span class="text-muted">Panel</span>
                 <span class="value-bold" style="font-size:var(--fs-xs);">
-                    {{ sc.panel_brand | default("—") }}
-                    {% if sc.panel_power_wp %}&nbsp;{{ sc.panel_power_wp }} Wp{% endif %}
+                    {{ standard.panel_brand | default("—") }}
+                    {% if standard.panel_power_wp %}&nbsp;· {{ standard.panel_power_wp }} Wp{% endif %}
                 </span>
             </div>
             <div class="param-row">
                 <span class="text-muted">Falownik</span>
                 <span class="value-bold" style="font-size:var(--fs-xs);">
-                    {{ sc.inverter_brand | default("—") }}
+                    {{ standard.inverter_brand | default("—") }}
+                    {% if standard.inverter_power_kw %}&nbsp;· {{ standard.inverter_power_kw | round(1) }} kW{% endif %}
                 </span>
             </div>
 
-            {# ── Finansowe #}
-            <div style="margin-top:12px; padding-top:10px; border-top:1px solid var(--gray-200);">
+            {# Progress bary #}
+            {% set ss_pct = ((standard.self_sufficiency_rate | default(0)) * 100) | round | int %}
+            {% set ac_pct = ((standard.autoconsumption_rate  | default(0)) * 100) | round | int %}
+            <div style="margin-top:12px; padding-top:10px; border-top:1px solid var(--mid-blue);">
+                <div class="progress-container" style="margin-bottom:8px;">
+                    <div class="progress-header">
+                        <span class="progress-title">Samowystarczalność</span>
+                        <span class="progress-value text-accent">{{ ss_pct }}%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill progress-fill--standard"
+                             style="width:{{ [ss_pct,100]|min }}%;"></div>
+                    </div>
+                </div>
+                <div class="progress-container" style="margin-bottom:0;">
+                    <div class="progress-header">
+                        <span class="progress-title">Autokonsumpcja</span>
+                        <span class="progress-value text-accent">{{ ac_pct }}%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill progress-fill--standard"
+                             style="width:{{ [ac_pct,100]|min }}%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                <div class="param-row">
-                    <span class="text-muted">Zwrot inwestycji</span>
-                    <span class="value-bold" style="color:{{ t.accent }};">
-                        {{ render_payback(
-                            sc.pv_payback_years,
-                            sc.pv_payback_optimistic_years,
-                            sc.pv_payback_pessimistic_years
-                        ) }}
-                    </span>
-                </div>
-                <div class="param-row">
-                    <span class="text-muted">Oszczędności rok&nbsp;1</span>
-                    <span class="value-bold">
-                        ok. {{ sc.pv_savings_pln | default(0) | format_pln }}
-                    </span>
-                </div>
-                <div class="param-row">
-                    <span class="text-muted">Zysk po 25 latach</span>
-                    <span class="value-bold" style="color:{{ t.accent }};">
-                        ok. {{ sc.pv_total_savings_25y_pln | default(0) | format_pln }}
-                    </span>
-                </div>
+    </div>{# /featured grid #}
+</div>
+{% endif %}{# /standard #}
 
+
+{# ══════════════════════════════════════════════════════════════════════════
+   DUO — Economy (lewa) + Premium (prawa)
+   Węższe karty, kompaktowy format — kluczowe liczby bez przepełnienia
+══════════════════════════════════════════════════════════════════════════ #}
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:20px;">
+
+    {# ── ECONOMY ──────────────────────────────────────────────────────── #}
+    <div class="avoid-break" style="
+        background:    white;
+        border:        1px solid var(--mid-green);
+        border-left:   4px solid var(--c-green);
+        border-radius: var(--r-lg);
+        overflow:      hidden;
+    ">
+        <div style="
+            background: var(--c-green);
+            padding:    9px 14px;
+            display:    flex;
+            align-items:center;
+            gap:        10px;
+        ">
+            <span class="badge badge-economy">Economy</span>
+            <span style="color:rgba(255,255,255,0.8); font-size:var(--fs-xs);">
+                Niższy koszt wejścia
+            </span>
+        </div>
+
+        <div style="padding:14px 16px;">
+            {% if economy %}
+
+            <div style="margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--gray-200);">
+                <div class="label-sm">Koszt instalacji PV</div>
+                <div style="font-size:var(--fs-h1); font-weight:900; color:var(--c-green); line-height:1.1;">
+                    {{ economy.pv_cost_gross_pln | default(0) | format_pln }}
+                </div>
+                {% if standard %}
+                {% set diff = (standard.pv_cost_gross_pln | default(0)) - (economy.pv_cost_gross_pln | default(0)) %}
+                {% if diff > 0 %}
+                <div class="text-xs" style="color:var(--c-green); font-weight:700; margin-top:2px;">
+                    Taniej o {{ diff | format_pln }} vs Standard
+                </div>
+                {% endif %}
+                {% endif %}
             </div>
 
-            {# ── Efektywność — progress bar #}
-            {% set ss_pct = ((sc.self_sufficiency_rate | default(0)) * 100) | round | int %}
-            <div style="margin-top:12px; padding-top:10px; border-top:1px solid var(--gray-200);">
+            <div class="param-row">
+                <span class="text-muted">Moc</span>
+                <span class="value-bold" style="color:var(--c-green);">
+                    {{ "%.2f" | format(economy.total_power_kwp | default(0)) }} kWp
+                </span>
+            </div>
+            <div class="param-row">
+                <span class="text-muted">Paneli</span>
+                <span class="value-bold">{{ economy.panels_count | default(0) }} szt.</span>
+            </div>
+            <div class="param-row">
+                <span class="text-muted">Produkcja</span>
+                <span class="value-bold">
+                    {{ economy.annual_production_kwh | default(0) | round | int | format_num }} kWh/rok
+                </span>
+            </div>
+            <div class="param-row">
+                <span class="text-muted">Zwrot</span>
+                <span class="value-bold" style="color:var(--c-green);">
+                    {{ render_payback(
+                        economy.pv_payback_years,
+                        economy.pv_payback_optimistic_years,
+                        economy.pv_payback_pessimistic_years
+                    ) }}
+                </span>
+            </div>
+            <div class="param-row">
+                <span class="text-muted">Oszczędności rok 1</span>
+                <span class="value-bold">ok. {{ economy.pv_savings_pln | default(0) | format_pln }}</span>
+            </div>
+            <div class="param-row">
+                <span class="text-muted">Zysk po 25 latach</span>
+                <span class="value-bold" style="color:var(--c-green);">
+                    ok. {{ economy.pv_total_savings_25y_pln | default(0) | format_pln }}
+                </span>
+            </div>
+            <div class="param-row">
+                <span class="text-muted">Panel</span>
+                <span class="value-bold" style="font-size:var(--fs-xs);">
+                    {{ economy.panel_brand | default("—") }}
+                    {% if economy.panel_power_wp %}&nbsp;· {{ economy.panel_power_wp }} Wp{% endif %}
+                </span>
+            </div>
+
+            {% set ss_eco = ((economy.self_sufficiency_rate | default(0)) * 100) | round | int %}
+            <div style="margin-top:10px; padding-top:8px; border-top:1px solid var(--gray-200);">
                 <div class="progress-header">
                     <span class="progress-title">Samowystarczalność</span>
-                    <span class="progress-value" style="color:{{ t.accent }};">{{ ss_pct }}%</span>
+                    <span class="progress-value text-green">{{ ss_eco }}%</span>
                 </div>
                 <div class="progress-track">
-                    <div class="progress-fill {{ t.bar_cls }}"
-                         style="width:{{ [ss_pct, 100] | min }}%;"></div>
+                    <div class="progress-fill progress-fill--economy"
+                         style="width:{{ [ss_eco,100]|min }}%;"></div>
                 </div>
             </div>
 
             {% else %}
-            {# Wariant niedostępny #}
             <div style="text-align:center; padding:20px; color:var(--gray-400); font-size:var(--fs-sm);">
                 Wariant niedostępny dla podanego dachu
             </div>
             {% endif %}
+        </div>
+    </div>
 
-        </div>{# /padding #}
-    </div>{# /card #}
-    {% endfor %}
+    {# ── PREMIUM ──────────────────────────────────────────────────────── #}
+    <div class="avoid-break" style="
+        background:    white;
+        border:        1px solid var(--purple-200);
+        border-left:   4px solid var(--purple-500);
+        border-radius: var(--r-lg);
+        overflow:      hidden;
+    ">
+        <div style="
+            background: var(--purple-700);
+            padding:    9px 14px;
+            display:    flex;
+            align-items:center;
+            gap:        10px;
+        ">
+            <span class="badge badge-premium">Premium</span>
+            <span style="color:rgba(255,255,255,0.8); font-size:var(--fs-xs);">
+                Najwyższa jakość, rozszerzona gwarancja
+            </span>
+        </div>
 
-</div>{# /grid-3 #}
+        <div style="padding:14px 16px;">
+            {% if premium %}
+
+            <div style="margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--gray-200);">
+                <div class="label-sm">Koszt instalacji PV</div>
+                <div style="font-size:var(--fs-h1); font-weight:900; color:var(--purple-700); line-height:1.1;">
+                    {{ premium.pv_cost_gross_pln | default(0) | format_pln }}
+                </div>
+                {% if standard %}
+                {% set pdiff = (premium.pv_cost_gross_pln | default(0)) - (standard.pv_cost_gross_pln | default(0)) %}
+                {% if pdiff > 0 %}
+                <div class="text-xs" style="color:var(--gray-500); font-weight:700; margin-top:2px;">
+                    Drożej o {{ pdiff | format_pln }} vs Standard
+                </div>
+                {% endif %}
+                {% endif %}
+            </div>
+
+            <div class="param-row">
+                <span class="text-muted">Moc</span>
+                <span class="value-bold" style="color:var(--purple-700);">
+                    {{ "%.2f" | format(premium.total_power_kwp | default(0)) }} kWp
+                </span>
+            </div>
+            <div class="param-row">
+                <span class="text-muted">Paneli</span>
+                <span class="value-bold">{{ premium.panels_count | default(0) }} szt.</span>
+            </div>
+            <div class="param-row">
+                <span class="text-muted">Produkcja</span>
+                <span class="value-bold">
+                    {{ premium.annual_production_kwh | default(0) | round | int | format_num }} kWh/rok
+                </span>
+            </div>
+            <div class="param-row">
+                <span class="text-muted">Zwrot</span>
+                <span class="value-bold" style="color:var(--purple-700);">
+                    {{ render_payback(
+                        premium.pv_payback_years,
+                        premium.pv_payback_optimistic_years,
+                        premium.pv_payback_pessimistic_years
+                    ) }}
+                </span>
+            </div>
+            <div class="param-row">
+                <span class="text-muted">Oszczędności rok 1</span>
+                <span class="value-bold">ok. {{ premium.pv_savings_pln | default(0) | format_pln }}</span>
+            </div>
+            <div class="param-row">
+                <span class="text-muted">Zysk po 25 latach</span>
+                <span class="value-bold" style="color:var(--purple-700);">
+                    ok. {{ premium.pv_total_savings_25y_pln | default(0) | format_pln }}
+                </span>
+            </div>
+            <div class="param-row">
+                <span class="text-muted">Panel</span>
+                <span class="value-bold" style="font-size:var(--fs-xs);">
+                    {{ premium.panel_brand | default("—") }}
+                    {% if premium.panel_power_wp %}&nbsp;· {{ premium.panel_power_wp }} Wp{% endif %}
+                </span>
+            </div>
+
+            {# Wyróżnik Premium — gwarancja #}
+            <div style="
+                margin-top:   10px;
+                padding:      7px 10px;
+                background:   var(--purple-50);
+                border:       1px solid var(--purple-200);
+                border-radius:var(--r-sm);
+            ">
+                <span class="text-xs" style="font-weight:700; color:var(--purple-700);">
+                    Gwarancja na produkcję: 30 lat (80%)
+                </span>
+                <span class="text-xs text-muted" style="margin-left:4px;">
+                    vs 25 lat w Economy i Standard
+                </span>
+            </div>
+
+            {% set ss_prem = ((premium.self_sufficiency_rate | default(0)) * 100) | round | int %}
+            <div style="margin-top:10px; padding-top:8px; border-top:1px solid var(--gray-200);">
+                <div class="progress-header">
+                    <span class="progress-title">Samowystarczalność</span>
+                    <span class="progress-value text-purple">{{ ss_prem }}%</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill progress-fill--premium"
+                         style="width:{{ [ss_prem,100]|min }}%;"></div>
+                </div>
+            </div>
+
+            {% else %}
+            <div style="text-align:center; padding:20px; color:var(--gray-400); font-size:var(--fs-sm);">
+                Wariant niedostępny dla podanego dachu
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+</div>{# /duo grid #}
+
 
 {# ══════════════════════════════════════════════════════════
-   TABELA ZBIORCZA — szybkie porównanie w 1 rzucie oka
+   TABELA ZBIORCZA
 ══════════════════════════════════════════════════════════ #}
-<div class="card avoid-break" style="padding:16px 20px;">
+<div class="card avoid-break" style="padding:14px 18px;">
 
-    <div class="section-label" style="margin-bottom:12px;">Tabela porównawcza</div>
+    <div class="section-label" style="margin-bottom:10px;">Tabela porównawcza — wszystkie warianty</div>
 
     <table class="data-table">
         <thead>
             <tr>
                 <th style="width:32%; text-align:left;">Parametr</th>
-                <th style="text-align:center; background:#1A7A40;">
-                    Economy
-                </th>
-                <th style="text-align:center; background:var(--c-primary);">
-                    Standard ★
-                </th>
-                <th style="text-align:center; background:var(--purple-700);">
-                    Premium
-                </th>
+                <th style="text-align:center; background:#1A7A40;">Economy</th>
+                <th style="text-align:center; background:var(--c-primary);">Standard ★</th>
+                <th style="text-align:center; background:var(--purple-700);">Premium</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td>Moc systemu [kWp]</td>
                 <td style="text-align:center; color:#1A7A40; font-weight:700;">
-                    {% if economy %}{{ "%.2f" | format(economy.total_power_kwp | default(0)) }}{% else %}—{% endif %}
+                    {% if economy %}{{ "%.2f"|format(economy.total_power_kwp|default(0)) }}{% else %}—{% endif %}
                 </td>
-                <td style="text-align:center; color:var(--c-accent); font-weight:800;"
-                    class="comp-table-std">
-                    {% if standard %}{{ "%.2f" | format(standard.total_power_kwp | default(0)) }}{% else %}—{% endif %}
+                <td class="comp-table-std" style="text-align:center; color:var(--c-accent); font-weight:800;">
+                    {% if standard %}{{ "%.2f"|format(standard.total_power_kwp|default(0)) }}{% else %}—{% endif %}
                 </td>
                 <td style="text-align:center; color:var(--purple-700); font-weight:700;">
-                    {% if premium %}{{ "%.2f" | format(premium.total_power_kwp | default(0)) }}{% else %}—{% endif %}
+                    {% if premium %}{{ "%.2f"|format(premium.total_power_kwp|default(0)) }}{% else %}—{% endif %}
                 </td>
             </tr>
             <tr>
                 <td>Liczba paneli [szt.]</td>
                 <td style="text-align:center;">
-                    {% if economy %}{{ economy.panels_count | default("—") }}{% else %}—{% endif %}
+                    {% if economy %}{{ economy.panels_count|default("—") }}{% else %}—{% endif %}
                 </td>
-                <td style="text-align:center; font-weight:700;" class="comp-table-std">
-                    {% if standard %}{{ standard.panels_count | default("—") }}{% else %}—{% endif %}
-                </td>
-                <td style="text-align:center;">
-                    {% if premium %}{{ premium.panels_count | default("—") }}{% else %}—{% endif %}
-                </td>
-            </tr>
-            <tr>
-                <td>Roczna produkcja [kWh]</td>
-                <td style="text-align:center;">
-                    {% if economy %}{{ economy.annual_production_kwh | default(0) | round | int | format_num }}{% else %}—{% endif %}
-                </td>
-                <td style="text-align:center; font-weight:700;" class="comp-table-std">
-                    {% if standard %}{{ standard.annual_production_kwh | default(0) | round | int | format_num }}{% else %}—{% endif %}
+                <td class="comp-table-std" style="text-align:center; font-weight:700;">
+                    {% if standard %}{{ standard.panels_count|default("—") }}{% else %}—{% endif %}
                 </td>
                 <td style="text-align:center;">
-                    {% if premium %}{{ premium.annual_production_kwh | default(0) | round | int | format_num }}{% else %}—{% endif %}
+                    {% if premium %}{{ premium.panels_count|default("—") }}{% else %}—{% endif %}
                 </td>
             </tr>
             <tr>
                 <td>Koszt instalacji PV</td>
                 <td style="text-align:center; color:#1A7A40; font-weight:700;">
-                    {% if economy %}{{ economy.pv_cost_gross_pln | default(0) | format_pln }}{% else %}—{% endif %}
+                    {% if economy %}{{ economy.pv_cost_gross_pln|default(0)|format_pln }}{% else %}—{% endif %}
                 </td>
-                <td style="text-align:center; color:var(--c-accent); font-weight:800;"
-                    class="comp-table-std">
-                    {% if standard %}{{ standard.pv_cost_gross_pln | default(0) | format_pln }}{% else %}—{% endif %}
+                <td class="comp-table-std" style="text-align:center; color:var(--c-accent); font-weight:800;">
+                    {% if standard %}{{ standard.pv_cost_gross_pln|default(0)|format_pln }}{% else %}—{% endif %}
                 </td>
                 <td style="text-align:center; color:var(--purple-700); font-weight:700;">
-                    {% if premium %}{{ premium.pv_cost_gross_pln | default(0) | format_pln }}{% else %}—{% endif %}
+                    {% if premium %}{{ premium.pv_cost_gross_pln|default(0)|format_pln }}{% else %}—{% endif %}
                 </td>
             </tr>
             <tr>
-                <td>Zwrot inwestycji [lata]</td>
+                <td>Zwrot inwestycji [lat]</td>
                 <td style="text-align:center; font-weight:700;">
-                    {% if economy %}{{ economy.pv_payback_years | default(0) | round(1) }}{% else %}—{% endif %}
+                    {% if economy %}{{ economy.pv_payback_years|default(0)|round(1) }}{% else %}—{% endif %}
                 </td>
-                <td style="text-align:center; font-weight:800; color:var(--c-accent);"
-                    class="comp-table-std">
-                    {% if standard %}{{ standard.pv_payback_years | default(0) | round(1) }}{% else %}—{% endif %}
+                <td class="comp-table-std" style="text-align:center; color:var(--c-accent); font-weight:800;">
+                    {% if standard %}{{ standard.pv_payback_years|default(0)|round(1) }}{% else %}—{% endif %}
                 </td>
                 <td style="text-align:center; font-weight:700;">
-                    {% if premium %}{{ premium.pv_payback_years | default(0) | round(1) }}{% else %}—{% endif %}
+                    {% if premium %}{{ premium.pv_payback_years|default(0)|round(1) }}{% else %}—{% endif %}
                 </td>
             </tr>
             <tr>
                 <td>Zysk po 25 latach</td>
                 <td style="text-align:center; color:#1A7A40; font-weight:700;">
-                    {% if economy %}ok. {{ economy.pv_total_savings_25y_pln | default(0) | format_pln }}{% else %}—{% endif %}
+                    {% if economy %}ok. {{ economy.pv_total_savings_25y_pln|default(0)|format_pln }}{% else %}—{% endif %}
                 </td>
-                <td style="text-align:center; color:var(--c-accent); font-weight:800;"
-                    class="comp-table-std">
-                    {% if standard %}ok. {{ standard.pv_total_savings_25y_pln | default(0) | format_pln }}{% else %}—{% endif %}
+                <td class="comp-table-std" style="text-align:center; color:var(--c-accent); font-weight:800;">
+                    {% if standard %}ok. {{ standard.pv_total_savings_25y_pln|default(0)|format_pln }}{% else %}—{% endif %}
                 </td>
                 <td style="text-align:center; color:var(--purple-700); font-weight:700;">
-                    {% if premium %}ok. {{ premium.pv_total_savings_25y_pln | default(0) | format_pln }}{% else %}—{% endif %}
+                    {% if premium %}ok. {{ premium.pv_total_savings_25y_pln|default(0)|format_pln }}{% else %}—{% endif %}
                 </td>
             </tr>
             <tr>
                 <td>Samowystarczalność</td>
                 <td style="text-align:center;">
-                    {% if economy %}{{ ((economy.self_sufficiency_rate | default(0)) * 100) | round | int }}%{% else %}—{% endif %}
+                    {% if economy %}{{ ((economy.self_sufficiency_rate|default(0))*100)|round|int }}%{% else %}—{% endif %}
                 </td>
-                <td style="text-align:center; font-weight:700;" class="comp-table-std">
-                    {% if standard %}{{ ((standard.self_sufficiency_rate | default(0)) * 100) | round | int }}%{% else %}—{% endif %}
+                <td class="comp-table-std" style="text-align:center; font-weight:700;">
+                    {% if standard %}{{ ((standard.self_sufficiency_rate|default(0))*100)|round|int }}%{% else %}—{% endif %}
                 </td>
                 <td style="text-align:center;">
-                    {% if premium %}{{ ((premium.self_sufficiency_rate | default(0)) * 100) | round | int }}%{% else %}—{% endif %}
+                    {% if premium %}{{ ((premium.self_sufficiency_rate|default(0))*100)|round|int }}%{% else %}—{% endif %}
                 </td>
             </tr>
             <tr>
-                <td>Gwarancja na produkcję</td>
+                <td>Gwarancja (produkcja)</td>
                 <td style="text-align:center;">25 lat (80%)</td>
-                <td style="text-align:center; font-weight:700;" class="comp-table-std">25 lat (80%)</td>
-                <td style="text-align:center;">30 lat (80%)</td>
+                <td class="comp-table-std" style="text-align:center; font-weight:700;">25 lat (80%)</td>
+                <td style="text-align:center; color:var(--purple-700); font-weight:700;">30 lat (80%)</td>
             </tr>
         </tbody>
     </table>
 
     <p class="text-xs text-muted" style="margin-top:8px; line-height:1.5;">
-        ★ Scenariusz Standard jest domyślnie rekomendowany jako optymalny kompromis
-        jakości, ceny i czasu zwrotu. Wszystkie kwoty są brutto (z VAT 23%).
+        ★ Scenariusz Standard jest rekomendowany jako optymalny kompromis jakości i czasu zwrotu.
+        Wszystkie kwoty brutto (z VAT 23%).
     </p>
-
 </div>
