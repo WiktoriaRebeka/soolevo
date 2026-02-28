@@ -1,356 +1,439 @@
+{# ═══════════════════════════════════════════════════════════════════════════
+   S2 — SCENARIUSZ GŁÓWNY (Standard)
+   Zmienne: standard (ScenarioResponseItem dict), req
+   Pola używane:
+     total_power_kwp, panels_count, panel_brand, panel_model, panel_power_wp
+     inverter_brand, inverter_model, inverter_power_kw
+     annual_production_kwh, annual_consumption_kwh, coverage_percent
+     pv_cost_gross_pln, pv_savings_pln, pv_payback_years,
+     pv_payback_optimistic_years, pv_payback_pessimistic_years,
+     pv_total_savings_25y_pln
+     battery_recommended, is_economically_justified,
+     total_cost_with_battery_pln, battery_payback_years,
+     battery_payback_optimistic_years, battery_payback_pessimistic_years,
+     battery_total_savings_25y_pln, battery_capacity_kwh, battery_model,
+     autoconsumption_rate, self_sufficiency_rate,
+     autoconsumption_rate_with_battery, self_sufficiency_rate_with_battery,
+     net_billing_annual_deposit_pln, effective_surplus_rate, rationale,
+     shading_loss_percent
+   Makro: render_payback (z _macros.html)
+   Filtry: format_pln, format_num
+═══════════════════════════════════════════════════════════════════════════ #}
+
 {% from 'report/_macros.html' import render_payback %}
 
-{# ═══════════════════════════════════════════════════════════════════════════
-   S2 — CZĘŚĆ A: header + 3 value boxy + inwestycja
-════════════════════════════════════════════════════════════════════════════ #}
+{# ══════════════════════════════════════════════════════════════════
+   CZĘŚĆ A — NAGŁÓWEK SCENARIUSZA + 3 VALUE BOXY + INWESTYCJA
+══════════════════════════════════════════════════════════════════ #}
 
-<div class="card" style="margin-bottom: 16px;">
-    <div style="page-break-before: always;"></div>
+<div class="card tier-standard avoid-break" style="margin-bottom:16px; padding:20px 22px;">
 
-    <!-- Pasek nagłówka S2 -->
-    <div style="
-        background: linear-gradient(135deg, #1B4F72 0%, #2E86C1 100%);
-        color: white;
-        font-size: 13px;
-        font-weight: 800;
-        letter-spacing: .05em;
-        padding: 10px 14px;
-        border-radius: 10px;
-        margin: 26px 0 14px;
-    ">
-        Scenariusz główny
+    {# Sekcja-header z numerem #}
+    <div class="section-header">
+        <div class="section-header-num">S2</div>
+        <div class="section-header-body" style="
+            background: var(--light-blue);
+            border-left-color: var(--c-accent);
+        ">
+            <div class="section-header-title">
+                Scenariusz główny
+                <span class="badge badge-standard" style="margin-left:8px; vertical-align:middle;">
+                    STANDARD
+                </span>
+            </div>
+            <div class="section-header-sub">
+                {{ standard.description | default("Rekomendowany kompromis jakości i ceny") }}
+            </div>
+        </div>
     </div>
 
-    <div style="
-        font-size: 11px;
-        color: #e2e8f0;
-        margin-top: -6px;
-        margin-bottom: 12px;
-    ">
-        Standard — rekomendowany kompromis jakości i ceny
-    </div>
+    {# ── Trzy value boxy ─────────────────────────────────────────── #}
+    <div class="grid-3" style="margin-bottom:18px; gap:12px;">
 
-    <!-- 3 value boxy -->
-    <div class="grid-3" style="margin-bottom: 18px;">
+        {# 1. Koszt instalacji #}
         <div class="stat-box bg-light-blue border-accent">
             <div class="label-sm">Koszt instalacji PV</div>
-            <div class="value-xl text-accent">{{ standard.pv_cost_gross_pln | format_pln }}</div>
-            <div class="text-sm text-muted" style="margin-top: 4px;">
+            <div class="value-xl text-accent">
+                {{ standard.pv_cost_gross_pln | format_pln }}
+            </div>
+            <div class="text-sm text-muted" style="margin-top:4px;">
                 ok. {{ standard.pv_payback_years | round(1) }} lat zwrotu
             </div>
         </div>
-        <div class="stat-box" style="background: #FFFBEB; border-color: #F59E0B;">
-            <div class="label-sm">Szacowany zysk po 25 latach</div>
-            <div class="value-xl" style="color: #B45309;">
+
+        {# 2. Zysk po 25 latach #}
+        <div class="stat-box" style="background:#FFFBEB; border-color:#F59E0B;">
+            <div class="label-sm">Szac. zysk po 25 latach</div>
+            <div class="value-xl" style="color:#B45309;">
                 ok. {{ standard.pv_total_savings_25y_pln | format_pln }}
             </div>
-            <div class="text-sm text-muted" style="margin-top: 4px;">
+            <div class="text-sm text-muted" style="margin-top:4px;">
                 ok. {{ standard.pv_savings_pln | format_pln }} / rok 1
             </div>
         </div>
+
+        {# 3. Moc systemu #}
         <div class="stat-box bg-light-blue border-accent">
             <div class="label-sm">Moc systemu</div>
-            <div class="value-xl text-accent">{{ standard.total_power_kwp | round(2) }} kWp</div>
-            <div class="text-sm text-muted" style="margin-top: 4px;">
+            <div class="value-xl text-accent">
+                {{ "%.2f" | format(standard.total_power_kwp) }} kWp
+            </div>
+            <div class="text-sm text-muted" style="margin-top:4px;">
                 {{ standard.panels_count }} paneli
+                · {{ standard.annual_production_kwh | round | int | format_num }} kWh/rok
             </div>
         </div>
+
     </div>
 
-    <!-- INWESTYCJA -->
-    <div>
-        <div class="section-label">Inwestycja</div>
+    {# ── INWESTYCJA — dwie karty (PV / PV + Bateria) ─────────────── #}
+    <div class="section-label">Inwestycja</div>
 
-        <div class="invest-row">
-            <div>
-                <div class="label-sm">Tylko panele PV</div>
-                <div class="value-xl">{{ standard.pv_cost_gross_pln | format_pln }}</div>
-            </div>
-            <div class="text-right">
-                <div class="label-sm">Szacowany zwrot</div>
-                <div class="value-base text-accent">
-                    {{ render_payback(
-                        standard.pv_payback_years,
-                        standard.pv_payback_optimistic_years,
-                        standard.pv_payback_pessimistic_years
-                    ) }}
-                </div>
-            </div>
-        </div>
-
-        {% if standard.battery_recommended %}
-        <div class="invest-row" style="background: var(--purple-50); border-color: var(--purple-200);">
-            <div>
-                <div class="label-sm">
-                    {% if standard.is_economically_justified %}
-                        PV + Magazyn energii (zalecany)
-                    {% else %}
-                        PV + Magazyn energii (opcjonalny)
-                    {% endif %}
-                </div>
-                <div class="value-xl">{{ standard.total_cost_with_battery_pln | format_pln }}</div>
-            </div>
-            <div class="text-right">
-                <div class="label-sm">Szacowany zwrot z magazynem</div>
-                <div class="value-base {{ 'text-purple' if standard.is_economically_justified else 'text-muted' }}">
-                    {{ render_payback(
-                        standard.battery_payback_years,
-                        standard.battery_payback_optimistic_years,
-                        standard.battery_payback_pessimistic_years
-                    ) }}
-                </div>
-            </div>
-        </div>
-        {% endif %}
-    </div>
-
-</div>
-
-{# ── Podział strony ─────────────────────────────────────────────────────── #}
-<div class="page-break"></div>
-
-{# ═══════════════════════════════════════════════════════════════════════════
-   S2 — CZĘŚĆ B: zysk 25y + co to oznacza + efektywność
-════════════════════════════════════════════════════════════════════════════ #}
-
-<div class="card avoid-break" style="margin-bottom: 16px;">
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-
-        <!-- Zysk po 25 latach -->
+    {# Karta: Sama PV #}
+    <div class="investment-card">
         <div>
-            <div class="section-label">Szacowany zysk po 25 latach</div>
-            <div class="stat-box" style="background: #FFFBEB; border-color: #F59E0B; margin-bottom: 8px;">
-                <div class="label-sm">Sama PV</div>
-                <div class="value-xl" style="color: #B45309;">ok. {{ standard.pv_total_savings_25y_pln | format_pln }}</div>
-                <div class="text-sm text-muted" style="margin-top: 4px;">
-                    ok. {{ standard.pv_savings_pln | format_pln }} / rok 1
-                </div>
+            <div class="label-sm">Tylko panele PV</div>
+            <div class="value-xl" style="color:var(--gray-900);">
+                {{ standard.pv_cost_gross_pln | format_pln }}
             </div>
-            {% if standard.battery_recommended and standard.battery_total_savings_25y_pln and standard.battery_total_savings_25y_pln > 0 %}
-            <div class="stat-box bg-purple-light border-purple">
-                <div class="label-sm">PV + Magazyn</div>
-                <div class="value-xl text-purple">ok. {{ standard.battery_total_savings_25y_pln | format_pln }}</div>
+        </div>
+        <div style="text-align:right; flex-shrink:0;">
+            <div class="label-sm">Szacowany zwrot</div>
+            <div class="value-base text-accent" style="white-space:nowrap;">
+                {{ render_payback(
+                    standard.pv_payback_years,
+                    standard.pv_payback_optimistic_years,
+                    standard.pv_payback_pessimistic_years
+                ) }}
+            </div>
+        </div>
+    </div>
+
+    {# Karta: PV + Magazyn (jeśli dostępna) #}
+    {% if standard.battery_recommended and standard.total_cost_with_battery_pln %}
+
+    {% if standard.is_economically_justified %}
+    <div class="investment-card--justified">
+    {% else %}
+    <div class="investment-card--neutral">
+    {% endif %}
+
+        <div>
+            <div class="label-sm">
+                {% if standard.is_economically_justified %}
+                    PV + Magazyn energii
+                    <span class="badge badge-premium" style="margin-left:6px;">ZALECANE</span>
+                {% else %}
+                    PV + Magazyn energii
+                    <span class="badge" style="background:var(--gray-200); color:var(--gray-600); margin-left:6px;">OPCJONALNY</span>
+                {% endif %}
+            </div>
+            <div class="value-xl" style="color:{{ 'var(--purple-700)' if standard.is_economically_justified else 'var(--gray-900)' }}; margin-top:4px;">
+                {{ standard.total_cost_with_battery_pln | format_pln }}
+            </div>
+            {% if standard.battery_model %}
+            <div class="text-sm text-muted" style="margin-top:3px;">
+                Magazyn: {{ standard.battery_model }}
+                ({{ standard.battery_capacity_kwh | round(1) }} kWh)
             </div>
             {% endif %}
         </div>
-
-        <!-- Co to oznacza w praktyce -->
-        <div>
-            <div class="section-label">Co to oznacza w praktyce</div>
-            <div class="box-gray">
-                {% set autokwh = standard.autoconsumption_kwh or 0 %}
-                <div class="param-row">
-                    <span class="text-muted">Produkcja roczna</span>
-                    <span class="value-bold text-accent">{{ standard.annual_production_kwh | round | int }} kWh</span>
-                </div>
-                <div class="param-row">
-                    <span class="text-muted">Autokonsumpcja</span>
-                    <span class="value-bold">
-                        {%- if autokwh > 0 -%}{{ autokwh | round | int }} kWh{%- else -%}—{%- endif -%}
-                    </span>
-                </div>
-                <div class="param-row">
-                    <span class="text-muted">Nadwyżka do sieci</span>
-                    <span class="value-bold">
-                        {%- if standard.surplus_kwh -%}{{ standard.surplus_kwh | round | int }} kWh{%- else -%}—{%- endif -%}
-                    </span>
-                </div>
-                <div class="param-row">
-                    <span class="text-muted">Samowystarczalność</span>
-                    <span class="value-bold text-accent">{{ (standard.self_sufficiency_rate * 100) | round | int }}%</span>
-                </div>
-                <div class="param-row">
-                    <span class="text-muted">Wskaźnik autokonsumpcji</span>
-                    <span class="value-bold text-accent">{{ (standard.autoconsumption_rate * 100) | round | int }}%</span>
-                </div>
+        <div style="text-align:right; flex-shrink:0;">
+            <div class="label-sm">Zwrot z magazynem</div>
+            <div class="value-base" style="
+                color:{{ 'var(--purple-700)' if standard.is_economically_justified else 'var(--gray-500)' }};
+                white-space:nowrap;
+            ">
+                {{ render_payback(
+                    standard.battery_payback_years,
+                    standard.battery_payback_optimistic_years,
+                    standard.battery_payback_pessimistic_years
+                ) }}
             </div>
         </div>
 
     </div>
-</div>
 
-<!-- EFEKTYWNOŚĆ Z PASKAMI -->
-<div class="card avoid-break" style="margin-bottom: 16px;">
-    <div class="section-label">Efektywność instalacji</div>
-    <div class="box-gray">
+    {# Rekomendacja ekspercka dot. baterii #}
+    {% if standard.rationale %}
+    <div class="alert {{ 'alert-blue' if standard.is_economically_justified else '' }}"
+         style="margin-top:10px;">
+        <p class="text-sm" style="margin:0; line-height:1.6; color:var(--gray-700);">
+            {{ standard.rationale }}
+        </p>
+    </div>
+    {% endif %}
 
-        {% set ac_pct = (standard.autoconsumption_rate * 100) | round | int %}
+    {% endif %}{# /battery_recommended #}
+
+</div>{# /card S2-A #}
+
+{# ══════════════════════════════════════════════════════════════════
+   STRONA-BREAK — S2-B na nowej stronie
+══════════════════════════════════════════════════════════════════ #}
+<div class="page-break"></div>
+
+{# ══════════════════════════════════════════════════════════════════
+   CZĘŚĆ B — EFEKTYWNOŚĆ + PRZEPŁYW ENERGII
+══════════════════════════════════════════════════════════════════ #}
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px;">
+
+    {# ── LEWA: Progress bary efektywności ──────────────────────── #}
+    <div class="card avoid-break" style="padding:18px 20px;">
+        <div class="section-label">Efektywność systemu</div>
+
+        {# Autokonsumpcja (bez baterii) #}
+        {% set ac_pct = ((standard.autoconsumption_rate | default(0)) * 100) | round | int %}
         <div class="progress-container">
             <div class="progress-header">
-                <span class="progress-title">Autokonsumpcja</span>
-                <span class="progress-value">{{ ac_pct }}%</span>
+                <span class="progress-title">Autokonsumpcja PV</span>
+                <span class="progress-value text-accent">{{ ac_pct }}%</span>
             </div>
             <div class="progress-track">
-                <div class="progress-fill bg-accent" style="width: {{ [ac_pct, 100] | min }}%;"></div>
+                <div class="progress-fill progress-fill--standard"
+                     style="width:{{ [ac_pct,100] | min }}%;"></div>
             </div>
-            <div class="progress-sublabel">Ile wyprodukowanej energii zużywasz na miejscu (bez magazynu)</div>
+            <div class="progress-sublabel">Ile produkcji zużywasz na bieżąco</div>
         </div>
 
-        {% if standard.autoconsumption_rate_with_battery and standard.autoconsumption_rate_with_battery > 0 %}
-        {% set acb_pct = (standard.autoconsumption_rate_with_battery * 100) | round | int %}
-        <div class="progress-container">
-            <div class="progress-header">
-                <span class="progress-title">Autokonsumpcja z magazynem</span>
-                <span class="progress-value">{{ acb_pct }}%</span>
-            </div>
-            <div class="progress-track">
-                <div class="progress-fill bg-purple" style="width: {{ [acb_pct, 100] | min }}%;"></div>
-            </div>
-            <div class="progress-sublabel">To samo, ale z energią zgromadzoną w baterii</div>
-        </div>
-        {% endif %}
-
-        <div class="divider"></div>
-
-        {% set ss_pct = (standard.self_sufficiency_rate * 100) | round | int %}
+        {# Samowystarczalność (bez baterii) #}
+        {% set ss_pct = ((standard.self_sufficiency_rate | default(0)) * 100) | round | int %}
         <div class="progress-container">
             <div class="progress-header">
                 <span class="progress-title">Samowystarczalność</span>
-                <span class="progress-value">{{ ss_pct }}%</span>
+                <span class="progress-value text-accent">{{ ss_pct }}%</span>
             </div>
             <div class="progress-track">
-                <div class="progress-fill bg-accent" style="width: {{ [ss_pct, 100] | min }}%;"></div>
+                <div class="progress-fill progress-fill--standard"
+                     style="width:{{ [ss_pct,100] | min }}%;"></div>
             </div>
-            <div class="progress-sublabel">Ile Twojego zapotrzebowania pokrywa PV (bez magazynu)</div>
+            <div class="progress-sublabel">Ile zapotrzebowania pokrywa PV</div>
         </div>
 
-        {% if standard.self_sufficiency_rate_with_battery and standard.self_sufficiency_rate_with_battery > 0 %}
-        {% set ssb_pct = (standard.self_sufficiency_rate_with_battery * 100) | round | int %}
+        {# Pokrycie zapotrzebowania #}
+        {% set cov_pct = (standard.coverage_percent | default(0)) | round | int %}
+        {% if cov_pct > 0 %}
         <div class="progress-container">
             <div class="progress-header">
-                <span class="progress-title">Samowystarczalność z magazynem</span>
-                <span class="progress-value">{{ ssb_pct }}%</span>
+                <span class="progress-title">Pokrycie zużycia</span>
+                <span class="progress-value text-accent">{{ cov_pct }}%</span>
             </div>
             <div class="progress-track">
-                <div class="progress-fill bg-purple" style="width: {{ [ssb_pct, 100] | min }}%;"></div>
+                <div class="progress-fill progress-fill--standard"
+                     style="width:{{ [cov_pct,100] | min }}%;"></div>
+            </div>
+            <div class="progress-sublabel">Produkcja vs. roczne zużycie</div>
+        </div>
+        {% endif %}
+
+        {# Autokonsumpcja z baterią (jeśli dostępna) #}
+        {% if standard.battery_recommended and standard.autoconsumption_rate_with_battery %}
+        {% set acb_pct = ((standard.autoconsumption_rate_with_battery | default(0)) * 100) | round | int %}
+        <div class="progress-container">
+            <div class="progress-header">
+                <span class="progress-title">Autokonsumpcja z magazynem</span>
+                <span class="progress-value text-purple">{{ acb_pct }}%</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill progress-fill--premium"
+                     style="width:{{ [acb_pct,100] | min }}%;"></div>
             </div>
             <div class="progress-sublabel">To samo, ale z baterią</div>
         </div>
         {% endif %}
 
-    </div>
-</div>
-
-<!-- REKOMENDACJA EKSPERTA -->
-{% if standard.rationale %}
-<div class="card avoid-break" style="margin-bottom: 16px;">
-    <div class="section-label">Analiza ekspercka</div>
-    <div style="background: #FFFBEB; border: 1px solid #F59E0B; border-left: 4px solid #F59E0B;
-                border-radius: 10px; padding: 14px 16px;">
-        <p class="text-base" style="color: var(--gray-700); margin: 0; line-height: 1.65;">
-            {{ standard.rationale }}
-        </p>
-    </div>
-    <div style="margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-        <div style="background: var(--gray-50); border-radius: 10px; padding: 12px 14px;
-                    border: 1px solid var(--gray-200);">
-            <div class="label-sm" style="margin-bottom: 4px;">Net-billing — nadwyżki do sieci</div>
-            <p class="text-sm text-muted" style="margin: 0; line-height: 1.5;">
-                Nadwyżki energii są odsprzedawane do sieci po bieżącej cenie rynkowej RCEm
-                (ok. 30% ceny detalicznej). Im wyższa autokonsumpcja, tym lepsza ekonomika inwestycji.
-            </p>
-        </div>
-        <div style="background: var(--gray-50); border-radius: 10px; padding: 12px 14px;
-                    border: 1px solid var(--gray-200);">
-            <div class="label-sm" style="margin-bottom: 4px;">Scenariusze zwrotu</div>
-            <p class="text-sm text-muted" style="margin: 0; line-height: 1.5;">
-                Przedział zwrotu zakłada inflację energii 3–6% rocznie.
-                Scenariusz bazowy przyjmuje 4%. Wyniki mają charakter szacunkowy.
-            </p>
-        </div>
-    </div>
-</div>
-{% endif %}
-
-{# ═══════════════════════════════════════════════════════════════════════════
-   S2 — CZĘŚĆ C: Parametry systemu + Wizualizacja dachu (jeden card, 2 kolumny)
-════════════════════════════════════════════════════════════════════════════ #}
-
-<div class="card avoid-break" style="margin-bottom: 16px;">
-
-    <div style="display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: start;">
-
-        <!-- LEWA: Parametry systemu -->
-        <div>
-            <div class="section-label">Parametry systemu</div>
-
-            <div class="grid-2" style="margin-bottom: 12px;">
-                <div class="stat-box bg-light-blue border-accent">
-                    <div class="label-sm">Moc systemu</div>
-                    <div class="value-xl text-accent">{{ standard.total_power_kwp | round(2) }} kWp</div>
-                </div>
-                <div class="stat-box bg-light-blue border-accent">
-                    <div class="label-sm">Roczna produkcja</div>
-                    <div class="value-xl text-accent">{{ standard.annual_production_kwh | round | int }} kWh</div>
-                </div>
+        {# Samowystarczalność z baterią #}
+        {% if standard.battery_recommended and standard.self_sufficiency_rate_with_battery %}
+        {% set ssb_pct = ((standard.self_sufficiency_rate_with_battery | default(0)) * 100) | round | int %}
+        <div class="progress-container">
+            <div class="progress-header">
+                <span class="progress-title">Samowystarczalność z magazynem</span>
+                <span class="progress-value text-purple">{{ ssb_pct }}%</span>
             </div>
-
-            <div class="box-gray">
-                <div class="param-row">
-                    <span class="text-muted">Liczba paneli</span>
-                    <span class="value-bold">{{ standard.panels_count }} szt.</span>
-                </div>
-                <div class="param-row">
-                    <span class="text-muted">Model paneli</span>
-                    <span class="value-bold">{{ standard.panel_brand }} {{ standard.panel_model }}</span>
-                </div>
-                <div class="param-row">
-                    <span class="text-muted">Moc panelu</span>
-                    <span class="value-bold">{{ standard.panel_power_wp }} Wp</span>
-                </div>
-                <div class="param-row">
-                    <span class="text-muted">Falownik</span>
-                    <span class="value-bold">{{ standard.inverter_brand }} {{ standard.inverter_model }}</span>
-                </div>
-                {% if standard.inverter_power_kw %}
-                <div class="param-row">
-                    <span class="text-muted">Moc falownika</span>
-                    <span class="value-bold">{{ standard.inverter_power_kw }} kW</span>
-                </div>
-                {% endif %}
-                {% if standard.battery_recommended and standard.battery_capacity_kwh and standard.battery_capacity_kwh > 0 %}
-                <div class="param-row">
-                    <span class="text-muted">Magazyn energii</span>
-                    <span class="value-bold text-purple">
-                        {{ standard.battery_model }} · {{ standard.battery_capacity_kwh | round(1) }} kWh
-                    </span>
-                </div>
-                {% endif %}
+            <div class="progress-track">
+                <div class="progress-fill progress-fill--premium"
+                     style="width:{{ [ssb_pct,100] | min }}%;"></div>
             </div>
-        </div>
-
-        <!-- PRAWA: Wizualizacja dachu — SVG programatyczny (identyczny z RoofVisualizer.jsx) -->
-        {% if charts and charts.roof_panels %}
-        <div style="width: 260px; flex-shrink: 0;">
-            <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
-                        letter-spacing: .05em; color: var(--c-primary); margin-bottom: 8px;">
-                Rozmieszczenie paneli
-            </div>
-
-            {# MIME TYPE: svg+xml — wygenerowany przez _chart_roof_panels() w report_generator.py #}
-            <img src="data:image/svg+xml;base64,{{ charts.roof_panels }}"
-                 alt="Rozmieszczenie paneli na dachu"
-                 style="width: 260px; display: block;
-                        border-radius: 8px; border: 1px solid var(--gray-200);">
-
-            <!-- Legenda — kolory identyczne z SVG i RoofVisualizer.jsx -->
-            <div style="display: flex; flex-direction: column; gap: 5px; margin-top: 8px;">
-                <div style="display: flex; align-items: center; gap: 6px;">
-                    <div style="width: 14px; height: 10px; flex-shrink: 0; background: #E8F4F3;
-                                border: 1.5px solid #569793; border-radius: 2px;"></div>
-                    <span style="font-size: 10px; color: var(--gray-500);">Powierzchnia dachu</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 6px;">
-                    <div style="width: 14px; height: 10px; flex-shrink: 0; background: #FFD700;
-                                border: 1.5px solid #B8860B; border-radius: 2px;"></div>
-                    <span style="font-size: 10px; color: var(--gray-500);">Panele fotowoltaiczne</span>
-                </div>
-            </div>
-            <p style="font-size: 9px; color: var(--gray-400); margin-top: 6px; margin-bottom: 0; line-height: 1.4;">
-                Rzut z góry. Finalne rozmieszczenie ustali instalator.
-            </p>
+            <div class="progress-sublabel">Niezależność energetyczna z baterią</div>
         </div>
         {% endif %}
 
     </div>
+
+    {# ── PRAWA: Bilans energetyczny ─────────────────────────────── #}
+    <div class="card avoid-break" style="padding:18px 20px;">
+        <div class="section-label">Bilans energetyczny</div>
+
+        <div class="box-gray" style="margin-bottom:12px;">
+            <div class="param-row">
+                <span class="text-muted">Roczna produkcja PV</span>
+                <span class="value-bold text-accent">
+                    {{ standard.annual_production_kwh | round | int | format_num }} kWh
+                </span>
+            </div>
+            <div class="param-row">
+                <span class="text-muted">Roczne zużycie</span>
+                <span class="value-bold">
+                    {{ standard.annual_consumption_kwh | round | int | format_num }} kWh
+                </span>
+            </div>
+            {% if standard.surplus_kwh is not none %}
+            <div class="param-row">
+                <span class="text-muted">Nadwyżka do sieci</span>
+                <span class="value-bold">
+                    {{ standard.surplus_kwh | round | int | format_num }} kWh
+                </span>
+            </div>
+            {% endif %}
+            <div class="param-row">
+                <span class="text-muted">Net-billing — depozyt roczny</span>
+                <span class="value-bold">
+                    {{ standard.net_billing_annual_deposit_pln | format_pln }}
+                </span>
+            </div>
+            <div class="param-row">
+                <span class="text-muted">Stawka net-billing (RCEm)</span>
+                <span class="value-bold">
+                    {% if standard.effective_surplus_rate %}
+                        {{ "%.3f" | format(standard.effective_surplus_rate) }} zł/kWh
+                    {% else %}—{% endif %}
+                </span>
+            </div>
+            {% if standard.shading_loss_percent and standard.shading_loss_percent > 0 %}
+            <div class="param-row">
+                <span class="text-muted">Straty przez zacienienie</span>
+                <span class="value-bold" style="color:var(--c-yellow);">
+                    {{ standard.shading_loss_percent | round(1) }}%
+                </span>
+            </div>
+            {% endif %}
+        </div>
+
+        {# Nota o net-billingu #}
+        <div style="
+            background: var(--gray-50);
+            border:     1px solid var(--gray-200);
+            border-left:3px solid var(--c-accent);
+            border-radius: var(--r-md);
+            padding:    10px 12px;
+        ">
+            <div class="label-sm" style="margin-bottom:4px;">Net-billing — jak to działa?</div>
+            <p class="text-xs text-muted" style="margin:0; line-height:1.55;">
+                Nadwyżki energii trafiają do sieci i są zapisywane jako depozyt pieniężny
+                (ok. 30% ceny detalicznej). Możesz go rozliczać przez 12 miesięcy.
+                Im wyższa autokonsumpcja, tym lepsza ekonomika.
+            </p>
+        </div>
+
+    </div>
+
+</div>
+
+{# ══════════════════════════════════════════════════════════════════
+   CZĘŚĆ C — PARAMETRY SYSTEMU + PRZEDZIAŁY ZWROTU
+══════════════════════════════════════════════════════════════════ #}
+
+<div class="card avoid-break" style="margin-bottom:16px; padding:18px 22px;">
+
+    <div class="section-label">Parametry systemu — Scenariusz Standard</div>
+
+    <div class="grid-2" style="gap:0 28px;">
+
+        {# Lewa: sprzęt #}
+        <div>
+            <div class="param-row">
+                <span class="text-muted">Moc systemu</span>
+                <span class="value-bold text-accent">
+                    {{ "%.2f" | format(standard.total_power_kwp) }} kWp
+                </span>
+            </div>
+            <div class="param-row">
+                <span class="text-muted">Liczba paneli</span>
+                <span class="value-bold">{{ standard.panels_count }} szt.</span>
+            </div>
+            <div class="param-row">
+                <span class="text-muted">Model paneli</span>
+                <span class="value-bold">
+                    {{ standard.panel_brand | default("—") }}
+                    {% if standard.panel_power_wp %}
+                        · {{ standard.panel_power_wp }} Wp
+                    {% endif %}
+                </span>
+            </div>
+            <div class="param-row">
+                <span class="text-muted">Falownik</span>
+                <span class="value-bold">
+                    {{ standard.inverter_brand | default("—") }}
+                    {% if standard.inverter_power_kw %}
+                        · {{ standard.inverter_power_kw | round(1) }} kW
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        {# Prawa: scenariusze zwrotu #}
+        <div>
+            <div class="section-label" style="font-size:var(--fs-xs);">Przedziały czasu zwrotu</div>
+
+            {# Tabela: optymistyczny / bazowy / pesymistyczny #}
+            <table class="data-table avoid-break" style="font-size:var(--fs-sm);">
+                <thead>
+                    <tr>
+                        <th style="text-align:left;">Scenariusz</th>
+                        <th style="text-align:center;">Tylko PV</th>
+                        {% if standard.battery_recommended %}<th style="text-align:center;">PV + Bateria</th>{% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="color:var(--c-green); font-weight:700;">Optymistyczny (inflacja 6%)</td>
+                        <td style="text-align:center; font-weight:700;">
+                            {{ standard.pv_payback_optimistic_years | round(1) }} lat
+                        </td>
+                        {% if standard.battery_recommended and standard.battery_payback_optimistic_years %}
+                        <td style="text-align:center; font-weight:700; color:var(--purple-700);">
+                            {{ standard.battery_payback_optimistic_years | round(1) }} lat
+                        </td>
+                        {% elif standard.battery_recommended %}
+                        <td style="text-align:center;">—</td>
+                        {% endif %}
+                    </tr>
+                    <tr>
+                        <td style="font-weight:700; color:var(--c-accent);">Bazowy (inflacja 4%)</td>
+                        <td style="text-align:center; font-weight:800; color:var(--c-accent);">
+                            {{ standard.pv_payback_years | round(1) }} lat
+                        </td>
+                        {% if standard.battery_recommended and standard.battery_payback_years %}
+                        <td style="text-align:center; font-weight:800; color:var(--purple-700);">
+                            {{ standard.battery_payback_years | round(1) }} lat
+                        </td>
+                        {% elif standard.battery_recommended %}
+                        <td style="text-align:center;">—</td>
+                        {% endif %}
+                    </tr>
+                    <tr>
+                        <td style="color:var(--c-yellow); font-weight:700;">Pesymistyczny (inflacja 2%)</td>
+                        <td style="text-align:center; font-weight:700;">
+                            {{ standard.pv_payback_pessimistic_years | round(1) }} lat
+                        </td>
+                        {% if standard.battery_recommended and standard.battery_payback_pessimistic_years %}
+                        <td style="text-align:center; font-weight:700; color:var(--purple-700);">
+                            {{ standard.battery_payback_pessimistic_years | round(1) }} lat
+                        </td>
+                        {% elif standard.battery_recommended %}
+                        <td style="text-align:center;">—</td>
+                        {% endif %}
+                    </tr>
+                </tbody>
+            </table>
+
+            <p class="text-xs text-muted" style="margin-top:8px; line-height:1.5;">
+                Scenariusze zakładają roczny wzrost cen energii odpowiednio 6%, 4% i 2%.
+                Rzeczywisty zwrot zależy od lokalnych warunków i cen prądu.
+            </p>
+        </div>
+
+    </div>
+
 </div>
