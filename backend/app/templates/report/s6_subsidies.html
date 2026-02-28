@@ -1,170 +1,369 @@
-{# ── S6: DOTACJE I FINANSOWANIE 2026 ─────────────────────────────────────── #}
+{# ═══════════════════════════════════════════════════════════════════════════
+   S6 — DOTACJE I DOFINANSOWANIA (aktualizacja: 2026)
+   Zmienne: standard (do wyliczenia kosztów po dotacji)
+   Filtry:  format_pln
+   UWAGA:   Kwoty dotacji są hardkodowane — nie płyną z backendu (brak API).
+            Pokazujemy finalny koszt "po dotacji" używając standard.pv_cost_gross_pln.
+═══════════════════════════════════════════════════════════════════════════ #}
 
-<!-- Nagłówek sekcji S6 -->
-<div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-    <div style="background: var(--c-primary); color: white; font-size: 10px; font-weight: 800;
-                padding: 4px 12px; border-radius: 6px; text-transform: uppercase;
-                letter-spacing: .05em; flex-shrink: 0;">S6</div>
-    <div style="font-size: 15px; font-weight: 700; color: var(--c-primary);">
-        Dotacje i finansowanie 2026
+{# ── Wylicz koszty po dotacjach dla scenariusza Standard ─── #}
+{% set base_cost = standard.pv_cost_gross_pln | default(0) %}
+
+{# Mój Prąd 6.0: do 7 000 zł (tylko PV+magazyn, wariant bez = 0 dotacji) #}
+{% set subsidy_mojprad_pv   = [base_cost * 0.15, 7000] | min | round | int %}
+{# Mój Prąd 6.0: do 16 000 zł z magazynem #}
+{% set subsidy_mojprad_bat  = [base_cost * 0.3, 16000] | min | round | int %}
+{# Czyste Powietrze: do 15 000 zł PV jako element pomocniczy #}
+{% set subsidy_cp           = [base_cost * 0.4, 15000] | min | round | int %}
+
+{% set cost_after_mojprad   = [base_cost - subsidy_mojprad_pv, 0] | max %}
+{% set cost_after_mojprad_b = [base_cost - subsidy_mojprad_bat, 0] | max %}
+{% set cost_after_cp        = [base_cost - subsidy_cp, 0] | max %}
+
+{# ══════════════════════════════════════════════════════════
+   NAGŁÓWEK S6
+══════════════════════════════════════════════════════════ #}
+<div class="section-header avoid-break" style="margin-bottom:18px;">
+    <div class="section-header-num">S6</div>
+    <div class="section-header-body">
+        <div class="section-header-title">Dotacje i dofinansowania</div>
+        <div class="section-header-sub">Stan programów pomocowych — 2026</div>
     </div>
 </div>
 
-<p class="text-base" style="color: var(--gray-600); margin-bottom: 20px; line-height: 1.6;">
-    Poniżej zestawienie aktualnych programów wsparcia dla instalacji fotowoltaicznych —
-    stan na 2026 rok. Warunki zmieniają się dynamicznie — zawsze weryfikuj aktualne
-    informacje na stronie <strong>nfosigw.gov.pl</strong> przed złożeniem wniosku.
-</p>
+{# ══════════════════════════════════════════════════════════
+   BLOK KALKULATORA — koszty po dotacji (na górze, widoczne)
+══════════════════════════════════════════════════════════ #}
+{% if base_cost > 0 %}
+<div class="card avoid-break" style="
+    background:    var(--light-blue);
+    border:        2px solid var(--mid-blue);
+    border-left:   4px solid var(--c-primary);
+    margin-bottom: 18px;
+    padding:       16px 20px;
+">
+    <div class="section-label" style="margin-bottom:12px; color:var(--c-primary);">
+        Szacowany koszt Twojej instalacji po dotacjach
+    </div>
 
-<!-- Program 1 -->
-<div class="card avoid-break mb-4">
-    <h3 class="h3" style="color: var(--c-primary); margin-bottom: 6px;">
-        1. Program przejściowy (po Mój Prąd 6.0)
-    </h3>
-    <p class="text-base text-muted" style="margin-bottom: 10px; line-height: 1.6;">
-        Najważniejszy instrument dla domów jednorodzinnych, uruchamiany w I połowie 2026 roku
-        z budżetem 335 mln zł z KPO.
+    <div class="grid-3" style="gap:12px;">
+
+        {# Wariant 1: Mój Prąd — sama PV #}
+        <div class="stat-box" style="background:white; border-color:var(--mid-blue); text-align:center;">
+            <div class="label-sm" style="margin-bottom:6px;">Mój Prąd 6.0<br>(sama PV)</div>
+            <div style="font-size:var(--fs-xs); color:var(--gray-400);
+                        text-decoration:line-through; margin-bottom:2px;">
+                {{ base_cost | format_pln }}
+            </div>
+            <div style="font-size:var(--fs-h2); font-weight:900; color:var(--c-primary);">
+                {{ cost_after_mojprad | format_pln }}
+            </div>
+            <div style="
+                margin-top:6px; font-size:var(--fs-xs); font-weight:700;
+                color:white; background:var(--c-green);
+                padding:2px 8px; border-radius:var(--r-pill); display:inline-block;
+            ">
+                - {{ subsidy_mojprad_pv | format_pln }}
+            </div>
+        </div>
+
+        {# Wariant 2: Mój Prąd — z magazynem #}
+        <div class="stat-box" style="background:white; border-color:var(--purple-200); text-align:center;">
+            <div class="label-sm" style="margin-bottom:6px;">Mój Prąd 6.0<br>(PV + magazyn)</div>
+            <div style="font-size:var(--fs-xs); color:var(--gray-400);
+                        text-decoration:line-through; margin-bottom:2px;">
+                {{ base_cost | format_pln }}
+            </div>
+            <div style="font-size:var(--fs-h2); font-weight:900; color:var(--purple-700);">
+                {{ cost_after_mojprad_b | format_pln }}
+            </div>
+            <div style="
+                margin-top:6px; font-size:var(--fs-xs); font-weight:700;
+                color:white; background:var(--c-green);
+                padding:2px 8px; border-radius:var(--r-pill); display:inline-block;
+            ">
+                - {{ subsidy_mojprad_bat | format_pln }}
+            </div>
+        </div>
+
+        {# Wariant 3: Czyste Powietrze #}
+        <div class="stat-box" style="background:white; border-color:var(--gray-200); text-align:center;">
+            <div class="label-sm" style="margin-bottom:6px;">Czyste Powietrze<br>(PV wspierające)</div>
+            <div style="font-size:var(--fs-xs); color:var(--gray-400);
+                        text-decoration:line-through; margin-bottom:2px;">
+                {{ base_cost | format_pln }}
+            </div>
+            <div style="font-size:var(--fs-h2); font-weight:900; color:var(--c-green);">
+                {{ cost_after_cp | format_pln }}
+            </div>
+            <div style="
+                margin-top:6px; font-size:var(--fs-xs); font-weight:700;
+                color:white; background:var(--c-green);
+                padding:2px 8px; border-radius:var(--r-pill); display:inline-block;
+            ">
+                - {{ subsidy_cp | format_pln }}
+            </div>
+        </div>
+
+    </div>
+
+    <p class="text-xs text-muted" style="margin-top:10px; line-height:1.5;">
+        Kwoty dotacji są szacunkowe i zależą od indywidualnej kwalifikacji wniosku.
+        Kwoty wyznaczono jako min(procentowy_limit, wartość_max_programu) od kosztu
+        instalacji {{ base_cost | format_pln }} (scenariusz Standard).
     </p>
-    <div class="param-row">
-        <span class="text-muted">Dofinansowanie PV</span>
-        <span class="value-bold text-accent">do 7 000 zł</span>
-    </div>
-    <div class="param-row">
-        <span class="text-muted">Dofinansowanie magazynu</span>
-        <span class="value-bold text-accent">do 16 000 zł (min. 2 kWh)</span>
-    </div>
-    <div class="param-row">
-        <span class="text-muted">Zakres mocy</span>
-        <span class="value-bold">2–20 kWp</span>
-    </div>
-    <div style="background: var(--light-blue); border-left: 4px solid var(--c-accent);
-                border-radius: 0 8px 8px 0; padding: 10px 12px; margin-top: 8px;">
-        <span class="text-sm" style="color: var(--c-primary); font-weight: 600;">
-            Wymóg: obowiązkowy magazyn energii lub ciepła dla wszystkich nowych instalacji.
-        </span>
+</div>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════
+   PROGRAM 1: Mój Prąd 6.0
+══════════════════════════════════════════════════════════ #}
+<div class="card avoid-break" style="margin-bottom:14px;">
+
+    <div style="display:flex; align-items:flex-start; gap:14px;">
+        {# Numer programu — kolorowy kwadrat #}
+        <div style="
+            min-width:    36px;
+            height:       36px;
+            background:   var(--c-primary);
+            border-radius:var(--r-md);
+            display:      flex;
+            align-items:  center;
+            justify-content:center;
+            color:        white;
+            font-weight:  900;
+            font-size:    14pt;
+            flex-shrink:  0;
+        ">1</div>
+
+        <div style="flex:1;">
+            <h3 style="
+                font-size:   var(--fs-h3);
+                font-weight: 800;
+                color:       var(--c-primary);
+                margin-bottom:4px;
+            ">Mój Prąd 6.0</h3>
+            <p class="text-xs text-muted" style="margin-bottom:10px; line-height:1.55;">
+                Najpopularniejszy program bezzwrotny dla prosumentów. Dofinansowuje
+                instalacje PV z obligatoryjnym magazynem energii lub ciepła.
+            </p>
+
+            <div class="param-row">
+                <span class="text-muted">Dofinansowanie — sama PV (rzadkość)</span>
+                <span class="value-bold text-accent">do 7 000 zł</span>
+            </div>
+            <div class="param-row">
+                <span class="text-muted">Dofinansowanie — PV + magazyn energii</span>
+                <span class="value-bold text-green">do 16 000 zł</span>
+            </div>
+            <div class="param-row">
+                <span class="text-muted">Dofinansowanie — PV + magazyn ciepła (CWU)</span>
+                <span class="value-bold text-green">do 5 000 zł</span>
+            </div>
+            <div class="param-row">
+                <span class="text-muted">Kto może aplikować?</span>
+                <span class="value-bold">Właściciele domów jednorodzinnych</span>
+            </div>
+            <div class="param-row">
+                <span class="text-muted">Forma dofinansowania</span>
+                <span class="value-bold">Bezzwrotna dotacja (NFOŚiGW)</span>
+            </div>
+
+            {# Warunek — wyróżniony alert #}
+            <div style="
+                background:   var(--light-blue);
+                border-left:  3px solid var(--c-accent);
+                border-radius:0 var(--r-sm) var(--r-sm) 0;
+                padding:      8px 12px;
+                margin-top:   10px;
+            ">
+                <span class="text-xs" style="font-weight:700; color:var(--c-primary);">
+                    Warunek kluczowy:
+                </span>
+                <span class="text-xs" style="color:var(--gray-700); margin-left:4px;">
+                    Od 2025 r. magazyn energii lub ciepła jest obowiązkowy.
+                    Sama PV bez magazynu kwalifikuje się jedynie do mniejszej puli.
+                </span>
+            </div>
+        </div>
     </div>
 </div>
 
-<!-- Program 2 -->
-<div class="card avoid-break mb-4">
-    <h3 class="h3" style="color: var(--c-primary); margin-bottom: 6px;">
-        2. Czyste Powietrze (po reformie 2026)
-    </h3>
-    <p class="text-base text-muted" style="margin-bottom: 10px; line-height: 1.6;">
-        Skierowany do osób wymieniających stare źródła ciepła.
-        PV jako element wspierający pompę ciepła.
-    </p>
-    <div class="param-row">
-        <span class="text-muted">Podstawowy (doch. do 135 000 zł/rok)</span>
-        <span class="value-bold text-accent">do 40% kosztów</span>
-    </div>
-    <div class="param-row">
-        <span class="text-muted">Podwyższony</span>
-        <span class="value-bold text-accent">do 70% kosztów</span>
-    </div>
-    <div class="param-row">
-        <span class="text-muted">Najwyższy (nawet 170 100 zł na całość)</span>
-        <span class="value-bold text-accent">do 100% kosztów</span>
-    </div>
-    <div class="param-row">
-        <span class="text-muted">PV jako element wspierający</span>
-        <span class="value-bold text-accent">do 15 000 zł</span>
+{# ══════════════════════════════════════════════════════════
+   PROGRAM 2: Czyste Powietrze
+══════════════════════════════════════════════════════════ #}
+<div class="card avoid-break" style="margin-bottom:14px;">
+
+    <div style="display:flex; align-items:flex-start; gap:14px;">
+        <div style="
+            min-width:    36px; height:36px;
+            background:   var(--c-green);
+            border-radius:var(--r-md);
+            display:flex; align-items:center; justify-content:center;
+            color:white; font-weight:900; font-size:14pt; flex-shrink:0;
+        ">2</div>
+
+        <div style="flex:1;">
+            <h3 style="font-size:var(--fs-h3); font-weight:800; color:var(--c-green); margin-bottom:4px;">
+                Czyste Powietrze (po reformie 2026)
+            </h3>
+            <p class="text-xs text-muted" style="margin-bottom:10px; line-height:1.55;">
+                Skierowany do wymiany starych źródeł ciepła. PV jako element wspomagający
+                pompę ciepła lub inny system grzewczy.
+            </p>
+
+            <div class="grid-2" style="gap:0 20px;">
+                <div>
+                    <div class="param-row">
+                        <span class="text-muted">Poziom podstawowy (doch. ≤ 135 000 zł/rok)</span>
+                        <span class="value-bold text-green">do 40% kosztów</span>
+                    </div>
+                    <div class="param-row">
+                        <span class="text-muted">Poziom podwyższony</span>
+                        <span class="value-bold text-green">do 70% kosztów</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="param-row">
+                        <span class="text-muted">Poziom najwyższy (maks. 170 100 zł łącznie)</span>
+                        <span class="value-bold text-green">do 100% kosztów</span>
+                    </div>
+                    <div class="param-row">
+                        <span class="text-muted">Limit na PV jako element wspomagający</span>
+                        <span class="value-bold text-green">do 15 000 zł</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-<!-- Programy 3 i 4 -->
-<div class="grid-2 mb-4">
+{# ══════════════════════════════════════════════════════════
+   PROGRAMY 3 & 4 — obok siebie
+══════════════════════════════════════════════════════════ #}
+<div class="grid-2" style="gap:14px; margin-bottom:14px;">
 
+    {# Grant OZE (BGK) #}
     <div class="card avoid-break">
-        <h3 class="h3" style="color: var(--c-primary); margin-bottom: 6px;">3. Grant OZE (BGK)</h3>
-        <p class="text-base text-muted" style="margin-bottom: 10px; line-height: 1.6;">
+        <div style="display:flex; align-items:flex-start; gap:12px; margin-bottom:10px;">
+            <div style="
+                min-width:32px; height:32px;
+                background:var(--c-yellow);
+                border-radius:var(--r-md);
+                display:flex; align-items:center; justify-content:center;
+                color:white; font-weight:900; font-size:12pt; flex-shrink:0;
+            ">3</div>
+            <h3 style="font-size:var(--fs-h3); font-weight:800; color:var(--c-primary); margin:4px 0 0;">
+                Grant OZE (BGK)
+            </h3>
+        </div>
+        <p class="text-xs text-muted" style="margin-bottom:10px; line-height:1.55;">
             Program dla wspólnot i spółdzielni mieszkaniowych.
         </p>
         <div class="param-row">
             <span class="text-muted">Dofinansowanie</span>
             <span class="value-bold text-accent">do 50% kosztów netto</span>
         </div>
-        <div style="background: #FEF9E7; border-left: 4px solid #B7950B;
-                    border-radius: 0 8px 8px 0; padding: 8px 10px; margin-top: 8px;">
-            <span class="text-sm" style="color: #7D6608; font-weight: 600;">
+        <div class="param-row">
+            <span class="text-muted">Kto może?</span>
+            <span class="value-bold">Wspólnoty, spółdzielnie</span>
+        </div>
+        <div style="
+            background:var(--light-yellow);
+            border-left:3px solid var(--c-yellow);
+            border-radius:0 var(--r-sm) var(--r-sm) 0;
+            padding:7px 10px; margin-top:8px;
+        ">
+            <span class="text-xs" style="font-weight:700; color:#7D6608;">
                 Nabór kończy się 30 czerwca 2026
             </span>
         </div>
     </div>
 
+    {# Energia dla Wsi #}
     <div class="card avoid-break">
-        <h3 class="h3" style="color: var(--c-primary); margin-bottom: 6px;">4. Energia dla Wsi</h3>
-        <p class="text-base text-muted" style="margin-bottom: 10px; line-height: 1.6;">
-            Program dla rolników i spółdzielni energetycznych.
+        <div style="display:flex; align-items:flex-start; gap:12px; margin-bottom:10px;">
+            <div style="
+                min-width:32px; height:32px;
+                background:var(--c-green);
+                border-radius:var(--r-md);
+                display:flex; align-items:center; justify-content:center;
+                color:white; font-weight:900; font-size:12pt; flex-shrink:0;
+            ">4</div>
+            <h3 style="font-size:var(--fs-h3); font-weight:800; color:var(--c-primary); margin:4px 0 0;">
+                Energia dla Wsi
+            </h3>
+        </div>
+        <p class="text-xs text-muted" style="margin-bottom:10px; line-height:1.55;">
+            Program ARiMR dla rolników i spółdzielni energetycznych.
         </p>
         <div class="param-row">
-            <span class="text-muted">Dofinansowanie</span>
-            <span class="value-bold text-accent">do 45% kosztów</span>
+            <span class="text-muted">Dotacja (mały projekt)</span>
+            <span class="value-bold text-green">do 25% kosztów</span>
         </div>
         <div class="param-row">
-            <span class="text-muted">Maksymalna kwota</span>
-            <span class="value-bold">20 mln zł</span>
+            <span class="text-muted">Pożyczka preferencyjna</span>
+            <span class="value-bold text-green">do 75% kosztów (2% rocznie)</span>
         </div>
-        <div style="background: var(--light-green); border-left: 4px solid var(--c-green);
-                    border-radius: 0 8px 8px 0; padding: 8px 10px; margin-top: 8px;">
-            <span class="text-sm" style="color: var(--c-green); font-weight: 600;">
-                Ruszył 3 lutego 2026
+        <div class="param-row">
+            <span class="text-muted">Kto może?</span>
+            <span class="value-bold">Rolnicy, spółdzielnie en.</span>
+        </div>
+    </div>
+
+</div>
+
+{# ══════════════════════════════════════════════════════════
+   WARUNKI WSPÓLNE DLA PROGRAMÓW
+══════════════════════════════════════════════════════════ #}
+<div class="card avoid-break" style="
+    background: var(--gray-50);
+    border-left: 4px solid var(--c-primary);
+">
+    <div class="section-label" style="margin-bottom:10px;">Warunki wspólne dla programów NFOŚiGW</div>
+
+    {% set requirements = [
+        ("Instalator z certyfikatem UDT",
+         "Montaż musi przeprowadzić firma posiadająca aktualne uprawnienia UDT do instalacji OZE."),
+        ("Wiek urządzeń",
+         "Panele, falownik i magazyn nie mogą być starsze niż 24 miesiące od daty produkcji."),
+        ("Brak wcześniejszego dofinansowania",
+         "Nie można łączyć dotacji z tego samego programu z poprzednią edycją na ten sam budynek."),
+        ("Audyt energetyczny (Czyste Powietrze)",
+         "W programie CP obowiązkowy przed inwestycją; koszt audytu jest dofinansowywany."),
+        ("Zachowanie trwałości projektu",
+         "Instalacja musi być eksploatowana przez minimum 5 lat od wypłaty dotacji."),
+    ] %}
+
+    {% for title, desc in requirements %}
+    <div style="
+        display:       flex;
+        gap:           10px;
+        align-items:   flex-start;
+        padding:       8px 0;
+        border-bottom: 1px solid var(--gray-200);
+    ">
+        {# Bullet w kolorze marki #}
+        <div style="
+            width:         8px;
+            height:        8px;
+            min-width:     8px;
+            border-radius: 50%;
+            background:    var(--c-primary);
+            margin-top:    5px;
+        "></div>
+        <div>
+            <span class="text-sm" style="font-weight:700; color:var(--gray-800);">
+                {{ title }}:&nbsp;
             </span>
+            <span class="text-sm text-muted">{{ desc }}</span>
         </div>
     </div>
-</div>
+    {% endfor %}
 
-<!-- Program 5 -->
-<div class="card avoid-break mb-6">
-    <h3 class="h3" style="color: var(--c-primary); margin-bottom: 6px;">5. Ulga termomodernizacyjna</h3>
-    <p class="text-base text-muted" style="margin-bottom: 10px; line-height: 1.6;">
-        Dostępna dla każdego podatnika — można łączyć z dotacjami (odliczasz wkład własny).
+    <p class="text-xs text-muted" style="margin-top:10px; line-height:1.5;">
+        Informacje aktualne na dzień {{ generation_date }}. Przed złożeniem wniosku
+        zweryfikuj aktualne zasady na
+        <strong>nfosigw.gov.pl</strong> lub <strong>czystepowietrze.gov.pl</strong>.
     </p>
-    <div class="param-row">
-        <span class="text-muted">Na osobę</span>
-        <span class="value-bold text-accent">do 53 000 zł od dochodu w PIT</span>
-    </div>
-    <div class="param-row">
-        <span class="text-muted">Małżonkowie</span>
-        <span class="value-bold text-accent">do 106 000 zł łącznie</span>
-    </div>
-</div>
-
-<!-- Wymagania techniczne 2026 -->
-<div class="avoid-break">
-    <div style="background: var(--c-primary); padding: 12px 16px; border-radius: 10px 10px 0 0;">
-        <span style="color: white; font-weight: 700; font-size: 13px;">
-            Główne wymagania techniczne 2026
-        </span>
-    </div>
-
-    <div style="background: var(--light-blue); border-left: 4px solid var(--c-primary);
-                padding: 10px 16px; margin-top: 2px;">
-        <span style="font-weight: 700; color: var(--c-primary);">Net-billing:</span>
-        <span class="text-base" style="color: var(--gray-700); margin-left: 4px;">
-            Wszystkie nowe dotacje wymagają rozliczania się w systemie net-billing.
-        </span>
-    </div>
-    <div style="background: var(--light-blue); border-left: 4px solid var(--c-primary);
-                padding: 10px 16px; margin-top: 2px;">
-        <span style="font-weight: 700; color: var(--c-primary);">Magazyn obowiązkowy:</span>
-        <span class="text-base" style="color: var(--gray-700); margin-left: 4px;">
-            Dotacja do samej PV praktycznie nie istnieje w 2026 — wspierane są wyłącznie zestawy
-            z magazynem energii lub ciepła.
-        </span>
-    </div>
-    <div style="background: var(--light-blue); border-left: 4px solid var(--c-primary);
-                padding: 10px 16px; margin-top: 2px;">
-        <span style="font-weight: 700; color: var(--c-primary);">Wiek urządzeń:</span>
-        <span class="text-base" style="color: var(--gray-700); margin-left: 4px;">
-            Panele, falownik i magazyn nie mogą być starsze niż 24 miesiące.
-        </span>
-    </div>
-    <div style="background: var(--light-blue); border-left: 4px solid var(--c-primary);
-                padding: 10px 16px; margin-top: 2px; border-radius: 0 0 10px 10px;">
-        <span style="font-weight: 700; color: var(--c-primary);">Audyt energetyczny:</span>
-        <span class="text-base" style="color: var(--gray-700); margin-left: 4px;">
-            W programie Czyste Powietrze obowiązkowy przed inwestycją.
-        </span>
-    </div>
 </div>
