@@ -81,12 +81,13 @@
                         PV + Magazyn energii (zalecany)
                     {% else %}
                         PV + Magazyn energii (opcjonalny)
+                    {% endif %}
                 </div>
                 <div class="value-xl">{{ standard.total_cost_with_battery_pln | format_pln }}</div>
             </div>
             <div class="text-right">
                 <div class="label-sm">Szacowany zwrot z magazynem</div>
-                <div class="value-base {% if standard.is_economically_justified %}text-purple{% else %}text-muted{% endif %}">
+                <div class="value-base {{ 'text-purple' if standard.is_economically_justified else 'text-muted' }}">
                     {{ render_payback(
                         standard.battery_payback_years,
                         standard.battery_payback_optimistic_years,
