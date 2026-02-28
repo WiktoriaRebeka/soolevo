@@ -1,69 +1,184 @@
-{% if warnings and warnings|length > 0 %}
+{# ═══════════════════════════════════════════════════════════════════════════
+   S5 — OSTRZEŻENIA I POTWIERDZENIA
+   Zmienne: warnings (List[Warning] z schemas/report.py)
+   Pola Warning: level (str), code (str|None), message (str),
+                 details (str|None), category (str|None)
 
-<div class="avoid-break mb-6">
+   SCHEMAT POZIOMÓW:
+     level == "error"   → czerwony (UWAGA)
+     level == "warning" → żółty   (OSTRZEŻENIE)
+     level == "info"    → niebieski (INFO)
+     anything else / None → zielony (OK)
 
-    <!-- Nagłówek S5 — bez emotikonek -->
-    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-        <div style="background: var(--c-primary); color: white; font-size: 10px; font-weight: 800;
-                    padding: 4px 12px; border-radius: 6px; text-transform: uppercase;
-                    letter-spacing: .05em; flex-shrink: 0;">S5</div>
-        <div style="font-size: 15px; font-weight: 700; color: var(--c-primary);">
-            Analiza ekspercka i zastrzeżenia
+   Sekcja renderowana warunkowo — tylko gdy warnings|length > 0
+   (guard w base.html, ale duplikujemy dla bezpieczeństwa)
+═══════════════════════════════════════════════════════════════════════════ #}
+
+{% if warnings and warnings | length > 0 %}
+
+{# ── Zlicz poziomy — do podsumowania w nagłówku ──────────────────────── #}
+{% set ns = namespace(errors=0, warn=0, info=0, ok=0) %}
+{% for w in warnings %}
+    {% if w.level == "error" %}{% set ns.errors = ns.errors + 1 %}
+    {% elif w.level == "warning" %}{% set ns.warn = ns.warn + 1 %}
+    {% elif w.level == "info" %}{% set ns.info = ns.info + 1 %}
+    {% else %}{% set ns.ok = ns.ok + 1 %}{% endif %}
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════
+   NAGŁÓWEK S5 z licznikami
+══════════════════════════════════════════════════════════ #}
+<div class="section-header avoid-break" style="margin-bottom:16px;">
+    <div class="section-header-num">S5</div>
+    <div class="section-header-body">
+        <div class="section-header-title">Analiza ekspercka i zastrzeżenia</div>
+        <div class="section-header-sub">
+            {{ warnings | length }} komunikat{% if warnings | length != 1 %}ów{% endif %}
+            {% if ns.errors > 0 %}&nbsp;·&nbsp;
+                <span style="color:var(--c-red); font-weight:700;">{{ ns.errors }} krytycznych</span>
+            {% endif %}
+            {% if ns.warn > 0 %}&nbsp;·&nbsp;
+                <span style="color:var(--c-yellow); font-weight:700;">{{ ns.warn }} ostrzeżeń</span>
+            {% endif %}
+            {% if ns.ok > 0 %}&nbsp;·&nbsp;
+                <span style="color:var(--c-green); font-weight:700;">{{ ns.ok }} pozytywnych</span>
+            {% endif %}
         </div>
     </div>
-
-    <div class="flex-col gap-4">
-
-        {% for w in warnings %}
-
-            {# Kolory i etykiety dla każdego typu ostrzeżenia #}
-            {% if w.type == 'red' %}
-                {% set border_color = '#C0392B' %}
-                {% set bg_color = '#FDEDEC' %}
-                {% set badge_bg = '#C0392B' %}
-                {% set badge_label = 'UWAGA' %}
-                {% set text_color = '#7B241C' %}
-            {% elif w.type == 'yellow' %}
-                {% set border_color = '#B7950B' %}
-                {% set bg_color = '#FEF9E7' %}
-                {% set badge_bg = '#B7950B' %}
-                {% set badge_label = 'OSTRZEŻENIE' %}
-                {% set text_color = '#6E4E00' %}
-            {% else %}
-                {% set border_color = '#1E8449' %}
-                {% set bg_color = '#D5F5E3' %}
-                {% set badge_bg = '#1E8449' %}
-                {% set badge_label = 'INFO' %}
-                {% set text_color = '#1A5E35' %}
-            {% endif %}
-
-            <div style="background: {{ bg_color }}; border: 1px solid {{ border_color }};
-                        border-left: 4px solid {{ border_color }}; border-radius: 10px;
-                        padding: 14px 16px;">
-
-                <!-- Tytuł z badgem -->
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                    <span style="background: {{ badge_bg }}; color: white; font-size: 9px;
-                                 font-weight: 800; padding: 2px 8px; border-radius: 5px;
-                                 letter-spacing: .05em; flex-shrink: 0; text-transform: uppercase;">
-                        {{ badge_label }}
-                    </span>
-                    <div style="font-size: 13px; font-weight: 700; color: {{ text_color }};">
-                        {{ w.title }}
-                    </div>
-                </div>
-
-                <!-- Treść -->
-                <div style="font-size: 13px; color: var(--gray-700); line-height: 1.6;">
-                    {{ w.message }}
-                </div>
-
-            </div>
-
-        {% endfor %}
-
-    </div>
-
 </div>
 
+{# ══════════════════════════════════════════════════════════
+   LISTA ALERTÓW
+══════════════════════════════════════════════════════════ #}
+{% for w in warnings %}
+
+{# ── Kolory + etykiety na podstawie w.level ────────────────── #}
+{% if w.level == "error" %}
+    {% set border_color = "var(--c-red)" %}
+    {% set bg_color     = "var(--light-red)" %}
+    {% set badge_bg     = "var(--c-red)" %}
+    {% set badge_label  = "UWAGA" %}
+    {% set text_color   = "#7B241C" %}
+    {% set icon_char    = "!" %}
+{% elif w.level == "warning" %}
+    {% set border_color = "var(--c-yellow)" %}
+    {% set bg_color     = "var(--light-yellow)" %}
+    {% set badge_bg     = "var(--c-yellow)" %}
+    {% set badge_label  = "OSTRZEŻENIE" %}
+    {% set text_color   = "#6E4E00" %}
+    {% set icon_char    = "?" %}
+{% elif w.level == "info" %}
+    {% set border_color = "var(--c-accent)" %}
+    {% set bg_color     = "var(--light-blue)" %}
+    {% set badge_bg     = "var(--c-accent)" %}
+    {% set badge_label  = "INFO" %}
+    {% set text_color   = "var(--c-primary)" %}
+    {% set icon_char    = "i" %}
+{% else %}
+    {% set border_color = "var(--c-green)" %}
+    {% set bg_color     = "var(--light-green)" %}
+    {% set badge_bg     = "var(--c-green)" %}
+    {% set badge_label  = "OK" %}
+    {% set text_color   = "#1A5E35" %}
+    {% set icon_char    = "+" %}
 {% endif %}
+
+<div class="avoid-break" style="
+    background:   {{ bg_color }};
+    border:       1px solid {{ border_color }};
+    border-left:  4px solid {{ border_color }};
+    border-radius:var(--r-md);
+    padding:      13px 16px;
+    margin-bottom:10px;
+    display:      flex;
+    gap:          12px;
+    align-items:  flex-start;
+">
+
+    {# Ikona — koliste kółko z symbolem #}
+    <div style="
+        width:        26px;
+        height:       26px;
+        min-width:    26px;
+        border-radius:50%;
+        background:   {{ badge_bg }};
+        color:        white;
+        display:      flex;
+        align-items:  center;
+        justify-content:center;
+        font-weight:  900;
+        font-size:    12pt;
+        line-height:  1;
+        flex-shrink:  0;
+        margin-top:   1px;
+    ">{{ icon_char }}</div>
+
+    <div style="flex:1;">
+
+        {# Wiersz: badge + kod + kategoria #}
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:5px; flex-wrap:wrap;">
+            <span style="
+                background:    {{ badge_bg }};
+                color:         white;
+                font-size:     var(--fs-badge);
+                font-weight:   900;
+                text-transform:uppercase;
+                letter-spacing:.07em;
+                padding:       2px 9px;
+                border-radius: var(--r-pill);
+                white-space:   nowrap;
+            ">{{ badge_label }}</span>
+
+            {% if w.code %}
+            <span style="
+                font-size:  var(--fs-xs);
+                font-weight:700;
+                color:      var(--gray-400);
+                font-family:monospace;
+            ">[{{ w.code }}]</span>
+            {% endif %}
+
+            {% if w.category %}
+            <span style="
+                font-size:  var(--fs-xs);
+                color:      var(--gray-500);
+                text-transform:uppercase;
+                letter-spacing:.05em;
+            ">{{ w.category }}</span>
+            {% endif %}
+        </div>
+
+        {# Treść główna #}
+        <div style="
+            font-size:   var(--fs-body);
+            font-weight: 600;
+            color:       {{ text_color }};
+            line-height: 1.6;
+        ">{{ w.message }}</div>
+
+        {# Szczegóły (opcjonalne) #}
+        {% if w.details %}
+        <div style="
+            font-size:   var(--fs-sm);
+            color:       var(--gray-600);
+            line-height: 1.55;
+            margin-top:  5px;
+            padding-top: 5px;
+            border-top:  1px solid {{ border_color }};
+            opacity:     0.85;
+        ">{{ w.details }}</div>
+        {% endif %}
+
+    </div>{# /flex content #}
+</div>
+
+{% endfor %}{# /warnings loop #}
+
+{# ── Nota metodologiczna #}
+<p class="text-xs text-muted" style="margin-top:4px; line-height:1.55;">
+    Powyższe komunikaty zostały wygenerowane automatycznie przez algorytm Soolevo
+    na podstawie Twoich danych wejściowych. Nie zastępują oceny certyfikowanego
+    instalatora dokonanej podczas wizji lokalnej.
+</p>
+
+{% endif %}{# /if warnings #}
