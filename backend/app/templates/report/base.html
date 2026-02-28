@@ -28,8 +28,8 @@
             <div class="cover-title">Raport<br>Fotowoltaiczny</div>
             <div class="cover-subtitle">
                 Pełna analiza opłacalności instalacji PV
-                {% if standard and standard.system_power_kwp %}
-                    &nbsp;·&nbsp; System {{ "%.1f"|format(standard.system_power_kwp) }} kWp
+                {% if standard and standard.total_power_kwp %}
+                    &nbsp;·&nbsp; System {{ "%.1f"|format(standard.total_power_kwp) }} kWp
                 {% endif %}
             </div>
 
@@ -38,8 +38,8 @@
                 <div class="cover-stat">
                     <div class="cover-stat-label">Moc systemu</div>
                     <div class="cover-stat-value">
-                        {% if standard and standard.system_power_kwp %}
-                            {{ "%.1f"|format(standard.system_power_kwp) }} kWp
+                        {% if standard and standard.total_power_kwp %}
+                            {{ "%.1f"|format(standard.total_power_kwp) }} kWp
                         {% else %}—{% endif %}
                     </div>
                 </div>
@@ -79,13 +79,13 @@
                 <div class="section-label" style="margin-bottom: 10px;">Analizowane warianty</div>
                 <div class="flex-row flex-wrap gap-2">
                     {% if standard %}
-                        <span class="badge badge-standard">Standard — {{ "%.1f"|format(standard.system_power_kwp or 0) }} kWp</span>
+                        <span class="badge badge-standard">Standard — {{ "%.1f"|format(standard.total_power_kwp or 0) }} kWp</span>
                     {% endif %}
                     {% if economy %}
-                        <span class="badge badge-economy">Economy — {{ "%.1f"|format(economy.system_power_kwp or 0) }} kWp</span>
+                        <span class="badge badge-economy">Economy — {{ "%.1f"|format(economy.total_power_kwp or 0) }} kWp</span>
                     {% endif %}
                     {% if premium %}
-                        <span class="badge badge-premium">Premium — {{ "%.1f"|format(premium.system_power_kwp or 0) }} kWp</span>
+                        <span class="badge badge-premium">Premium — {{ "%.1f"|format(premium.total_power_kwp or 0) }} kWp</span>
                     {% endif %}
                 </div>
             </div>
