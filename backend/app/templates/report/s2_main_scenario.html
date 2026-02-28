@@ -1,29 +1,334 @@
-{# PATCH: backend/app/templates/report/s2_main_scenario.html
-   Zmiana: data:image/png → data:image/svg+xml dla wykresu dachu
-   Legenda kolorów dachu jest już zakodowana wewnątrz SVG, ale dla pewności
-   zostawiamy legendarny blok HTML (kolory są teraz poprawne #FFD700/#B8860B).
-   
-   Znajdź tę linię:
-     <img src="data:image/png;base64,{{ charts.roof_panels }}"
-   
-   Zastąp ją:
-     <img src="data:image/svg+xml;base64,{{ charts.roof_panels }}"
-   
-   Gotowy fragment do wklejenia poniżej:
-#}
+{% from 'report/_macros.html' import render_payback %}
 
+{# ═══════════════════════════════════════════════════════════════════════════
+   S2 — CZĘŚĆ A: header + 3 value boxy + inwestycja
+════════════════════════════════════════════════════════════════════════════ #}
+
+<div class="card" style="margin-bottom: 16px;">
+    <div style="page-break-before: always;"></div>
+
+    <!-- Pasek nagłówka S2 -->
+    <div style="background: var(--c-primary); margin: -20px -24px 20px;
+                padding: 11px 20px; border-radius: 14px 14px 0 0;
+                display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <span style="background: rgba(255,255,255,0.2); color: white; font-size: 10px;
+                     font-weight: 800; padding: 3px 10px; border-radius: 6px;
+                     text-transform: uppercase; letter-spacing: .05em; flex-shrink: 0;">
+            S2
+        </span>
+        <span style="color: white; font-size: 13px; font-weight: 700; flex-shrink: 0;">
+            Scenariusz główny
+        </span>
+        <span style="background: rgba(255,255,255,0.15); color: #BFD9ED;
+                     font-size: 10px; padding: 3px 10px; border-radius: 6px;">
+            STANDARD — rekomendowany kompromis jakości i ceny
+        </span>
+    </div>
+
+    <!-- 3 value boxy -->
+    <div class="grid-3" style="margin-bottom: 18px;">
+        <div class="stat-box bg-light-blue border-accent">
+            <div class="label-sm">Koszt instalacji PV</div>
+            <div class="value-xl text-accent">{{ standard.pv_cost_gross_pln | format_pln }}</div>
+            <div class="text-sm text-muted" style="margin-top: 4px;">
+                ok. {{ standard.pv_payback_years | round(1) }} lat zwrotu
+            </div>
+        </div>
+        <div class="stat-box" style="background: #FFFBEB; border-color: #F59E0B;">
+            <div class="label-sm">Szacowany zysk po 25 latach</div>
+            <div class="value-xl" style="color: #B45309;">
+                ok. {{ standard.pv_total_savings_25y_pln | format_pln }}
+            </div>
+            <div class="text-sm text-muted" style="margin-top: 4px;">
+                ok. {{ standard.pv_savings_pln | format_pln }} / rok 1
+            </div>
+        </div>
+        <div class="stat-box bg-light-blue border-accent">
+            <div class="label-sm">Moc systemu</div>
+            <div class="value-xl text-accent">{{ standard.total_power_kwp | round(2) }} kWp</div>
+            <div class="text-sm text-muted" style="margin-top: 4px;">
+                {{ standard.panels_count }} paneli
+            </div>
+        </div>
+    </div>
+
+    <!-- INWESTYCJA -->
+    <div>
+        <div class="section-label">Inwestycja</div>
+
+        <div class="invest-row">
+            <div>
+                <div class="label-sm">Tylko panele PV</div>
+                <div class="value-xl">{{ standard.pv_cost_gross_pln | format_pln }}</div>
+            </div>
+            <div class="text-right">
+                <div class="label-sm">Szacowany zwrot</div>
+                <div class="value-base text-accent">
+                    {{ render_payback(
+                        standard.pv_payback_years,
+                        standard.pv_payback_optimistic_years,
+                        standard.pv_payback_pessimistic_years
+                    ) }}
+                </div>
+            </div>
+        </div>
+
+        {% if standard.battery_recommended %}
+        <div class="invest-row" style="background: var(--purple-50); border-color: var(--purple-200);">
+            <div>
+                <div class="label-sm">
+                    {% if standard.is_economically_justified %}
+                        PV + Magazyn energii (zalecany)
+                    {% else %}
+                        PV + Magazyn energii (opcjonalny)
+                    {% endif %}
+                </div>
+                <div class="value-xl">{{ standard.total_cost_with_battery_pln | format_pln }}</div>
+            </div>
+            <div class="text-right">
+                <div class="label-sm">Szacowany zwrot z magazynem</div>
+                <div class="value-base {% if standard.is_economically_justified %}text-purple{% else %}text-muted{% endif %}">
+                    {{ render_payback(
+                        standard.battery_payback_years,
+                        standard.battery_payback_optimistic_years,
+                        standard.battery_payback_pessimistic_years
+                    ) }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+{# ── Podział strony ─────────────────────────────────────────────────────── #}
+<div class="page-break"></div>
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   S2 — CZĘŚĆ B: zysk 25y + co to oznacza + efektywność
+════════════════════════════════════════════════════════════════════════════ #}
+
+<div class="card avoid-break" style="margin-bottom: 16px;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+
+        <!-- Zysk po 25 latach -->
+        <div>
+            <div class="section-label">Szacowany zysk po 25 latach</div>
+            <div class="stat-box" style="background: #FFFBEB; border-color: #F59E0B; margin-bottom: 8px;">
+                <div class="label-sm">Sama PV</div>
+                <div class="value-xl" style="color: #B45309;">ok. {{ standard.pv_total_savings_25y_pln | format_pln }}</div>
+                <div class="text-sm text-muted" style="margin-top: 4px;">
+                    ok. {{ standard.pv_savings_pln | format_pln }} / rok 1
+                </div>
+            </div>
+            {% if standard.battery_recommended and standard.battery_total_savings_25y_pln and standard.battery_total_savings_25y_pln > 0 %}
+            <div class="stat-box bg-purple-light border-purple">
+                <div class="label-sm">PV + Magazyn</div>
+                <div class="value-xl text-purple">ok. {{ standard.battery_total_savings_25y_pln | format_pln }}</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Co to oznacza w praktyce -->
+        <div>
+            <div class="section-label">Co to oznacza w praktyce</div>
+            <div class="box-gray">
+                {% set autokwh = standard.autoconsumption_kwh or 0 %}
+                <div class="param-row">
+                    <span class="text-muted">Produkcja roczna</span>
+                    <span class="value-bold text-accent">{{ standard.annual_production_kwh | round | int }} kWh</span>
+                </div>
+                <div class="param-row">
+                    <span class="text-muted">Autokonsumpcja</span>
+                    <span class="value-bold">
+                        {%- if autokwh > 0 -%}{{ autokwh | round | int }} kWh{%- else -%}—{%- endif -%}
+                    </span>
+                </div>
+                <div class="param-row">
+                    <span class="text-muted">Nadwyżka do sieci</span>
+                    <span class="value-bold">
+                        {%- if standard.surplus_kwh -%}{{ standard.surplus_kwh | round | int }} kWh{%- else -%}—{%- endif -%}
+                    </span>
+                </div>
+                <div class="param-row">
+                    <span class="text-muted">Samowystarczalność</span>
+                    <span class="value-bold text-accent">{{ (standard.self_sufficiency_rate * 100) | round | int }}%</span>
+                </div>
+                <div class="param-row">
+                    <span class="text-muted">Wskaźnik autokonsumpcji</span>
+                    <span class="value-bold text-accent">{{ (standard.autoconsumption_rate * 100) | round | int }}%</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- EFEKTYWNOŚĆ Z PASKAMI -->
+<div class="card avoid-break" style="margin-bottom: 16px;">
+    <div class="section-label">Efektywność instalacji</div>
+    <div class="box-gray">
+
+        {% set ac_pct = (standard.autoconsumption_rate * 100) | round | int %}
+        <div class="progress-container">
+            <div class="progress-header">
+                <span class="progress-title">Autokonsumpcja</span>
+                <span class="progress-value">{{ ac_pct }}%</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill bg-accent" style="width: {{ [ac_pct, 100] | min }}%;"></div>
+            </div>
+            <div class="progress-sublabel">Ile wyprodukowanej energii zużywasz na miejscu (bez magazynu)</div>
+        </div>
+
+        {% if standard.autoconsumption_rate_with_battery and standard.autoconsumption_rate_with_battery > 0 %}
+        {% set acb_pct = (standard.autoconsumption_rate_with_battery * 100) | round | int %}
+        <div class="progress-container">
+            <div class="progress-header">
+                <span class="progress-title">Autokonsumpcja z magazynem</span>
+                <span class="progress-value">{{ acb_pct }}%</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill bg-purple" style="width: {{ [acb_pct, 100] | min }}%;"></div>
+            </div>
+            <div class="progress-sublabel">To samo, ale z energią zgromadzoną w baterii</div>
+        </div>
+        {% endif %}
+
+        <div class="divider"></div>
+
+        {% set ss_pct = (standard.self_sufficiency_rate * 100) | round | int %}
+        <div class="progress-container">
+            <div class="progress-header">
+                <span class="progress-title">Samowystarczalność</span>
+                <span class="progress-value">{{ ss_pct }}%</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill bg-accent" style="width: {{ [ss_pct, 100] | min }}%;"></div>
+            </div>
+            <div class="progress-sublabel">Ile Twojego zapotrzebowania pokrywa PV (bez magazynu)</div>
+        </div>
+
+        {% if standard.self_sufficiency_rate_with_battery and standard.self_sufficiency_rate_with_battery > 0 %}
+        {% set ssb_pct = (standard.self_sufficiency_rate_with_battery * 100) | round | int %}
+        <div class="progress-container">
+            <div class="progress-header">
+                <span class="progress-title">Samowystarczalność z magazynem</span>
+                <span class="progress-value">{{ ssb_pct }}%</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill bg-purple" style="width: {{ [ssb_pct, 100] | min }}%;"></div>
+            </div>
+            <div class="progress-sublabel">To samo, ale z baterią</div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<!-- REKOMENDACJA EKSPERTA -->
+{% if standard.rationale %}
+<div class="card avoid-break" style="margin-bottom: 16px;">
+    <div class="section-label">Analiza ekspercka</div>
+    <div style="background: #FFFBEB; border: 1px solid #F59E0B; border-left: 4px solid #F59E0B;
+                border-radius: 10px; padding: 14px 16px;">
+        <p class="text-base" style="color: var(--gray-700); margin: 0; line-height: 1.65;">
+            {{ standard.rationale }}
+        </p>
+    </div>
+    <div style="margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div style="background: var(--gray-50); border-radius: 10px; padding: 12px 14px;
+                    border: 1px solid var(--gray-200);">
+            <div class="label-sm" style="margin-bottom: 4px;">Net-billing — nadwyżki do sieci</div>
+            <p class="text-sm text-muted" style="margin: 0; line-height: 1.5;">
+                Nadwyżki energii są odsprzedawane do sieci po bieżącej cenie rynkowej RCEm
+                (ok. 30% ceny detalicznej). Im wyższa autokonsumpcja, tym lepsza ekonomika inwestycji.
+            </p>
+        </div>
+        <div style="background: var(--gray-50); border-radius: 10px; padding: 12px 14px;
+                    border: 1px solid var(--gray-200);">
+            <div class="label-sm" style="margin-bottom: 4px;">Scenariusze zwrotu</div>
+            <p class="text-sm text-muted" style="margin: 0; line-height: 1.5;">
+                Przedział zwrotu zakłada inflację energii 3–6% rocznie.
+                Scenariusz bazowy przyjmuje 4%. Wyniki mają charakter szacunkowy.
+            </p>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{# ═══════════════════════════════════════════════════════════════════════════
+   S2 — CZĘŚĆ C: Parametry systemu + Wizualizacja dachu (jeden card, 2 kolumny)
+════════════════════════════════════════════════════════════════════════════ #}
+
+<div class="card avoid-break" style="margin-bottom: 16px;">
+
+    <div style="display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: start;">
+
+        <!-- LEWA: Parametry systemu -->
+        <div>
+            <div class="section-label">Parametry systemu</div>
+
+            <div class="grid-2" style="margin-bottom: 12px;">
+                <div class="stat-box bg-light-blue border-accent">
+                    <div class="label-sm">Moc systemu</div>
+                    <div class="value-xl text-accent">{{ standard.total_power_kwp | round(2) }} kWp</div>
+                </div>
+                <div class="stat-box bg-light-blue border-accent">
+                    <div class="label-sm">Roczna produkcja</div>
+                    <div class="value-xl text-accent">{{ standard.annual_production_kwh | round | int }} kWh</div>
+                </div>
+            </div>
+
+            <div class="box-gray">
+                <div class="param-row">
+                    <span class="text-muted">Liczba paneli</span>
+                    <span class="value-bold">{{ standard.panels_count }} szt.</span>
+                </div>
+                <div class="param-row">
+                    <span class="text-muted">Model paneli</span>
+                    <span class="value-bold">{{ standard.panel_brand }} {{ standard.panel_model }}</span>
+                </div>
+                <div class="param-row">
+                    <span class="text-muted">Moc panelu</span>
+                    <span class="value-bold">{{ standard.panel_power_wp }} Wp</span>
+                </div>
+                <div class="param-row">
+                    <span class="text-muted">Falownik</span>
+                    <span class="value-bold">{{ standard.inverter_brand }} {{ standard.inverter_model }}</span>
+                </div>
+                {% if standard.inverter_power_kw %}
+                <div class="param-row">
+                    <span class="text-muted">Moc falownika</span>
+                    <span class="value-bold">{{ standard.inverter_power_kw }} kW</span>
+                </div>
+                {% endif %}
+                {% if standard.battery_recommended and standard.battery_capacity_kwh and standard.battery_capacity_kwh > 0 %}
+                <div class="param-row">
+                    <span class="text-muted">Magazyn energii</span>
+                    <span class="value-bold text-purple">
+                        {{ standard.battery_model }} · {{ standard.battery_capacity_kwh | round(1) }} kWh
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- PRAWA: Wizualizacja dachu — SVG programatyczny (identyczny z RoofVisualizer.jsx) -->
+        {% if charts and charts.roof_panels %}
         <div style="width: 260px; flex-shrink: 0;">
             <div style="font-size: 10px; font-weight: 700; text-transform: uppercase;
                         letter-spacing: .05em; color: var(--c-primary); margin-bottom: 8px;">
                 Rozmieszczenie paneli
             </div>
 
+            {# MIME TYPE: svg+xml — wygenerowany przez _chart_roof_panels() w report_generator.py #}
             <img src="data:image/svg+xml;base64,{{ charts.roof_panels }}"
                  alt="Rozmieszczenie paneli na dachu"
                  style="width: 260px; display: block;
                         border-radius: 8px; border: 1px solid var(--gray-200);">
 
-            <!-- Legenda — kolory zsynchronizowane z RoofVisualizer.jsx -->
+            <!-- Legenda — kolory identyczne z SVG i RoofVisualizer.jsx -->
             <div style="display: flex; flex-direction: column; gap: 5px; margin-top: 8px;">
                 <div style="display: flex; align-items: center; gap: 6px;">
                     <div style="width: 14px; height: 10px; flex-shrink: 0; background: #E8F4F3;
@@ -40,3 +345,7 @@
                 Rzut z góry. Finalne rozmieszczenie ustali instalator.
             </p>
         </div>
+        {% endif %}
+
+    </div>
+</div>
