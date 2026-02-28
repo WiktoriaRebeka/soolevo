@@ -15,9 +15,7 @@
         {% include "report/s2_main_scenario.html" %}
     </div>
 
-    <!-- BRAK page-break tutaj — S2 sam generuje podział wewnątrz siebie.
-         S3 (Wykres 1) naturalnie dołącza do Parametrów systemu z S2 Część C.
-         Dopiero Wykres 2 i 3 wymuszają nową stronę wewnątrz s3_charts.html -->
+    <!-- S3 — wykresy energetyczne -->
     <div class="page-section">
         {% include "report/s3_charts.html" %}
     </div>
@@ -29,7 +27,7 @@
         {% include "report/s4_alternatives.html" %}
     </div>
 
-    <!-- S5 — Ostrzeżenia (bez nowej strony — dołącza za S4) -->
+    <!-- S5 — Ostrzeżenia -->
     {% if warnings and warnings|length > 0 %}
     <div class="page-section" style="margin-top: 24px;">
         {% include "report/s5_warnings.html" %}
@@ -57,7 +55,7 @@
         {% include "report/s8_next_steps.html" %}
     </div>
 
-    <!-- S9 — Zastrzeżenia (bez nowej strony — dołącza za S8) -->
+    <!-- S9 — Zastrzeżenia -->
     <div class="page-section" style="margin-top: 24px;">
         {% include "report/s9_disclaimer.html" %}
     </div>
