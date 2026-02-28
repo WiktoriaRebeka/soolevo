@@ -1,69 +1,324 @@
-{# ── S8: NASTĘPNE KROKI ───────────────────────────────────────────────────── #}
+{# ═══════════════════════════════════════════════════════════════════════════
+   S8 — NASTĘPNE KROKI
+   Zmienne: standard (do wstrzyknięcia kwot), generation_date
+   Układ: Duże złote cyfry + pogrubiony tytuł + opis + alert kontekstowy
+   Kolory cyfr: var(--amber-500) = #F59E0B (Soolevo gold)
+═══════════════════════════════════════════════════════════════════════════ #}
 
-<!-- Nagłówek sekcji S8 -->
-<div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
-    <div style="background: var(--c-primary); color: white; font-size: 10px; font-weight: 800;
-                padding: 4px 12px; border-radius: 6px; text-transform: uppercase;
-                letter-spacing: .05em; flex-shrink: 0;">S8</div>
-    <div style="font-size: 15px; font-weight: 700; color: var(--c-primary);">
-        Następne kroki
-    </div>
-</div>
+{# ── Pomocnicze dane z raportu do wstrzyknięcia w kroki ─── #}
+{% set cost_est    = standard.pv_cost_gross_pln    | default(0) %}
+{% set payback_est = standard.pv_payback_years     | default(0) %}
+{% set power_est   = standard.total_power_kwp      | default(0) %}
+{% set panels_est  = standard.panels_count         | default(0) %}
+{% set savings_est = standard.pv_savings_pln       | default(0) %}
 
-{% set steps = [
-    (
-        'Sprawdź aktualne nabory regionalne i celowe przed zleceniem wyceny',
-        'Niektóre fundusze (np. Grant OZE w BGK) kończą nabory już 30 czerwca 2026 r. Sprawdź nfosigw.gov.pl oraz stronę swojego WFOŚiGW.'
-    ),
-    (
-        'Pokaż ten raport instalatorowi',
-        'Zawiera aktualne progi dofinansowań i wymogi techniczne, co ułatwi projektowanie zestawu hybrydowego zgodnego z nowymi dotacjami.'
-    ),
-    (
-        'Poproś o wyceny od minimum 3 niezależnych firm',
-        'Rynkowe rozbieżności cenowe dla tej samej mocy mogą wynosić od 30% do 50%. Nie podpisuj umowy bez porównania ofert.'
-    ),
-    (
-        'Porównaj oferty z parametrami z raportu',
-        'Zweryfikuj prognozowaną autokonsumpcję (ok. 80% przy magazynie), długość gwarancji produktowej i serwisowej oraz model falownika.'
-    ),
-    (
-        'Przeczytaj sekcję zastrzeżeń przed podpisaniem umowy',
-        'Sprawdź, czy firma nie znajduje się na liście podmiotów ukaranych przez UOKiK i czy instalator posiada aktualny certyfikat UDT.'
-    )
-] %}
-
-{% for title, desc in steps %}
-<div style="display: flex; gap: 0; margin-bottom: 8px; border-radius: 10px; overflow: hidden;
-            border: 1px solid var(--gray-200);">
-    <!-- Numer kroku -->
-    <div style="background: var(--c-primary); min-width: 48px; display: flex; align-items: center;
-                justify-content: center; flex-shrink: 0;">
-        <span style="color: white; font-weight: 900; font-size: 18px;">{{ loop.index }}</span>
-    </div>
-    <!-- Treść -->
-    <div style="background: var(--gray-50); padding: 13px 16px; flex: 1;
-                border-left: 3px solid var(--c-accent);">
-        <div style="font-weight: 700; color: var(--c-primary); font-size: 13px; margin-bottom: 4px;">
-            {{ title }}
+{# ══════════════════════════════════════════════════════════
+   NAGŁÓWEK S8
+══════════════════════════════════════════════════════════ #}
+<div class="section-header avoid-break" style="margin-bottom:20px;">
+    <div class="section-header-num">S8</div>
+    <div class="section-header-body"
+         style="background:var(--amber-50); border-left-color:var(--c-yellow);">
+        <div class="section-header-title" style="color:var(--gray-900);">
+            Następne kroki — co zrobić teraz?
         </div>
-        <div class="text-base text-muted" style="line-height: 1.6;">{{ desc }}</div>
+        <div class="section-header-sub">
+            Twoja droga od raportu do pierwszej zielonej energii
+        </div>
     </div>
 </div>
-{% endfor %}
 
-<div style="page-break-before: always;"></div>
-<!-- Zastrzeżenia prawne -->
-<div style="margin-top: 24px; padding: 14px 16px; border-top: 2px solid var(--gray-200);
-            background: var(--gray-50); border-radius: 0 0 10px 10px;">
-    <p class="text-sm text-muted" style="line-height: 1.6; margin-bottom: 6px;">
-        <strong>Zastrzeżenia prawne:</strong> Niniejszy raport stanowi symulację komputerową.
-        Nie jest ofertą handlową ani ekspertyzą techniczną. Przed podjęciem decyzji zalecamy
-        konsultację z licencjonowanym instalatorem OZE.
+{# ── Lead z kontekstem raportu ─────────────────────────────── #}
+<div style="
+    background:   var(--amber-50);
+    border:       1px solid var(--amber-200);
+    border-left:  4px solid var(--c-yellow);
+    border-radius:var(--r-md);
+    padding:      12px 16px;
+    margin-bottom:20px;
+" class="avoid-break">
+    <p class="text-sm" style="margin:0; line-height:1.65; color:var(--gray-700);">
+        Na podstawie Twojego raportu wiemy, że instalacja o mocy
+        <strong style="color:var(--c-primary);">{{ "%.2f" | format(power_est) }} kWp
+        ({{ panels_est }} paneli)</strong>
+        może zwrócić się w ok.
+        <strong style="color:var(--c-accent);">{{ payback_est | round(1) }} lat</strong>
+        i generować oszczędności już od pierwszego roku — ok.
+        <strong style="color:var(--c-green);">{{ savings_est | format_pln }}/rok</strong>.
+        Poniżej 5 konkretnych kroków, które wykonasz w ciągu najbliższych tygodni.
     </p>
-    <p class="text-sm text-muted" style="line-height: 1.6; margin: 0;">
-        Wygenerowano: <strong>{{ generation_date }}</strong>
-        &nbsp;·&nbsp; Wersja: {{ version }}
-        &nbsp;·&nbsp; Dokument ma charakter informacyjny, nie jest ofertą handlową.
-    </p>
+</div>
+
+{# ══════════════════════════════════════════════════════════
+   KROKI — wielka złota cyfra + treść
+══════════════════════════════════════════════════════════ #}
+
+{# KROK 1 #}
+<div class="avoid-break" style="
+    display:       flex;
+    gap:           0;
+    margin-bottom: 12px;
+    border-radius: var(--r-md);
+    overflow:      hidden;
+    border:        1px solid var(--amber-200);
+    page-break-inside:avoid;
+">
+    {# Kolumna z cyfrą #}
+    <div style="
+        background:     var(--amber-50);
+        min-width:      62px;
+        display:        flex;
+        flex-direction: column;
+        align-items:    center;
+        justify-content:center;
+        padding:        10px 0;
+        border-right:   2px solid var(--amber-200);
+        flex-shrink:    0;
+    ">
+        <span style="
+            font-size:   26pt;
+            font-weight: 900;
+            color:       var(--c-yellow);
+            line-height: 1;
+        ">1</span>
+        <span style="
+            font-size:  var(--fs-xs);
+            font-weight:700;
+            color:      var(--gray-400);
+            letter-spacing:.04em;
+            text-transform:uppercase;
+            margin-top: 3px;
+        ">KROK</span>
+    </div>
+
+    {# Treść kroku #}
+    <div style="padding:14px 18px; flex:1; background:white;">
+        <div style="
+            font-size:   var(--fs-h3);
+            font-weight: 900;
+            color:       var(--gray-900);
+            margin-bottom:6px;
+        ">Sprawdź nabory dotacji i złóż wniosek</div>
+        <p class="text-sm" style="margin:0 0 8px; line-height:1.65; color:var(--gray-700);">
+            Zanim podpiszesz umowę z instalatorem, sprawdź aktualny status naborów
+            programu <strong>Mój Prąd 6.0</strong> na <em>nfosigw.gov.pl</em>.
+            Wniosek możesz złożyć online — potrzebujesz faktury pro-forma od instalatora,
+            profilu zaufanego i rachunku bankowego.
+        </p>
+        <div style="
+            display:     inline-flex;
+            align-items: center;
+            gap:         8px;
+            padding:     6px 12px;
+            background:  var(--light-green);
+            border:      1px solid var(--mid-green);
+            border-radius:var(--r-pill);
+        ">
+            <span class="text-xs" style="font-weight:700; color:var(--c-green);">
+                Potencjalna dotacja: do
+                {{ [cost_est * 0.3, 16000] | min | round | int | format_pln }}
+            </span>
+        </div>
+    </div>
+</div>
+
+{# KROK 2 #}
+<div class="avoid-break" style="
+    display:       flex;
+    gap:           0;
+    margin-bottom: 12px;
+    border-radius: var(--r-md);
+    overflow:      hidden;
+    border:        1px solid var(--gray-200);
+    page-break-inside:avoid;
+">
+    <div style="
+        background:     var(--amber-50);
+        min-width:      62px;
+        display:        flex;
+        flex-direction: column;
+        align-items:    center;
+        justify-content:center;
+        padding:        10px 0;
+        border-right:   2px solid var(--amber-200);
+        flex-shrink:    0;
+    ">
+        <span style="font-size:26pt; font-weight:900; color:var(--c-yellow); line-height:1;">2</span>
+        <span style="font-size:var(--fs-xs); font-weight:700; color:var(--gray-400);
+                     letter-spacing:.04em; text-transform:uppercase; margin-top:3px;">KROK</span>
+    </div>
+    <div style="padding:14px 18px; flex:1; background:white;">
+        <div style="font-size:var(--fs-h3); font-weight:900; color:var(--gray-900); margin-bottom:6px;">
+            Zbierz 3 niezależne wyceny od instalatorów
+        </div>
+        <p class="text-sm" style="margin:0 0 8px; line-height:1.65; color:var(--gray-700);">
+            Różnice cenowe na rynku wynoszą 30–50% dla tej samej mocy.
+            Pokaż każdemu instalatorowi <strong>ten raport</strong> — zawiera parametry techniczne
+            ({{ "%.2f" | format(power_est) }} kWp, {{ panels_est }} paneli), które ułatwią
+            porównanie ofert. Żądaj wyceny w formie pisemnej z wyszczególnieniem marek urządzeń.
+        </p>
+        <div style="
+            display:inline-flex; gap:12px; flex-wrap:wrap;
+        ">
+            <span style="
+                padding:5px 12px; background:var(--light-blue);
+                border:1px solid var(--mid-blue); border-radius:var(--r-pill);
+                font-size:var(--fs-xs); font-weight:700; color:var(--c-primary);
+            ">Sprawdź certyfikat UDT instalatora</span>
+            <span style="
+                padding:5px 12px; background:var(--light-blue);
+                border:1px solid var(--mid-blue); border-radius:var(--r-pill);
+                font-size:var(--fs-xs); font-weight:700; color:var(--c-primary);
+            ">Weryfikuj firmę w KRS / CEIDG</span>
+        </div>
+    </div>
+</div>
+
+{# KROK 3 #}
+<div class="avoid-break" style="
+    display:       flex;
+    gap:           0;
+    margin-bottom: 12px;
+    border-radius: var(--r-md);
+    overflow:      hidden;
+    border:        1px solid var(--gray-200);
+    page-break-inside:avoid;
+">
+    <div style="
+        background:     var(--amber-50);
+        min-width:      62px;
+        display:        flex;
+        flex-direction: column;
+        align-items:    center;
+        justify-content:center;
+        padding:        10px 0;
+        border-right:   2px solid var(--amber-200);
+        flex-shrink:    0;
+    ">
+        <span style="font-size:26pt; font-weight:900; color:var(--c-yellow); line-height:1;">3</span>
+        <span style="font-size:var(--fs-xs); font-weight:700; color:var(--gray-400);
+                     letter-spacing:.04em; text-transform:uppercase; margin-top:3px;">KROK</span>
+    </div>
+    <div style="padding:14px 18px; flex:1; background:white;">
+        <div style="font-size:var(--fs-h3); font-weight:900; color:var(--gray-900); margin-bottom:6px;">
+            Podpisz umowę i ustal harmonogram montażu
+        </div>
+        <p class="text-sm" style="margin:0; line-height:1.65; color:var(--gray-700);">
+            Umowa musi zawierać: termin realizacji, kary umowne za opóźnienie
+            (min. 0,5%/dzień), zakres gwarancji na urządzenia i robociznę,
+            oraz klauzulę prawa do odstąpienia (14 dni). Zaliczka nie powinna
+            przekraczać <strong>20–30%</strong> całości. Typowy czas montażu:
+            1–2 dni robocze.
+        </p>
+    </div>
+</div>
+
+{# KROK 4 #}
+<div class="avoid-break" style="
+    display:       flex;
+    gap:           0;
+    margin-bottom: 12px;
+    border-radius: var(--r-md);
+    overflow:      hidden;
+    border:        1px solid var(--gray-200);
+    page-break-inside:avoid;
+">
+    <div style="
+        background:     var(--amber-50);
+        min-width:      62px;
+        display:        flex;
+        flex-direction: column;
+        align-items:    center;
+        justify-content:center;
+        padding:        10px 0;
+        border-right:   2px solid var(--amber-200);
+        flex-shrink:    0;
+    ">
+        <span style="font-size:26pt; font-weight:900; color:var(--c-yellow); line-height:1;">4</span>
+        <span style="font-size:var(--fs-xs); font-weight:700; color:var(--gray-400);
+                     letter-spacing:.04em; text-transform:uppercase; margin-top:3px;">KROK</span>
+    </div>
+    <div style="padding:14px 18px; flex:1; background:white;">
+        <div style="font-size:var(--fs-h3); font-weight:900; color:var(--gray-900); margin-bottom:6px;">
+            Odbiór instalacji i wymiana licznika przez OSD
+        </div>
+        <p class="text-sm" style="margin:0; line-height:1.65; color:var(--gray-700);">
+            Przy odbiorze zażądaj <strong>protokołu pomiarów elektrycznych</strong>
+            (impedancja pętli, Isc i Voc paneli). Instalator zgłasza mikroinstalację
+            do operatora (OSD: Tauron, Energa, PGE…). OSD ma <strong>30 dni</strong>
+            na wymianę licznika na dwukierunkowy smart meter.
+        </p>
+    </div>
+</div>
+
+{# KROK 5 #}
+<div class="avoid-break" style="
+    display:       flex;
+    gap:           0;
+    margin-bottom: 20px;
+    border-radius: var(--r-md);
+    overflow:      hidden;
+    border:        1px solid var(--gray-200);
+    page-break-inside:avoid;
+">
+    <div style="
+        background:     var(--amber-50);
+        min-width:      62px;
+        display:        flex;
+        flex-direction: column;
+        align-items:    center;
+        justify-content:center;
+        padding:        10px 0;
+        border-right:   2px solid var(--amber-200);
+        flex-shrink:    0;
+    ">
+        <span style="font-size:26pt; font-weight:900; color:var(--c-yellow); line-height:1;">5</span>
+        <span style="font-size:var(--fs-xs); font-weight:700; color:var(--gray-400);
+                     letter-spacing:.04em; text-transform:uppercase; margin-top:3px;">KROK</span>
+    </div>
+    <div style="padding:14px 18px; flex:1; background:white;">
+        <div style="font-size:var(--fs-h3); font-weight:900; color:var(--gray-900); margin-bottom:6px;">
+            Monitoruj produkcję i zarządzaj depozytami net-billing
+        </div>
+        <p class="text-sm" style="margin:0; line-height:1.65; color:var(--gray-700);">
+            Aplikacja falownika pokaże produkcję w czasie rzeczywistym.
+            Sprawdzaj ją co tydzień — nagły spadek sygnalizuje usterkę.
+            Depozyt z net-billingu rozliczaj w ciągu 12 miesięcy (sprzedawca
+            zwraca go na konto po złożeniu wniosku). Prognozowana pierwsza
+            roczna oszczędność: ok. <strong style="color:var(--c-green);">
+            {{ savings_est | format_pln }}</strong>.
+        </p>
+    </div>
+</div>
+
+{# ── Linki i zasoby #}
+<div class="card avoid-break" style="
+    background:   var(--gray-50);
+    border-left:  4px solid var(--c-primary);
+    padding:      14px 18px;
+">
+    <div class="section-label" style="margin-bottom:8px;">Przydatne zasoby</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 20px;">
+        {% for label, url in [
+            ("Nabory Mój Prąd",          "nfosigw.gov.pl"),
+            ("Czyste Powietrze",          "czystepowietrze.gov.pl"),
+            ("Rejestr instalatorów UDT",  "udt.gov.pl"),
+            ("UOKiK — rejestr kar",       "uokik.gov.pl/rejestr"),
+            ("Sprawdź firmę w KRS",       "ekrs.ms.gov.pl"),
+            ("Sprawdź firmę w CEIDG",     "ceidg.gov.pl"),
+        ] %}
+        <div style="display:flex; align-items:baseline; gap:6px;">
+            <span style="
+                width:6px; height:6px; min-width:6px;
+                border-radius:50%;
+                background:var(--c-primary);
+                display:inline-block;
+                margin-bottom:1px;
+            "></span>
+            <span class="text-xs" style="color:var(--gray-700);">
+                {{ label }}: <strong>{{ url }}</strong>
+            </span>
+        </div>
+        {% endfor %}
+    </div>
 </div>
