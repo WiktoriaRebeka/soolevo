@@ -1,238 +1,399 @@
 {# ═══════════════════════════════════════════════════════════════════════════
    S3 — WYKRESY ENERGETYCZNE
-   ─────────────────────────────────────────────────────────────────────────
-   Wykres 1 (miesięczny bilans) — bez page-break, naturalnie dołącza do S2C
-   Wykres 2 (cashflow 25 lat)   — po page-break, nowa strona
-   Wykres 3 (dobowy lato+zima)  — na tej samej stronie co Wykres 2
-
-   WAŻNE:
-   • Legenda Wykresu 1 jest wbudowana w obrazek PNG (matplotlib fig.legend)
-     → NIE duplikujemy jej w HTML
-   • Legenda Wykresu 3 jest wbudowana w obrazek PNG (jedna wspólna na dole)
-     → NIE duplikujemy jej w HTML
-   • Stary blok z kolorami #27AE60, #F39C12, #E74C3C, #2980B9 USUNIĘTY
+   Klucze w dict charts{} (z report_generator.py):
+     charts.monthly_balance  → PNG base64 (miesięczny bilans)
+     charts.payback          → PNG base64 (cashflow 25 lat)   ← UWAGA: NIE cashflow_25
+     charts.daily_flow       → PNG base64 (dobowy profil)
+     charts.roof_panels      → SVG/PNG base64 (schemat dachu — używany też w S0)
+   Legenda jest wbudowana w każdy PNG przez matplotlib — NIE duplikujemy jej.
+   Każdy wykres: karta .card + avoid-break + opis pod obrazkiem.
 ═══════════════════════════════════════════════════════════════════════════ #}
 
-{# ─── WYKRES 1: Miesięczny bilans energii ────────────────────────────────── #}
-{# Celowo BEZ page-break — naturalnie dołącza do parametrów systemu z S2C    #}
+{# ══════════════════════════════════════════════════════════
+   NAGŁÓWEK S3
+══════════════════════════════════════════════════════════ #}
+<div class="section-header avoid-break" style="margin-bottom:18px;">
+    <div class="section-header-num">S3</div>
+    <div class="section-header-body">
+        <div class="section-header-title">Wizualizacje energetyczne</div>
+        <div class="section-header-sub">
+            Scenariusz Standard · symulacja godzinowa · inflacja energii +4%/rok
+        </div>
+    </div>
+</div>
 
-<div class="card avoid-break" style="margin-top: 16px; margin-bottom: 0; padding: 16px 20px;">
+{# ══════════════════════════════════════════════════════════
+   WYKRES 1 — Miesięczny bilans energii
+   Kolory PNG: autokonsumpcja #22c55e · nadwyżka #facc15
+               pobór z sieci #ef4444 · zapotrzebowanie #3b82f6
+══════════════════════════════════════════════════════════ #}
+<div class="card avoid-break" style="margin-bottom:16px; padding:18px 20px;
+     page-break-inside:avoid;">
 
-    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase;
-                letter-spacing: .05em; color: var(--c-primary); margin-bottom: 10px;">
-        Miesięczny bilans energii — Scenariusz Standard
+    {# Pasek tytułowy wewnątrz karty #}
+    <div style="
+        display:       flex;
+        align-items:   center;
+        gap:           10px;
+        margin-bottom: 14px;
+        padding-bottom:10px;
+        border-bottom: 1px solid var(--gray-200);
+    ">
+        <div style="
+            width:         4px;
+            height:        22px;
+            background:    var(--c-accent);
+            border-radius: 2px;
+            flex-shrink:   0;
+        "></div>
+        <div>
+            <div style="font-size:var(--fs-h3); font-weight:800; color:var(--gray-900);">
+                Miesięczny bilans energii
+            </div>
+            <div class="text-xs text-muted">Scenariusz Standard · cały rok kalendarzowy</div>
+        </div>
     </div>
 
     {% if charts and charts.monthly_balance %}
-
-        {# Wykres PNG — legenda wbudowana przez matplotlib fig.legend() #}
         <img src="data:image/png;base64,{{ charts.monthly_balance }}"
              alt="Miesięczny bilans energii"
-             style="width: 100%; border-radius: 8px; display: block;">
-
+             style="width:100%; border-radius:var(--r-sm); display:block;">
     {% else %}
-
-        {# ── FALLBACK: tabela HTML gdy matplotlib niedostępny ─────────────── #}
-        {% set ap = standard.annual_production_kwh or 0 %}
-        {% set ac = standard.annual_consumption_kwh or (data.annual_consumption_kwh or 0) %}
+        {# FALLBACK: tabela sezonowa #}
+        {% set ap = standard.annual_production_kwh | default(0) %}
+        {% set ac = standard.annual_consumption_kwh | default(data.annual_consumption_kwh | default(0)) %}
         {% set seasons = [
-            ('Styczeń–Luty',         0.07, 0.19),
-            ('Marzec–Kwiecień',      0.18, 0.17),
-            ('Maj–Czerwiec',         0.25, 0.15),
-            ('Lipiec–Sierpień',      0.25, 0.14),
-            ('Wrzesień–Październik', 0.16, 0.17),
-            ('Listopad–Grudzień',    0.09, 0.18)
+            ('Styczeń – Luty',         0.07, 0.19),
+            ('Marzec – Kwiecień',      0.18, 0.17),
+            ('Maj – Czerwiec',         0.25, 0.15),
+            ('Lipiec – Sierpień',      0.25, 0.14),
+            ('Wrzesień – Październik', 0.16, 0.17),
+            ('Listopad – Grudzień',    0.09, 0.18),
         ] %}
-        <table style="width:100%; border-collapse:collapse; font-size:12px;">
+        <table class="data-table">
             <thead>
-                <tr style="background:var(--gray-100); border-bottom:2px solid var(--gray-200);">
-                    <th style="text-align:left; padding:7px 10px; font-weight:700; color:var(--gray-700);">Okres</th>
-                    <th style="text-align:right; padding:7px 10px; font-weight:700; color:var(--c-accent);">Produkcja kWh</th>
-                    <th style="text-align:right; padding:7px 10px; font-weight:700; color:var(--gray-700);">Zużycie kWh</th>
-                    <th style="padding:7px 10px; font-weight:700; color:var(--gray-700); width:40%;">Bilans</th>
+                <tr>
+                    <th style="text-align:left;">Okres</th>
+                    <th style="text-align:right; color:var(--c-accent);">Produkcja kWh</th>
+                    <th style="text-align:right;">Zużycie kWh</th>
+                    <th style="text-align:right; color:var(--c-green);">Nadwyżka kWh</th>
                 </tr>
             </thead>
             <tbody>
                 {% for label, pw, cw in seasons %}
                 {% set pv = (ap * pw) | round | int %}
                 {% set cv = (ac * cw) | round | int %}
-                {% set av = [pv, cv] | min %}
-                {% set sv = pv - av %}
-                {% set gv = cv - av %}
-                {% set bm = [pv, cv] | max %}
-                {% set ap_pct = ((av / bm) * 100) | round | int if bm > 0 else 0 %}
-                {% set sp_pct = ((sv / bm) * 100) | round | int if bm > 0 else 0 %}
-                {% set gp_pct = ((gv / bm) * 100) | round | int if bm > 0 else 0 %}
-                <tr style="border-bottom:1px solid var(--gray-100);
-                           {% if loop.index is even %}background:var(--gray-50);{% endif %}">
-                    <td style="padding:6px 10px; font-weight:600; color:var(--gray-700);">{{ label }}</td>
-                    <td style="padding:6px 10px; text-align:right; font-weight:700; color:var(--c-accent);">{{ pv }}</td>
-                    <td style="padding:6px 10px; text-align:right; color:var(--gray-600);">{{ cv }}</td>
-                    <td style="padding:6px 10px;">
-                        <div style="display:flex; height:10px; border-radius:4px;
-                                    overflow:hidden; background:var(--gray-200);">
-                            {% if ap_pct > 0 %}<div style="width:{{ ap_pct }}%; background:#22c55e;"></div>{% endif %}
-                            {% if sp_pct > 0 %}<div style="width:{{ sp_pct }}%; background:#facc15;"></div>{% endif %}
-                            {% if gp_pct > 0 %}<div style="width:{{ gp_pct }}%; background:#ef4444; margin-left:auto;"></div>{% endif %}
-                        </div>
+                <tr>
+                    <td>{{ label }}</td>
+                    <td style="text-align:right; font-weight:700; color:var(--c-accent);">{{ pv | format_num }}</td>
+                    <td style="text-align:right;">{{ cv | format_num }}</td>
+                    <td style="text-align:right; color:{{ 'var(--c-green)' if pv > cv else 'var(--c-red)' }}; font-weight:700;">
+                        {{ (pv - cv) | format_num }}
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+    {% endif %}
 
-        {# Legenda fallbacku — kolory ZSYNCHRONIZOWANE z report_generator.py v5.0 #}
-        <div style="display:flex; gap:16px; margin-top:10px; flex-wrap:wrap;">
-            <div style="display:flex; align-items:center; gap:5px;">
-                <div style="width:12px; height:12px; background:#22c55e; border-radius:2px;"></div>
-                <span style="font-size:11px; color:var(--gray-600);">Autokonsumpcja</span>
+    {# Opis pod wykresem #}
+    <div style="
+        margin-top:    12px;
+        padding:       10px 14px;
+        background:    var(--gray-50);
+        border-left:   3px solid var(--c-accent);
+        border-radius: 0 var(--r-sm) var(--r-sm) 0;
+    ">
+        <p class="text-xs text-muted" style="margin:0; line-height:1.6;">
+            <strong style="color:var(--gray-800);">Jak czytać ten wykres:</strong>
+            Słupki pokazują miesięczną produkcję PV względem zużycia.
+            Latem powstaje znaczna nadwyżka przekazywana do sieci w ramach net-billingu.
+            Zimą instalacja pokrywa zużycie jedynie częściowo — reszta pochodzi z sieci.
+            Wysoka autokonsumpcja wiosną i jesienią minimalizuje koszty zakupu energii.
+        </p>
+    </div>
+</div>
+
+{# PAGE BREAK przed wykresem 2 #}
+<div class="page-break"></div>
+
+{# ══════════════════════════════════════════════════════════
+   WYKRES 2 — Prognoza zysku netto / 25 lat (CashflowChart25)
+   Klucz: charts.payback  (generowany przez _chart_cashflow_25)
+   Kolory PNG: linia PV #D4AC0D · linia bat #8b5cf6 · zero #94a3b8
+══════════════════════════════════════════════════════════ #}
+<div class="card avoid-break" style="margin-bottom:16px; padding:18px 20px;
+     page-break-inside:avoid;">
+
+    <div style="
+        display:       flex;
+        align-items:   center;
+        gap:           10px;
+        margin-bottom: 14px;
+        padding-bottom:10px;
+        border-bottom: 1px solid var(--gray-200);
+    ">
+        <div style="
+            width:4px; height:22px;
+            background: #D4AC0D;
+            border-radius:2px; flex-shrink:0;
+        "></div>
+        <div>
+            <div style="font-size:var(--fs-h3); font-weight:800; color:var(--gray-900);">
+                Prognoza skumulowanego zysku — 25 lat
             </div>
-            <div style="display:flex; align-items:center; gap:5px;">
-                <div style="width:12px; height:12px; background:#facc15; border-radius:2px;"></div>
-                <span style="font-size:11px; color:var(--gray-600);">Nadwyżka do sieci</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:5px;">
-                <div style="width:12px; height:12px; background:#ef4444; border-radius:2px;"></div>
-                <span style="font-size:11px; color:var(--gray-600);">Pobór z sieci</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:5px;">
-                <div style="width:14px; height:3px; background:#3b82f6; border-radius:2px; margin-top:5px;"></div>
-                <span style="font-size:11px; color:var(--gray-600);">Zapotrzebowanie</span>
+            <div class="text-xs text-muted">
+                Inflacja energii +4% rocznie (scenariusz bazowy)
             </div>
         </div>
 
-    {% endif %}
-
-</div>
-
-
-{# ─── PAGE BREAK przed Wykresem 2 ────────────────────────────────────────── #}
-<div class="page-break"></div>
-
-
-{# ─── WYKRES 2: Prognoza zysku netto (25 lat) — CashflowChart25 ─────────── #}
-
-<div class="card avoid-break" style="margin-bottom: 16px; padding: 16px 20px;">
-
-    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase;
-                letter-spacing: .05em; color: var(--c-primary); margin-bottom: 10px;">
-        Prognoza zysku netto — 25 lat (inflacja energii +4% rocznie)
+        {# KPI inline — zwrot i zysk 25 lat #}
+        <div style="margin-left:auto; display:flex; gap:16px; flex-shrink:0;">
+            <div style="text-align:center;">
+                <div class="label-sm">Zwrot</div>
+                <div style="font-size:var(--fs-h3); font-weight:900; color:var(--c-accent);">
+                    ~{{ standard.pv_payback_years | default(0) | round(1) }} lat
+                </div>
+            </div>
+            <div style="text-align:center;">
+                <div class="label-sm">Zysk 25 lat</div>
+                <div style="font-size:var(--fs-h3); font-weight:900; color:var(--c-accent);">
+                    ok. {{ standard.pv_total_savings_25y_pln | default(0) | format_pln }}
+                </div>
+            </div>
+        </div>
     </div>
 
     {% if charts and charts.payback %}
-
         <img src="data:image/png;base64,{{ charts.payback }}"
              alt="Prognoza zysku netto 25 lat"
-             style="width: 100%; border-radius: 8px; display: block;">
-
+             style="width:100%; border-radius:var(--r-sm); display:block;">
     {% else %}
-
-        {# ── FALLBACK: tabela kluczowych wartości finansowych ─────────────── #}
+        {# FALLBACK: tabela milestones #}
         <div class="box-gray">
             <div class="param-row">
-                <span class="text-muted">Inwestycja startowa</span>
-                <span class="value-bold" style="color:#C0392B;">
-                    –{{ standard.pv_cost_gross_pln | format_pln }}
+                <span class="text-muted">Inwestycja startowa (rok 0)</span>
+                <span class="value-bold" style="color:var(--c-red);">
+                    −{{ standard.pv_cost_gross_pln | default(0) | format_pln }}
                 </span>
             </div>
             <div class="param-row">
-                <span class="text-muted">Roczne oszczędności (rok 1)</span>
-                <span class="value-bold text-accent">
-                    ok. {{ standard.pv_savings_pln | format_pln }}
-                </span>
+                <span class="text-muted">Oszczędności rok 1</span>
+                <span class="value-bold text-accent">ok. {{ standard.pv_savings_pln | default(0) | format_pln }}</span>
             </div>
             <div class="param-row">
-                <span class="text-muted">Prognozowany zwrot (zakres 3–6% inflacji)</span>
-                <span class="value-bold text-accent">
-                    ok.
-                    {{ standard.pv_payback_optimistic_years | round(1)
-                       if standard.pv_payback_optimistic_years else '?' }}
-                    –
-                    {{ standard.pv_payback_pessimistic_years | round(1)
-                       if standard.pv_payback_pessimistic_years else '?' }}
-                    lat
-                </span>
+                <span class="text-muted">Szacowany rok zwrotu</span>
+                <span class="value-bold text-accent">~{{ standard.pv_payback_years | default(0) | round(1) }} lat</span>
             </div>
             <div class="param-row">
-                <span class="text-muted">Szacowany zysk netto po 25 latach</span>
-                <span class="value-bold" style="color:#1E8449;">
-                    ok. {{ standard.pv_total_savings_25y_pln | format_pln }}
+                <span class="text-muted">Skumulowany zysk po 25 latach</span>
+                <span class="value-bold" style="color:#B45309;">
+                    ok. {{ standard.pv_total_savings_25y_pln | default(0) | format_pln }}
                 </span>
             </div>
-            {% if standard.battery_recommended and standard.with_battery_total_cost_pln %}
-            <div class="param-row">
-                <span class="text-muted">Zysk z wariantem PV + magazyn / 25 lat</span>
-                <span class="value-bold" style="color:#7c3aed;">
-                    ok. {{ standard.total_savings_25y_with_battery_pln | format_pln }}
-                </span>
-            </div>
-            {% endif %}
         </div>
-
     {% endif %}
 
+    <div style="
+        margin-top: 12px;
+        padding:    10px 14px;
+        background: var(--gray-50);
+        border-left:3px solid #D4AC0D;
+        border-radius:0 var(--r-sm) var(--r-sm) 0;
+    ">
+        <p class="text-xs text-muted" style="margin:0; line-height:1.6;">
+            <strong style="color:var(--gray-800);">Jak czytać ten wykres:</strong>
+            Krzywa PV (złota) pokazuje skumulowany zysk netto — punkt przecięcia z osią zerową
+            to moment zwrotu inwestycji. Krzywa bat. (fioletowa) uwzględnia opcjonalny magazyn energii.
+            Założono wzrost cen energii o 4% rocznie (scenariusz bazowy).
+            Przedziały optymistyczny i pesymistyczny zakładają odpowiednio 6% i 2%.
+        </p>
+    </div>
 </div>
 
+{# ══════════════════════════════════════════════════════════
+   WYKRES 3 — Dobowy profil energetyczny (lato + zima)
+   Klucz: charts.daily_flow
+   Kolory PNG: PV #D4AC0D · pobór z sieci #E57373 · zużycie #2E86C1
+              ładowanie bat. #66BB6A · rozładowanie bat. #A78BFA
+══════════════════════════════════════════════════════════ #}
+<div class="card avoid-break" style="margin-bottom:16px; padding:18px 20px;
+     page-break-inside:avoid;">
 
-{# ─── WYKRES 3: Dobowy przepływ energii (lato + zima) ───────────────────── #}
-
-<div class="card avoid-break" style="padding: 16px 20px;">
-
-    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase;
-                letter-spacing: .05em; color: var(--c-primary); margin-bottom: 10px;">
-        Dobowy przepływ energii — przykładowy dzień (lato vs. zima)
+    <div style="
+        display:       flex;
+        align-items:   center;
+        gap:           10px;
+        margin-bottom: 14px;
+        padding-bottom:10px;
+        border-bottom: 1px solid var(--gray-200);
+    ">
+        <div style="
+            width:4px; height:22px;
+            background: var(--c-accent);
+            border-radius:2px; flex-shrink:0;
+        "></div>
+        <div>
+            <div style="font-size:var(--fs-h3); font-weight:800; color:var(--gray-900);">
+                Dobowy profil przepływu energii
+            </div>
+            <div class="text-xs text-muted">Typowy dzień letni i zimowy · godz. 0:00–23:00</div>
+        </div>
     </div>
 
     {% if charts and charts.daily_flow %}
-
-        {# Wykres PNG — legenda wbudowana przez matplotlib fig.legend() na dole #}
         <img src="data:image/png;base64,{{ charts.daily_flow }}"
-             alt="Dobowy przepływ energii"
-             style="width: 100%; border-radius: 8px; display: block;">
-
+             alt="Dobowy profil energetyczny"
+             style="width:100%; border-radius:var(--r-sm); display:block;">
     {% else %}
-
-        {# ── FALLBACK: informacja tekstowa gdy brak danych godzinowych ──────── #}
-        <div style="background:var(--gray-50); border:1px dashed var(--gray-300);
-                    border-radius:10px; padding:20px; text-align:center;">
-            <p class="text-sm text-muted" style="margin:0; line-height:1.6;">
-                Wykres dobowy niedostępny — brak danych godzinowych w tej symulacji.<br>
-                Produkcja roczna:
-                <strong class="text-accent">
-                    {{ standard.annual_production_kwh | round | int }} kWh
-                </strong>
-                &nbsp;·&nbsp; Autokonsumpcja:
-                <strong>
-                    {{ ((standard.autoconsumption_rate or 0) * 100) | round | int }}%
-                </strong>
+        {# FALLBACK: uproszczony opis słowny #}
+        <div style="
+            padding:      20px;
+            background:   var(--gray-50);
+            border-radius:var(--r-md);
+            text-align:   center;
+        ">
+            <p class="text-sm text-muted" style="margin:0;">
+                Wykres niedostępny — brak danych godzinowych symulacji.
             </p>
         </div>
+    {% endif %}
 
-        {# Legenda fallbacku — kolory zsynchronizowane z report_generator.py v5.0 #}
-        <div style="display:flex; gap:14px; margin-top:12px; flex-wrap:wrap;
-                    justify-content:center;">
-            <div style="display:flex; align-items:center; gap:5px;">
-                <div style="width:12px;height:12px;background:#D4AC0D;border-radius:2px;"></div>
-                <span style="font-size:11px;color:var(--gray-600);">Produkcja PV</span>
+    {# Legenda kolorów — identyczna z EnergyFlowChart.jsx #}
+    <div style="
+        display:     flex;
+        flex-wrap:   wrap;
+        gap:         10px 18px;
+        margin-top:  12px;
+        padding:     10px 14px;
+        background:  var(--gray-50);
+        border-left: 3px solid var(--c-accent);
+        border-radius:0 var(--r-sm) var(--r-sm) 0;
+    ">
+        {% set legend = [
+            ("#D4AC0D", "Produkcja PV"),
+            ("#E57373", "Pobór z sieci"),
+            ("#2E86C1", "Zużycie domu"),
+            ("#66BB6A", "Ładowanie baterii"),
+            ("#A78BFA", "Rozładowanie baterii"),
+        ] %}
+        {% for color, label in legend %}
+        <div style="display:flex; align-items:center; gap:5px;">
+            <div style="
+                width:12px; height:12px;
+                background:    {{ color }};
+                border-radius: 2px;
+                flex-shrink:   0;
+            "></div>
+            <span class="text-xs" style="color:var(--gray-600);">{{ label }}</span>
+        </div>
+        {% endfor %}
+
+        <div style="flex-basis:100%; margin-top:4px;">
+            <p class="text-xs text-muted" style="margin:0; line-height:1.6;">
+                <strong style="color:var(--gray-800);">Jak czytać ten wykres:</strong>
+                Szczyt produkcji PV następuje między godz. 10:00 a 15:00. Nadwyżka
+                w tym oknie ładuje baterię lub trafia do sieci. Wieczorne zużycie
+                pokrywane jest z rozładowania magazynu lub z sieci (pobór czerwony).
+            </p>
+        </div>
+    </div>
+</div>
+
+{# ══════════════════════════════════════════════════════════
+   WYKRES 4 — Schemat rozmieszczenia paneli na dachu
+   Klucz: charts.roof_panels (SVG/PNG base64)
+   Wyświetlany tu ORAZ linkowany z S0 przez include
+══════════════════════════════════════════════════════════ #}
+{% if charts and charts.roof_panels %}
+<div class="card avoid-break" style="margin-bottom:16px; padding:18px 20px;
+     page-break-inside:avoid;">
+
+    <div style="
+        display:       flex;
+        align-items:   center;
+        gap:           10px;
+        margin-bottom: 14px;
+        padding-bottom:10px;
+        border-bottom: 1px solid var(--gray-200);
+    ">
+        <div style="
+            width:4px; height:22px;
+            background: var(--c-primary);
+            border-radius:2px; flex-shrink:0;
+        "></div>
+        <div>
+            <div style="font-size:var(--fs-h3); font-weight:800; color:var(--gray-900);">
+                Schemat rozmieszczenia paneli
             </div>
-            <div style="display:flex; align-items:center; gap:5px;">
-                <div style="width:12px;height:12px;background:#E57373;border-radius:2px;"></div>
-                <span style="font-size:11px;color:var(--gray-600);">Pobór z sieci</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:5px;">
-                <div style="width:12px;height:12px;background:#2E86C1;border-radius:2px;"></div>
-                <span style="font-size:11px;color:var(--gray-600);">Zużycie domu</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:5px;">
-                <div style="width:12px;height:12px;background:#66BB6A;border-radius:2px;"></div>
-                <span style="font-size:11px;color:var(--gray-600);">Ładowanie bat.</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:5px;">
-                <div style="width:12px;height:12px;background:#A78BFA;border-radius:2px;"></div>
-                <span style="font-size:11px;color:var(--gray-600);">Rozładowanie bat.</span>
+            <div class="text-xs text-muted">
+                {{ standard.panels_count | default("—") }} paneli
+                · {{ "%.2f" | format(standard.total_power_kwp | default(0)) }} kWp
+                · Scenariusz Standard
             </div>
         </div>
 
-    {% endif %}
+        {# Róża wiatrów inline — czytelny kontekst #}
+        <div style="
+            margin-left:  auto;
+            text-align:   center;
+            flex-shrink:  0;
+        ">
+            <div style="
+                font-size:  var(--fs-xs);
+                font-weight:700;
+                color:      var(--gray-500);
+                letter-spacing:.05em;
+                text-transform:uppercase;
+            ">Orientacja</div>
+            <div style="
+                font-size:  var(--fs-h3);
+                font-weight:900;
+                color:      var(--c-primary);
+            ">
+                {% set facet = req.facets[0] if req.facets else none %}
+                {% if facet and facet.azimuth_deg is not none %}
+                    {% set az = facet.azimuth_deg %}
+                    {% if az >= 337.5 or az < 22.5 %}N
+                    {% elif az < 67.5 %}NE
+                    {% elif az < 112.5 %}E
+                    {% elif az < 157.5 %}SE
+                    {% elif az < 202.5 %}S
+                    {% elif az < 247.5 %}SW
+                    {% elif az < 292.5 %}W
+                    {% else %}NW{% endif %}
+                    <span style="font-size:var(--fs-xs); font-weight:600; color:var(--gray-400);">
+                        ({{ az | round | int }}&deg;)
+                    </span>
+                {% else %}—{% endif %}
+            </div>
+        </div>
+    </div>
 
+    {# Obraz — obsługuje zarówno SVG jak i PNG base64 #}
+    <div style="
+        background:    var(--gray-50);
+        border-radius: var(--r-md);
+        padding:       12px;
+        text-align:    center;
+    ">
+        <img src="data:image/png;base64,{{ charts.roof_panels }}"
+             alt="Schemat rozmieszczenia paneli na dachu"
+             style="max-width:100%; max-height:220px; display:inline-block; border-radius:var(--r-sm);">
+    </div>
+
+    <div style="
+        margin-top: 10px;
+        padding:    8px 12px;
+        background: var(--gray-50);
+        border-left:3px solid var(--c-primary);
+        border-radius:0 var(--r-sm) var(--r-sm) 0;
+    ">
+        <p class="text-xs text-muted" style="margin:0; line-height:1.6;">
+            Wizualizacja poglądowa — rzeczywisty schemat montażowy wykonuje projektant instalacji
+            podczas audytu na miejscu. Liczba i układ paneli mogą nieznacznie odbiegać
+            od ostatecznego projektu w zależności od przeszkód i lokalnych wymogów technicznych.
+        </p>
+    </div>
 </div>
+{% endif %}{# /roof_panels #}
