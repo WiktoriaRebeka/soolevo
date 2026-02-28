@@ -12,68 +12,78 @@
     <span class="pdf-generation-date" aria-hidden="true">{{ generation_date }}</span>
 
     {# ════════════════════════════════════════════════════════════════════════
-       OKŁADKA (strona 1)
-       Celowo poza .page-section — zajmuje pełną stronę bez marginesów @page.
-       @page :first usuwa stopkę/nagłówek z tej strony.
+       STRONA 1: DASHBOARD (Hero + S0 + S1)
+       Kompaktowy układ, aby wszystko zmieściło się na jednej stronie A4.
     ════════════════════════════════════════════════════════════════════════ #}
-    <div class="cover-page">
+    
+    <div class="dashboard-page" style="page-break-after: always;">
 
-        {# Hero banner — ciemne tło, białe litery #}
-        <div class="cover-hero">
-
-            {# Logo #}
-            <div class="cover-logo">☀ Soolevo<span>.com</span></div>
-
-            {# Tytuł #}
-            <div class="cover-title">Raport<br>Fotowoltaiczny</div>
-            <div class="cover-subtitle">
-                Pełna analiza opłacalności instalacji PV
-                {% if standard and standard.total_power_kwp %}
-                    &nbsp;·&nbsp; System {{ "%.1f"|format(standard.total_power_kwp) }} kWp
-                {% endif %}
+        {# 1. HERO / COVER SECTION (Skompresowana wysokość) #}
+        <div class="cover-hero avoid-break" style="
+            background: linear-gradient(135deg, var(--c-primary) 0%, var(--c-accent) 100%);
+            border-radius: 0 0 14px 14px;
+            overflow: hidden;
+            margin-bottom: 10px; /* Mniejszy margines dolny */
+            color: white;
+            padding: 16px 20px; /* Zmniejszony padding (było 24px) */
+        ">
+            {# Logo i Tytuł #}
+            <div style="margin-bottom: 14px;"> <!-- Zmniejszony odstęp -->
+                <div class="cover-logo" style="font-size:12pt; font-weight:900; margin-bottom:8px; letter-spacing:-0.02em;">
+                    ☀ Soolevo<span style="opacity:0.7;">.com</span>
+                </div>
+                <div class="cover-title" style="font-size:20pt; font-weight:900; margin:0 0 4px; line-height:1.1;">
+                    Raport Fotowoltaiczny
+                </div>
+                <div class="cover-subtitle" style="color:#BFD9ED; font-size:9pt; margin:0; line-height:1.4;">
+                    Pełna analiza opłacalności instalacji PV
+  
+                </div>
             </div>
 
- 
-                {# 4 statystyki kontekstowe #}
+
+            {# Pasek 4 kluczowych statystyk (Brak zaokrągleń, mniejsza wysokość) #}
             <div style="
                 display: grid;
                 grid-template-columns: repeat(4, 1fr);
-                border-top: 1px solid rgba(255,255,255,0.14);
+                background: rgba(0,0,0,0.15);
+                border: 1px solid rgba(255,255,255,0.14);
+                border-radius: 0; /* USUNIĘTE ZAOKRĄGLENIE */
             ">
-                {# Zużycie roczne #}
-                <div class="hero-stat" style="border-right:1px solid rgba(255,255,255,0.14);">
-                    <div class="hero-stat-label">Zużycie roczne</div>
-                    <div class="hero-stat-value">
+                {# 1. Zużycie roczne #}
+                <div class="hero-stat" style="padding:10px 14px; border-right:1px solid rgba(255,255,255,0.14);">
+                    <div class="hero-stat-label" style="font-size:7pt; text-transform:uppercase; opacity:0.7; margin-bottom:2px;">Zużycie roczne</div>
+                    <div class="hero-stat-value" style="font-size:11pt; font-weight:700;">
                         {% if data.annual_consumption_kwh %}
                             {{ data.annual_consumption_kwh | round | int | format_num }} kWh
                         {% else %}—{% endif %}
                     </div>
                 </div>
 
-                {# Moc systemu #}
-                <div class="hero-stat" style="border-right:1px solid rgba(255,255,255,0.14);">
-                    <div class="hero-stat-label">Moc systemu (Std)</div>
-                    <div class="hero-stat-value">
+                {# 2. Moc systemu #}
+                <div class="hero-stat" style="padding:10px 14px; border-right:1px solid rgba(255,255,255,0.14);">
+                    <div class="hero-stat-label" style="font-size:7pt; text-transform:uppercase; opacity:0.7; margin-bottom:2px;">Moc systemu (Std)</div>
+                    <div class="hero-stat-value" style="font-size:11pt; font-weight:700;">
                         {% if standard and standard.total_power_kwp %}
                             {{ "%.2f" | format(standard.total_power_kwp) }} kWp
                         {% else %}—{% endif %}
                     </div>
                 </div>
 
-                {# Koszt instalacji #}
-                <div class="hero-stat" style="border-right:1px solid rgba(255,255,255,0.14);">
-                    <div class="hero-stat-label">Koszt instalacji</div>
-                    <div class="hero-stat-value">
+                {# 3. Koszt instalacji #}
+                <div class="hero-stat" style="padding:10px 14px; border-right:1px solid rgba(255,255,255,0.14);">
+                    <div class="hero-stat-label" style="font-size:7pt; text-transform:uppercase; opacity:0.7; margin-bottom:2px;">Koszt instalacji</div>
+                    <div class="hero-stat-value" style="font-size:11pt; font-weight:700;">
                         {% if standard and standard.pv_cost_gross_pln %}
                             {{ standard.pv_cost_gross_pln | format_pln }}
                         {% else %}—{% endif %}
                     </div>
                 </div>
 
-                {# Zwrot #}
-                <div class="hero-stat">
-                    <div class="hero-stat-label">Zwrot inwestycji</div>
-                    <div class="hero-stat-value">
+                {# 4. Zwrot inwestycji #}
+                <div class="hero-stat" style="padding:10px 14px;">
+                    <div class="hero-stat-label" style="font-size:7pt; text-transform:uppercase; opacity:0.7; margin-bottom:2px;">Zwrot inwestycji</div>
+                    <div class="hero-stat-value" style="font-size:11pt; font-weight:700;">
                         {% if standard and standard.pv_payback_years %}
                             ok. {{ standard.pv_payback_years | round(1) }} lat
                         {% else %}—{% endif %}
@@ -83,52 +93,53 @@
 
         </div>{# /cover-hero #}
 
+        {# 2. S0 - DANE WEJŚCIOWE #}
+        <div class="page-section avoid-break" style="margin-bottom: 14px;">
+            {% include "report/s0_inputs.html" %}
+        </div>
 
+        {# 3. S1 - WERDYKT #}
+        <div class="page-section avoid-break">
+            {% include "report/s1_verdict.html" %}
+        </div>
 
-    </div>{# /cover-page #}
+    </div>{# /dashboard-page #}
 
 
     {# ════════════════════════════════════════════════════════════════════════
-       STRONA 2+: WŁAŚCIWA TREŚĆ RAPORTU
-       Od tej strony aktywują się nagłówki/stopki z @page.
+       STRONA 2+: SZCZEGÓŁY ANALIZY
     ════════════════════════════════════════════════════════════════════════ #}
-
-    {# S0 — Dane wejściowe + S1 — Werdykt + S2 — Scenariusz główny #}
-    <div class="page-section">
-        {% include "report/s0_inputs.html" %}
-        {% include "report/s1_verdict.html" %}
-        {% include "report/s2_main_scenario.html" %}
-    </div>
-
-    {# S3 — Wykresy energetyczne (naturalnie dołącza, bez page-break przed) #}
-    <div class="page-section">
-        {% include "report/s3_charts.html" %}
-    </div>
-
-    <div class="page-break"></div>
 
     {# S4 — Porównanie wariantów #}
     <div class="page-section">
         {% include "report/s4_alternatives.html" %}
     </div>
 
-    {# S5 — Ostrzeżenia (warunkowo) #}
-    {% if warnings and warnings | length > 0 %}
-    <div class="page-section" style="margin-top: 20px;">
-        {% include "report/s5_warnings.html" %}
+    <div class="page-break"></div>
+
+    {# S3 — Wykresy #}
+    <div class="page-section">
+        {% include "report/s3_charts.html" %}
     </div>
-    {% endif %}
 
     <div class="page-break"></div>
 
-    {# S6 — Dotacje i dofinansowania #}
+    {# S5 — Ostrzeżenia #}
+    {% if warnings and warnings | length > 0 %}
+    <div class="page-section">
+        {% include "report/s5_warnings.html" %}
+    </div>
+    <div class="page-break"></div>
+    {% endif %}
+
+    {# S6 — Dotacje #}
     <div class="page-section">
         {% include "report/s6_subsidies.html" %}
     </div>
 
     <div class="page-break"></div>
 
-    {# S7 — Przewodnik po procesie zakupu #}
+    {# S7 — Przewodnik #}
     <div class="page-section">
         {% include "report/s7_guide.html" %}
     </div>
@@ -140,12 +151,12 @@
         {% include "report/s8_next_steps.html" %}
     </div>
 
-    {# S9 — Zastrzeżenia prawne + stopka wewnętrzna #}
+    {# S9 — Zastrzeżenia #}
     <div class="page-section" style="margin-top: 20px;">
         {% include "report/s9_disclaimer.html" %}
     </div>
 
-    {# Stopka wewnątrz treści — ostatnia strona #}
+    {# Stopka #}
     <div class="report-footer-block avoid-break">
         <div class="report-footer-brand">☀ Soolevo</div>
         <div class="report-footer-meta">
