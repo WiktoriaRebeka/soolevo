@@ -5,76 +5,92 @@
    Zmienne: standard, economy, premium (ScenarioResponseItem dicts)
    Makro:   render_payback (z _macros.html)
    Filtry:  format_pln, format_num
+
+   Pola baterii (prawidłowe nazwy ze schematu ScenarioResponseItem):
+     battery_capacity_kwh            – pojemność magazynu [kWh]
+     battery_model                   – model magazynu
+     battery_total_savings_25y_pln   – zysk PV+bat 25 lat [PLN]
+     battery_payback_years           – zwrot PV+bat (bazowy)
+     battery_payback_optimistic_years
+     battery_payback_pessimistic_years
+     total_cost_with_battery_pln     – łączny koszt PV+bat [PLN]
+     autoconsumption_rate_with_battery   (0–1)
+     self_sufficiency_rate_with_battery  (0–1)
 ═══════════════════════════════════════════════════════════════════════════ #}
 
 {% from 'report/_macros.html' import render_payback %}
 
-{# ══════════════════════════════════════════════════════════
-   NAGŁÓWEK S4B
-══════════════════════════════════════════════════════════ #}
+
 <div class="section-header avoid-break" style="margin-bottom:18px;">
-    <div class="section-header-num">S4B</div>
+    <div class="section-header-num">S2</div>
     <div class="section-header-body">
         <div class="section-header-title">Porównanie wariantów z magazynem energii</div>
         <div class="section-header-sub">Economy · Standard · Premium — zestawy hybrydowe (PV + magazyn)</div>
     </div>
 </div>
-
 {# ══════════════════════════════════════════════════════════════════════════
-   KARTA FEATURED — STANDARD + MAGAZYN (pozioma, pełna szerokość)
-   Lewa połowa: KPI finansowe | Prawa połowa: specyfikacja + progress bary
+   KARTA FEATURED — STANDARD + MAGAZYN (pełna szerokość, układ poziomy)
+   Kolorystyka teal (#0D7377) — odróżnienie od S4 (navy/blue)
 ══════════════════════════════════════════════════════════════════════════ #}
 {% if standard %}
 <div class="avoid-break" style="
-    background:    var(--light-blue);
-    border:        2px solid var(--mid-blue);
-    border-left:   5px solid var(--c-accent);
+    background:    #E8F6F7;
+    border:        2px solid #A8D5D7;
+    border-left:   5px solid #0D7377;
     border-radius: var(--r-lg);
     overflow:      hidden;
     margin-bottom: 14px;
 ">
 
-    {# Pasek tytułowy — gradient full-width #}
+    {# Pasek tytułowy — gradient teal #}
     <div style="
-        background: linear-gradient(135deg, var(--c-primary) 0%, var(--c-accent) 100%);
-        padding:    10px 18px;
-        display:    flex;
-        align-items:center;
-        gap:        12px;
+        background:  linear-gradient(135deg, #0D7377 0%, #2B8A8E 100%);
+        padding:     10px 18px;
+        display:     flex;
+        align-items: center;
+        gap:         12px;
     ">
-        <span class="badge badge-standard">Standard</span>
         <span style="
-            background:    white;
-            color:         var(--c-primary);
-            font-size:     var(--fs-badge);
-            font-weight:   900;
-            padding:       2px 9px;
-            border-radius: var(--r-pill);
-            text-transform:uppercase;
-            letter-spacing:.07em;
+            background:     rgba(255,255,255,0.25);
+            color:          white;
+            font-size:      var(--fs-badge);
+            font-weight:    900;
+            padding:        3px 10px;
+            border-radius:  var(--r-pill);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+        ">Standard</span>
+        <span style="
+            background:     white;
+            color:          #0D7377;
+            font-size:      var(--fs-badge);
+            font-weight:    900;
+            padding:        2px 9px;
+            border-radius:  var(--r-pill);
+            text-transform: uppercase;
+            letter-spacing: .07em;
         ">REKOMENDOWANY</span>
         <span style="color:rgba(255,255,255,0.75); font-size:var(--fs-xs); margin-left:auto;">
             {{ standard.description | default("Optymalny kompromis jakości i ceny") }}
         </span>
     </div>
 
-    {# Ciało — dwie kolumny (lewa:finansowe / prawa:tech+bary) #}
+    {# Ciało — dwie kolumny #}
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:0;">
 
-        {# ─── LEWA: KPI finansowe ───────────────────────────────── #}
-        <div style="padding:18px 20px; border-right:1px solid var(--mid-blue);">
+        {# ─── LEWA: parametry finansowe ─────────────────────────── #}
+        <div style="padding:14px 16px; border-right:1px solid #A8D5D7;">
 
-            <div class="section-label" style="margin-bottom:10px; color:var(--c-primary);">
+            <div class="section-label" style="margin-bottom:10px; color:#0D7377;">
                 Parametry finansowe
             </div>
 
-            {# Koszt z magazynem #}
             <div style="margin-bottom:14px;">
                 <div class="label-sm">Koszt instalacji PV + magazyn</div>
                 <div style="
                     font-size:   var(--fs-hero);
                     font-weight: 900;
-                    color:       var(--c-primary);
+                    color:       #0D7377;
                     line-height: 1.05;
                 ">{{ standard.total_cost_with_battery_pln | default(0) | format_pln }}</div>
                 {% if standard.pv_cost_gross_pln %}
@@ -84,40 +100,21 @@
                 {% endif %}
             </div>
 
-            {# Zwrot + Zysk 25 lat side-by-side #}
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <div class="stat-box" style="
-                    background: white;
-                    border-color: var(--mid-blue);
-                    text-align: center;
-                ">
+                <div class="stat-box" style="background:white; border-color:#A8D5D7; text-align:center;">
                     <div class="label-sm" style="margin-bottom:4px;">Zwrot inwestycji</div>
-                    <div style="
-                        font-size:   var(--fs-h2);
-                        font-weight: 900;
-                        color:       var(--c-accent);
-                        line-height: 1.15;
-                    ">
+                    <div style="font-size:var(--fs-h2); font-weight:900; color:#0D7377; line-height:1.15;">
                         {{ render_payback(
                             standard.battery_payback_years,
-                            standard.battery_payback_years,
-                            standard.battery_payback_years
+                            standard.battery_payback_optimistic_years,
+                            standard.battery_payback_pessimistic_years
                         ) }}
                     </div>
                 </div>
-                <div class="stat-box" style="
-                    background: white;
-                    border-color: var(--mid-blue);
-                    text-align: center;
-                ">
+                <div class="stat-box" style="background:white; border-color:#A8D5D7; text-align:center;">
                     <div class="label-sm" style="margin-bottom:4px;">Zysk 25 lat</div>
-                    <div style="
-                        font-size:   var(--fs-h3);
-                        font-weight: 900;
-                        color:       var(--c-accent);
-                        line-height: 1.2;
-                    ">
-                        ok. {{ standard.total_savings_25y_with_battery_pln | default(0) | format_pln }}
+                    <div style="font-size:var(--fs-h3); font-weight:900; color:#0D7377; line-height:1.2;">
+                        ok. {{ standard.battery_total_savings_25y_pln | default(0) | format_pln }}
                     </div>
                     <div class="text-xs text-muted" style="margin-top:2px;">
                         rok 1: ok. {{ standard.pv_savings_pln | default(0) | format_pln }}
@@ -129,21 +126,21 @@
         {# ─── PRAWA: specyfikacja + progress bary ───────────────── #}
         <div style="padding:18px 20px;">
 
-            <div class="section-label" style="margin-bottom:10px; color:var(--c-primary);">
+            <div class="section-label" style="margin-bottom:10px; color:#0D7377;">
                 Specyfikacja techniczna
             </div>
 
             <div class="param-row">
                 <span class="text-muted">Moc systemu</span>
-                <span class="value-bold text-accent">
+                <span class="value-bold" style="color:#0D7377;">
                     {{ "%.2f" | format(standard.total_power_kwp | default(0)) }} kWp
                 </span>
             </div>
             <div class="param-row">
                 <span class="text-muted">Magazyn energii</span>
-                <span class="value-bold text-accent">
-                    {{ standard.battery_kwh | default(0) }} kWh
-                    {% if standard.battery_model %}&nbsp;· {{ standard.battery_model }}{% endif %}
+                <span class="value-bold" style="color:#0D7377;">
+                    {{ standard.battery_capacity_kwh | default(0) }} kWh
+                    {% if standard.battery_model %}&nbsp;·&nbsp;{{ standard.battery_model }}{% endif %}
                 </span>
             </div>
             <div class="param-row">
@@ -160,33 +157,32 @@
                 <span class="text-muted">Panel</span>
                 <span class="value-bold" style="font-size:var(--fs-xs);">
                     {{ standard.panel_brand | default("—") }}
-                    {% if standard.panel_power_wp %}&nbsp;· {{ standard.panel_power_wp }} Wp{% endif %}
+                    {% if standard.panel_power_wp %}&nbsp;·&nbsp;{{ standard.panel_power_wp }} Wp{% endif %}
                 </span>
             </div>
 
-            {# Progress bary #}
-            {% set ss_pct = ((standard.self_sufficiency_with_battery | default(0)) * 100) | round | int %}
-            {% set ac_pct = ((standard.autoconsumption_with_battery | default(0)) * 100) | round | int %}
+            {% set ss_pct = ((standard.self_sufficiency_rate_with_battery | default(0)) * 100) | round | int %}
+            {% set ac_pct = ((standard.autoconsumption_rate_with_battery   | default(0)) * 100) | round | int %}
 
-            <div style="margin-top:12px; padding-top:10px; border-top:1px solid var(--mid-blue);">
+            <div style="margin-top:12px; padding-top:10px; border-top:1px solid #A8D5D7;">
                 <div class="progress-container" style="margin-bottom:8px;">
                     <div class="progress-header">
                         <span class="progress-title">Samowystarczalność</span>
-                        <span class="progress-value text-accent">{{ ss_pct }}%</span>
+                        <span class="progress-value" style="color:#0D7377;">{{ ss_pct }}%</span>
                     </div>
                     <div class="progress-track">
-                        <div class="progress-fill progress-fill--standard"
-                             style="width:{{ [ss_pct,100]|min }}%;"></div>
+                        <div style="height:100%; border-radius:inherit; width:{{ [ss_pct,100]|min }}%;
+                                    background:linear-gradient(90deg,#0D7377,#2B8A8E);"></div>
                     </div>
                 </div>
                 <div class="progress-container" style="margin-bottom:0;">
                     <div class="progress-header">
                         <span class="progress-title">Autokonsumpcja</span>
-                        <span class="progress-value text-accent">{{ ac_pct }}%</span>
+                        <span class="progress-value" style="color:#0D7377;">{{ ac_pct }}%</span>
                     </div>
                     <div class="progress-track">
-                        <div class="progress-fill progress-fill--standard"
-                             style="width:{{ [ac_pct,100]|min }}%;"></div>
+                        <div style="height:100%; border-radius:inherit; width:{{ [ac_pct,100]|min }}%;
+                                    background:linear-gradient(90deg,#0D7377,#2B8A8E);"></div>
                     </div>
                 </div>
             </div>
@@ -199,12 +195,11 @@
 
 {# ══════════════════════════════════════════════════════════════════════════
    DUO — Economy + Magazyn (lewa) + Premium + Magazyn (prawa)
-   Węższe karty, kompaktowy format — kluczowe liczby bez przepełnienia
 ══════════════════════════════════════════════════════════════════════════ #}
 <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:20px;">
 
     {# ── ECONOMY + MAGAZYN ────────────────────────────────────────────── #}
-    <div class="avoid-break" style="
+    <div class="card-block" style="
         background:    white;
         border:        1px solid var(--mid-green);
         border-left:   4px solid var(--c-green);
@@ -245,8 +240,8 @@
             <div class="param-row">
                 <span class="text-muted">Magazyn</span>
                 <span class="value-bold" style="color:var(--c-green);">
-                    {{ economy.battery_kwh | default(0) }} kWh
-                    {% if economy.battery_model %}&nbsp;· {{ economy.battery_model }}{% endif %}
+                    {{ economy.battery_capacity_kwh | default(0) }} kWh
+                    {% if economy.battery_model %}&nbsp;·&nbsp;{{ economy.battery_model }}{% endif %}
                 </span>
             </div>
             <div class="param-row">
@@ -254,8 +249,8 @@
                 <span class="value-bold" style="color:var(--c-green);">
                     {{ render_payback(
                         economy.battery_payback_years,
-                        economy.battery_payback_years,
-                        economy.battery_payback_years
+                        economy.battery_payback_optimistic_years,
+                        economy.battery_payback_pessimistic_years
                     ) }}
                 </span>
             </div>
@@ -266,19 +261,19 @@
             <div class="param-row">
                 <span class="text-muted">Zysk po 25 latach</span>
                 <span class="value-bold" style="color:var(--c-green);">
-                    ok. {{ economy.total_savings_25y_with_battery_pln | default(0) | format_pln }}
+                    ok. {{ economy.battery_total_savings_25y_pln | default(0) | format_pln }}
                 </span>
             </div>
             <div class="param-row">
                 <span class="text-muted">Panel</span>
                 <span class="value-bold" style="font-size:var(--fs-xs);">
                     {{ economy.panel_brand | default("—") }}
-                    {% if economy.panel_power_wp %}&nbsp;· {{ economy.panel_power_wp }} Wp{% endif %}
+                    {% if economy.panel_power_wp %}&nbsp;·&nbsp;{{ economy.panel_power_wp }} Wp{% endif %}
                 </span>
             </div>
 
-            {% set ss_eco = ((economy.self_sufficiency_with_battery | default(0)) * 100) | round | int %}
-            {% set ac_eco = ((economy.autoconsumption_with_battery | default(0)) * 100) | round | int %}
+            {% set ss_eco = ((economy.self_sufficiency_rate_with_battery | default(0)) * 100) | round | int %}
+            {% set ac_eco = ((economy.autoconsumption_rate_with_battery   | default(0)) * 100) | round | int %}
             <div style="margin-top:10px; padding-top:8px; border-top:1px solid var(--gray-200);">
                 <div class="progress-header">
                     <span class="progress-title">Samowystarczalność</span>
@@ -309,7 +304,7 @@
     </div>
 
     {# ── PREMIUM + MAGAZYN ────────────────────────────────────────────── #}
-    <div class="avoid-break" style="
+    <div class="card-block" style="
         background:    white;
         border:        1px solid var(--purple-200);
         border-left:   4px solid var(--purple-500);
@@ -350,8 +345,8 @@
             <div class="param-row">
                 <span class="text-muted">Magazyn</span>
                 <span class="value-bold" style="color:var(--purple-700);">
-                    {{ premium.battery_kwh | default(0) }} kWh
-                    {% if premium.battery_model %}&nbsp;· {{ premium.battery_model }}{% endif %}
+                    {{ premium.battery_capacity_kwh | default(0) }} kWh
+                    {% if premium.battery_model %}&nbsp;·&nbsp;{{ premium.battery_model }}{% endif %}
                 </span>
             </div>
             <div class="param-row">
@@ -359,8 +354,8 @@
                 <span class="value-bold" style="color:var(--purple-700);">
                     {{ render_payback(
                         premium.battery_payback_years,
-                        premium.battery_payback_years,
-                        premium.battery_payback_years
+                        premium.battery_payback_optimistic_years,
+                        premium.battery_payback_pessimistic_years
                     ) }}
                 </span>
             </div>
@@ -383,24 +378,24 @@
             <div class="param-row">
                 <span class="text-muted">Zysk po 25 latach</span>
                 <span class="value-bold" style="color:var(--purple-700);">
-                    ok. {{ premium.total_savings_25y_with_battery_pln | default(0) | format_pln }}
+                    ok. {{ premium.battery_total_savings_25y_pln | default(0) | format_pln }}
                 </span>
             </div>
             <div class="param-row">
                 <span class="text-muted">Panel</span>
                 <span class="value-bold" style="font-size:var(--fs-xs);">
                     {{ premium.panel_brand | default("—") }}
-                    {% if premium.panel_power_wp %}&nbsp;· {{ premium.panel_power_wp }} Wp{% endif %}
+                    {% if premium.panel_power_wp %}&nbsp;·&nbsp;{{ premium.panel_power_wp }} Wp{% endif %}
                 </span>
             </div>
 
             {# Wyróżnik Premium — gwarancja #}
             <div style="
-                margin-top:   10px;
-                padding:      7px 10px;
-                background:   var(--purple-50);
-                border:       1px solid var(--purple-200);
-                border-radius:var(--r-sm);
+                margin-top:    10px;
+                padding:       7px 10px;
+                background:    var(--purple-50);
+                border:        1px solid var(--purple-200);
+                border-radius: var(--r-sm);
             ">
                 <span class="text-xs" style="font-weight:700; color:var(--purple-700);">
                     Gwarancja na produkcję: 30 lat (80%)
@@ -410,8 +405,8 @@
                 </span>
             </div>
 
-            {% set ss_prem = ((premium.self_sufficiency_with_battery | default(0)) * 100) | round | int %}
-            {% set ac_prem = ((premium.autoconsumption_with_battery | default(0)) * 100) | round | int %}
+            {% set ss_prem = ((premium.self_sufficiency_rate_with_battery | default(0)) * 100) | round | int %}
+            {% set ac_prem = ((premium.autoconsumption_rate_with_battery   | default(0)) * 100) | round | int %}
             <div style="margin-top:10px; padding-top:8px; border-top:1px solid var(--gray-200);">
                 <div class="progress-header">
                     <span class="progress-title">Samowystarczalność</span>
