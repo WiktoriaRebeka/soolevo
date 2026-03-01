@@ -460,35 +460,33 @@ function ScenarioCard({ scenario, inputData }) {
         </div>
 
         {/* Legenda — NOWA, czytelna dla 50+ */}
+        {/* Legenda — spójna z aktualną kolorystyką dachu i paneli */}
         <div className="mt-3 flex flex-wrap gap-4 justify-center">
           {[
             {
-              color: "#e8f4f3",
-              border: "#569793",
+              color: "#d9d9d9",     // szary dach
+              border: "#7a7a7a",    // kontur dachu
               label: "Powierzchnia dachu",
             },
             {
-              color: "#FFD700",
-              border: "#B8860B",
+              color: "linear-gradient(135deg, #0A0F14, #325374)", // gradient panelu
+              border: "#2A2F33",    // ramka panelu
               label: "Panele fotowoltaiczne",
             },
-          ].map((item) => (
-            <div key={item.label} className="flex items-center gap-2">
-              <span
-                className="inline-block w-5 h-4 rounded-sm shrink-0"
+          ].map((item, idx) => (
+            <div key={idx} className="flex items-center gap-2">
+              <div
                 style={{
-                  backgroundColor: item.color,
+                  width: 22,
+                  height: 22,
+                  background: item.color,
                   border: `2px solid ${item.border}`,
+                  borderRadius: 4,
                 }}
               />
-              <span className="text-sm text-gray-500 font-medium">{item.label}</span>
+              <span className="text-sm text-gray-700 font-medium">{item.label}</span>
             </div>
           ))}
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">
-              Paneli: <strong className="text-gray-500">{allPanels.length} szt.</strong>
-            </span>
-          </div>
         </div>
       </section>
 

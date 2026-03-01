@@ -30,83 +30,48 @@ const C = { dim: "#1B4F72", muted: "#6b7280" };
 //   x, y  → lewy górny róg zagnieżdżonego SVG (środek róży = x+r*extraFactor)
 //   r     → rozmiar wynikowy w pikselach głównego SVG (width = height = r * 4.67)
 // ══════════════════════════════════════════════════════════════════════════════
-function CompassRose({ x, y, r = 22, azimuthDeg = 180 }) {
-  // ── Wewnętrzny viewBox — identyczny z RoofSchemaDisplay ──────────────────
-  // W SchemaDisplay: cx=252, cy=22, r=15, etykiety do cy+r+9=46 → viewport ~70h
-  // Centrum w viewBox = (35, 35), r_vb = 15 → proporcje 1:1 z oryginałem
-  const VB_SIZE = 70;   // viewBox "0 0 70 70"
-  const VB_CX   = 35;   // centrum X w viewBox
-  const VB_CY   = 35;   // centrum Y w viewBox
-  const VB_R    = 15;   // promień w viewBox (jak w RoofSchemaDisplay)
+function CompassRose({ x, y, r = 15, azimuthDeg = 180 }) {
+  const cx = x;
+  const cy = y;
 
-  // Rozmiar zagnieżdżonego SVG w px głównego SVG
-  // r=22 → svgSize ≈ 68px (zachowuje proporcje VB_SIZE/VB_R = 70/15 ≈ 4.67)
-  const svgSize = r * (VB_SIZE / VB_R);
-
-  // Pozycja: x,y to środek róży w głównym SVG → przesuwamy o pół svgSize
-  const svgX = x - svgSize / 2;
-  const svgY = y - svgSize / 2;
-
-  // ── Logika rotacji — IDENTYCZNA z RoofSchemaDisplay.jsx ──────────────────
   const rotate = 180 - azimuthDeg;
 
-  // ── Stałe wewnętrzne viewBox (jak w RoofSchemaDisplay) ────────────────────
-  const cx  = VB_CX;
-  const cy  = VB_CY;
-  const rv  = VB_R;
-  const arm = rv * 0.78;
-  const hw  = rv * 0.22;
+  const arm = r * 0.78;
+  const hw  = r * 0.22;
 
   return (
-    // Zagnieżdżony SVG — własny viewBox, niezależny od pikselowych wartości głównego
-    <svg
-      x={svgX}
-      y={svgY}
-      width={svgSize}
-      height={svgSize}
-      viewBox={`0 0 ${VB_SIZE} ${VB_SIZE}`}
-      preserveAspectRatio="xMidYMid meet"
-      overflow="visible"
-    >
-      {/* Rotacja wokół centrum viewBox — identyczna z RoofSchemaDisplay */}
-      <g transform={`rotate(${rotate}, ${cx}, ${cy})`}>
-        {/* Zewnętrzny krąg — identyczny z RoofSchemaDisplay */}
-        <circle cx={cx} cy={cy} r={rv} fill="white" stroke={C.dim} strokeWidth="1.2" opacity="0.92"/>
+    <g transform={`rotate(${rotate}, ${cx}, ${cy})`}>
+      <circle cx={cx} cy={cy} r={r} fill="white" stroke={C.dim} strokeWidth={r * 0.08} opacity="0.92"/>
 
-        {/* ── Ramię S (dół) — czerwone = kierunek połaci ── */}
-        <polygon
-          points={`${cx},${cy + arm} ${cx - hw},${cy + 2} ${cx + hw},${cy + 2}`}
-          fill="#E74C3C" opacity="0.9"
-        />
-        {/* ── Ramię N (góra) — ciemny navy ── */}
-        <polygon
-          points={`${cx},${cy - arm} ${cx - hw},${cy - 2} ${cx + hw},${cy - 2}`}
-          fill={C.dim} opacity="0.75"
-        />
-        {/* ── Ramię E (prawo) — szary ── */}
-        <polygon
-          points={`${cx + arm},${cy} ${cx + 2},${cy - hw} ${cx + 2},${cy + hw}`}
-          fill={C.muted} opacity="0.5"
-        />
-        {/* ── Ramię W (lewo) — szary ── */}
-        <polygon
-          points={`${cx - arm},${cy} ${cx - 2},${cy - hw} ${cx - 2},${cy + hw}`}
-          fill={C.muted} opacity="0.5"
-        />
+      <polygon
+        points={`${cx},${cy+arm} ${cx-hw},${cy+2} ${cx+hw},${cy+2}`}
+        fill="#E74C3C" opacity="0.9"
+      />
 
-        {/* Środkowy krążek */}
-        <circle cx={cx} cy={cy} r={2.5} fill="white" stroke={C.dim} strokeWidth="1.2"/>
+      <polygon
+        points={`${cx},${cy-arm} ${cx-hw},${cy-2} ${cx+hw},${cy-2}`}
+        fill={C.dim} opacity="0.75"
+      />
 
-        {/* Opisy kierunków — IDENTYCZNE z RoofSchemaDisplay (stałe fonty 7.5/6.5) */}
-        <text x={cx}          y={cy - rv - 3}  textAnchor="middle" fontSize="7.5" fontWeight="900" fill={C.dim}>N</text>
-        <text x={cx}          y={cy + rv + 9}  textAnchor="middle" fontSize="7.5" fontWeight="900" fill="#E74C3C">S</text>
-        <text x={cx + rv + 4} y={cy + 2.5}     textAnchor="start"  fontSize="6.5" fontWeight="700" fill={C.muted}>E</text>
-        <text x={cx - rv - 4} y={cy + 2.5}     textAnchor="end"    fontSize="6.5" fontWeight="700" fill={C.muted}>W</text>
-      </g>
-    </svg>
+      <polygon
+        points={`${cx+arm},${cy} ${cx+2},${cy-hw} ${cx+2},${cy+hw}`}
+        fill={C.muted} opacity="0.5"
+      />
+
+      <polygon
+        points={`${cx-arm},${cy} ${cx-2},${cy-hw} ${cx-2},${cy+hw}`}
+        fill={C.muted} opacity="0.5"
+      />
+
+      <circle cx={cx} cy={cy} r={r * 0.17} fill="white" stroke={C.dim} strokeWidth={r * 0.08}/>
+
+      <text x={cx} y={cy - r - r*0.2} textAnchor="middle" fontSize={r * 0.55} fontWeight="900" fill={C.dim}>N</text>
+      <text x={cx} y={cy + r + r*0.45} textAnchor="middle" fontSize={r * 0.55} fontWeight="900" fill="#E74C3C">S</text>
+      <text x={cx + r + r*0.25} y={cy + r*0.1} textAnchor="start" fontSize={r * 0.45} fontWeight="700" fill={C.muted}>E</text>
+      <text x={cx - r - r*0.25} y={cy + r*0.1} textAnchor="end" fontSize={r * 0.45} fontWeight="700" fill={C.muted}>W</text>
+    </g>
   );
 }
-
 // ══════════════════════════════════════════════════════════════════════════════
 // GŁÓWNY KOMPONENT
 // ══════════════════════════════════════════════════════════════════════════════
@@ -130,11 +95,13 @@ const RoofVisualizer = ({
   const PADDING = 100;
   const DRAW    = CANVAS - PADDING * 2;
 
-  // ─── KOLORY DACHU — zachowane bez zmian ──────────────────────────────────
-  const ROOF_FILL   = "#e8f4f3";
-  const ROOF_STROKE = "#569793";
-  const DIM_COLOR   = "#569793";
-  const LABEL_COLOR = "#2C3E50";
+
+    // ─── KOLORY DACHU — szara dachówka ─────────────────────────────────────────
+  const ROOF_FILL   = "#d9d9d9";   // jasny szary (tło dachówki)
+  const ROOF_STROKE = "#7a7a7a";   // ciemniejszy szary (kontur dachówki)
+
+  const DIM_COLOR   = "#6b6b6b";   // linie wymiarów
+  const LABEL_COLOR = "#2C3E50";   // etykiety (bez zmian)
 
   // ─── SKALOWANIE — bez zmian ───────────────────────────────────────────────
   let maxWidthMeters = width || 1;
@@ -203,10 +170,11 @@ const RoofVisualizer = ({
         <defs>
 
           {/* Gradient panelu PV — ciemny realistyczny moduł */}
+     
           <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%"   stopColor="#0A0F14"/>
-            <stop offset="50%"  stopColor="#141920"/>
-            <stop offset="100%" stopColor="#1A1F24"/>
+            <stop offset="0%"   stopColor="#0A1A2F"/>   {/* ciemny granat */}
+            <stop offset="50%"  stopColor="#15273D"/>   {/* środek – lekki połysk */}
+            <stop offset="100%" stopColor="#1F2F45"/>   {/* jaśniejszy dół */}
           </linearGradient>
 
           {/* Subtelny pattern dachówki — poziome linie co 8px */}
@@ -254,15 +222,7 @@ const RoofVisualizer = ({
               strokeWidth="2.5"
               rx="3"
             />
-            {/* Linia kalenicy — środek poziomy (dach dwuspadowy) */}
-            {roofType === "rectangular" && (
-              <line
-                x1={PADDING}           y1={PADDING + roofLpx / 2}
-                x2={PADDING + roofWpx} y2={PADDING + roofLpx / 2}
-                stroke={ROOF_STROKE} strokeWidth="1.8"
-                strokeDasharray="6,4" opacity="0.7"
-              />
-            )}
+
           </g>
         )}
 
@@ -442,6 +402,7 @@ const RoofVisualizer = ({
             RÓŻA WIATRÓW — identyczna z RoofSchemaDisplay.jsx
         ════════════════════════════════════════════════════════════════ */}
         <CompassRose x={cx} y={cy} r={cr} azimuthDeg={azimuthDeg}/>
+        
 
         {/* Skala — prawa dolna */}
         <text x={svgW - 8} y={svgH - 8}
