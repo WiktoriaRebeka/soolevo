@@ -306,13 +306,12 @@
 
     {# ── PREMIUM + MAGAZYN ────────────────────────────────────────────── #}
 
-    <div class="avoid-break" style="
-        background:    white;
+
+    <div class="avoid-break card-block" style="
         border:        1px solid var(--purple-200);
         border-left:   4px solid var(--purple-500);
-        border-radius: var(--r-lg);
-        overflow:      hidden;
     ">
+
         <div style="
             background: var(--purple-700);
             padding:    9px 14px;
@@ -351,6 +350,7 @@
                     {% if premium.battery_model %}&nbsp;·&nbsp;{{ premium.battery_model }}{% endif %}
                 </span>
             </div>
+
             <div class="param-row">
                 <span class="text-muted">Zwrot inwestycji</span>
                 <span class="value-bold" style="color:var(--purple-700);">
@@ -368,6 +368,7 @@
                     ok. {{ premium.battery_total_savings_25y_pln | default(0) | format_pln }}
                 </span>
             </div>
+
             <div class="param-row">
                 <span class="text-muted">Panel</span>
                 <span class="value-bold" style="font-size:var(--fs-xs);">
@@ -376,7 +377,6 @@
                 </span>
             </div>
 
-            {# Wyróżnik Premium — gwarancja #}
             <div style="
                 margin-top:    10px;
                 padding:       7px 10px;
@@ -394,6 +394,7 @@
 
             {% set ss_prem = ((premium.self_sufficiency_rate_with_battery | default(0)) * 100) | round | int %}
             {% set ac_prem = ((premium.autoconsumption_rate_with_battery   | default(0)) * 100) | round | int %}
+
             <div style="margin-top:10px; padding-top:8px; border-top:1px solid var(--gray-200);">
                 <div class="progress-header">
                     <span class="progress-title">Samowystarczalność</span>
@@ -401,9 +402,10 @@
                 </div>
                 <div class="progress-track">
                     <div class="progress-fill progress-fill--premium"
-                         style="width:{{ [ss_prem,100]|min }}%;"></div>
+                        style="width:{{ [ss_prem,100]|min }}%;"></div>
                 </div>
             </div>
+
             <div style="margin-top:6px;">
                 <div class="progress-header">
                     <span class="progress-title">Autokonsumpcja</span>
@@ -411,7 +413,7 @@
                 </div>
                 <div class="progress-track">
                     <div class="progress-fill progress-fill--premium"
-                         style="width:{{ [ac_prem,100]|min }}%;"></div>
+                        style="width:{{ [ac_prem,100]|min }}%;"></div>
                 </div>
             </div>
 
