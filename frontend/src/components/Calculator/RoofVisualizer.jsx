@@ -151,11 +151,14 @@ const RoofVisualizer = ({
     return PADDING + panelYFromTop;
   };
 
-  // ─── POZYCJA RÓŻY WIATRÓW — bez zmian ────────────────────────────────────
-  const cx = maxWidthPx + PADDING + COMPASS_MARGIN - 10;
-  const cy = PADDING + 28;
-  const cr = 22;
 
+  // Konwersja azymutu backend → róża
+  const azimuthForRose = (azimuthDeg + 180) % 360;
+
+  // Responsywne pozycjonowanie róży
+  const roseX = svgW - PADDING * 0.9;
+  const roseY = PADDING * 1.1;
+  const roseR = svgW * 0.03;
   // ─── ID GRADIENTU PANELU (unikalny per instancja) ─────────────────────────
   const gradId      = "pvGrad";
   const patternId   = "roofTile";
@@ -407,8 +410,9 @@ const RoofVisualizer = ({
         {/* ════════════════════════════════════════════════════════════════
             RÓŻA WIATRÓW — identyczna z RoofSchemaDisplay.jsx
         ════════════════════════════════════════════════════════════════ */}
-        <CompassRose x={cx} y={cy} r={cr} azimuthDeg={azimuthDeg}/>
-        
+
+        <CompassRose x={roseX} y={roseY} r={roseR} azimuthDeg={azimuthForRose} />
+
 
         {/* Skala — prawa dolna */}
         <text x={svgW - 8} y={svgH - 8}
