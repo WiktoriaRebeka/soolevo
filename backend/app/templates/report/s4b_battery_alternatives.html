@@ -199,6 +199,7 @@
 <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:20px;">
 
     {# ── ECONOMY + MAGAZYN ────────────────────────────────────────────── #}
+
     <div class="avoid-break" style="
         background:    white;
         border:        1px solid var(--mid-green);
@@ -304,6 +305,7 @@
     </div>
 
     {# ── PREMIUM + MAGAZYN ────────────────────────────────────────────── #}
+
     <div class="avoid-break" style="
         background:    white;
         border:        1px solid var(--purple-200);
@@ -359,22 +361,7 @@
                     ) }}
                 </span>
             </div>
-            <div class="param-row">
-                <span class="text-muted">Moc</span>
-                <span class="value-bold" style="color:var(--purple-700);">
-                    {{ "%.2f" | format(premium.total_power_kwp | default(0)) }} kWp
-                </span>
-            </div>
-            <div class="param-row">
-                <span class="text-muted">Paneli</span>
-                <span class="value-bold">{{ premium.panels_count | default(0) }} szt.</span>
-            </div>
-            <div class="param-row">
-                <span class="text-muted">Produkcja</span>
-                <span class="value-bold">
-                    {{ premium.annual_production_kwh | default(0) | round | int | format_num }} kWh/rok
-                </span>
-            </div>
+
             <div class="param-row">
                 <span class="text-muted">Zysk po 25 latach</span>
                 <span class="value-bold" style="color:var(--purple-700);">
