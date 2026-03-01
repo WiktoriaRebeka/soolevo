@@ -20,14 +20,44 @@
 
 {% from 'report/_macros.html' import render_payback %}
 
-
-<div class="section-header avoid-break" style="margin-bottom:18px;">
-    <div class="section-header-num">S2</div>
-    <div class="section-header-body">
-        <div class="section-header-title">Porównanie wariantów z magazynem energii</div>
-        <div class="section-header-sub">Economy · Standard · Premium — zestawy hybrydowe (PV + magazyn)</div>
+{# ══════════════════════════════════════════════════════════
+   NAGŁÓWEK S4B — kolor teal (#0D7377) odróżnia od S4 (blue)
+══════════════════════════════════════════════════════════ #}
+<div class="avoid-break" style="
+    display:        flex;
+    align-items:    stretch;
+    margin-bottom:  18px;
+    border-radius:  var(--r-md);
+    overflow:       hidden;
+    border:         1px solid #A8D5D7;
+">
+    <div style="
+        background:     #0D7377;
+        color:          white;
+        font-size:      var(--fs-sm);
+        font-weight:    900;
+        letter-spacing: .06em;
+        padding:        10px 16px;
+        display:        flex;
+        align-items:    center;
+        white-space:    nowrap;
+        flex-shrink:    0;
+    ">S4B</div>
+    <div style="
+        background:  #E8F6F7;
+        padding:     10px 16px;
+        flex:        1;
+        border-left: 4px solid #0D7377;
+    ">
+        <div style="font-size:var(--fs-base); font-weight:800; color:#0D7377; line-height:1.2;">
+            Porównanie wariantów z magazynem energii
+        </div>
+        <div style="font-size:var(--fs-xs); color:#2B8A8E; margin-top:2px;">
+            Economy · Standard · Premium — zestawy hybrydowe (PV + magazyn)
+        </div>
     </div>
 </div>
+
 {# ══════════════════════════════════════════════════════════════════════════
    KARTA FEATURED — STANDARD + MAGAZYN (pełna szerokość, układ poziomy)
    Kolorystyka teal (#0D7377) — odróżnienie od S4 (navy/blue)
@@ -79,7 +109,7 @@
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:0;">
 
         {# ─── LEWA: parametry finansowe ─────────────────────────── #}
-        <div style="padding:14px 16px; border-right:1px solid #A8D5D7;">
+        <div style="padding:18px 20px; border-right:1px solid #A8D5D7;">
 
             <div class="section-label" style="margin-bottom:10px; color:#0D7377;">
                 Parametry finansowe
@@ -199,7 +229,6 @@
 <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:20px;">
 
     {# ── ECONOMY + MAGAZYN ────────────────────────────────────────────── #}
-
     <div class="avoid-break" style="
         background:    white;
         border:        1px solid var(--mid-green);
@@ -305,13 +334,13 @@
     </div>
 
     {# ── PREMIUM + MAGAZYN ────────────────────────────────────────────── #}
-
-
-    <div class="avoid-break card-block" style="
+    <div class="avoid-break" style="
+        background:    white;
         border:        1px solid var(--purple-200);
         border-left:   4px solid var(--purple-500);
+        border-radius: var(--r-lg);
+        overflow:      hidden;
     ">
-
         <div style="
             background: var(--purple-700);
             padding:    9px 14px;
@@ -350,7 +379,6 @@
                     {% if premium.battery_model %}&nbsp;·&nbsp;{{ premium.battery_model }}{% endif %}
                 </span>
             </div>
-
             <div class="param-row">
                 <span class="text-muted">Zwrot inwestycji</span>
                 <span class="value-bold" style="color:var(--purple-700);">
@@ -368,7 +396,6 @@
                     ok. {{ premium.battery_total_savings_25y_pln | default(0) | format_pln }}
                 </span>
             </div>
-
             <div class="param-row">
                 <span class="text-muted">Panel</span>
                 <span class="value-bold" style="font-size:var(--fs-xs);">
@@ -377,6 +404,7 @@
                 </span>
             </div>
 
+            {# Wyróżnik Premium — gwarancja #}
             <div style="
                 margin-top:    10px;
                 padding:       7px 10px;
@@ -394,7 +422,6 @@
 
             {% set ss_prem = ((premium.self_sufficiency_rate_with_battery | default(0)) * 100) | round | int %}
             {% set ac_prem = ((premium.autoconsumption_rate_with_battery   | default(0)) * 100) | round | int %}
-
             <div style="margin-top:10px; padding-top:8px; border-top:1px solid var(--gray-200);">
                 <div class="progress-header">
                     <span class="progress-title">Samowystarczalność</span>
@@ -402,10 +429,9 @@
                 </div>
                 <div class="progress-track">
                     <div class="progress-fill progress-fill--premium"
-                        style="width:{{ [ss_prem,100]|min }}%;"></div>
+                         style="width:{{ [ss_prem,100]|min }}%;"></div>
                 </div>
             </div>
-
             <div style="margin-top:6px;">
                 <div class="progress-header">
                     <span class="progress-title">Autokonsumpcja</span>
@@ -413,7 +439,7 @@
                 </div>
                 <div class="progress-track">
                     <div class="progress-fill progress-fill--premium"
-                        style="width:{{ [ac_prem,100]|min }}%;"></div>
+                         style="width:{{ [ac_prem,100]|min }}%;"></div>
                 </div>
             </div>
 
