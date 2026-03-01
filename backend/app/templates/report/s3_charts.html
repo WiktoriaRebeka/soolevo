@@ -44,31 +44,7 @@
                 </div>
                 <div class="text-xs text-muted">Scenariusz Standard · cały rok kalendarzowy</div>
             </div>
-            {# Mini-legenda inline — 4 kafelki w jednej linii #}
-            <div style="
-                margin-left:    auto;
-                display:        grid;
-                grid-template-columns: repeat(4, auto);
-                gap:            0 16px;
-                flex-shrink:    0;
-            ">
-                {% for color, label in [
-                    ('#0D7377', 'Autokonsumpcja'),
-                    ('#C9963C', 'Nadwyżka do sieci'),
-                    ('#A04050', 'Pobór z sieci'),
-                    ('#1B4F72', 'Zapotrzebowanie'),
-                ] %}
-                <div style="display:flex; align-items:center; gap:5px;">
-                    <div style="
-                        width:10px; height:10px;
-                        background:{{ color }};
-                        border-radius:2px;
-                        flex-shrink:0;
-                    "></div>
-                    <span style="font-size:6.5pt; color:var(--gray-600); white-space:nowrap;">{{ label }}</span>
-                </div>
-                {% endfor %}
-            </div>
+{# Legenda wbudowana w obraz PNG przez matplotlib — nie duplikujemy #}
         </div>
 
         {% if charts and charts.monthly_balance %}
