@@ -151,7 +151,10 @@ const RoofVisualizer = ({
     return PADDING + panelYFromTop;
   };
 
-
+  // ─── POZYCJA RÓŻY WIATRÓW — bez zmian ────────────────────────────────────
+  const cx = maxWidthPx + PADDING + COMPASS_MARGIN - 10;
+  const cy = PADDING + 28;
+  const cr = 22;
   // Konwersja azymutu backend → róża
   const azimuthForRose = (azimuthDeg + 180) % 360;
 
@@ -410,8 +413,17 @@ const RoofVisualizer = ({
         {/* ════════════════════════════════════════════════════════════════
             RÓŻA WIATRÓW — identyczna z RoofSchemaDisplay.jsx
         ════════════════════════════════════════════════════════════════ */}
+        <CompassRose x={cx} y={cy} r={cr} azimuthDeg={azimuthDeg}/>
+        // Backend zwraca azymut połaci w innym układzie niż róża.
+        // Róża oczekuje: 180 = S, 90 = E, 270 = W, 0 = N.
+        // Backend często zwraca: 0 = S, 90 = W, 180 = N, 270 = E.
+        // Konwersja:
+        const azimuthForRose = (azimuthDeg + 180) % 360;
 
-        <CompassRose x={roseX} y={roseY} r={roseR} azimuthDeg={azimuthForRose} />
+        // Pozycjonowanie róży musi być proporcjonalne do viewBox, nie sztywne:
+        const roseX = svgW - PADDING * 0.9;
+        const roseY = PADDING * 1.1;
+        const roseR = svgW * 0.03; // 3% szerokości — responsywne
 
 
         {/* Skala — prawa dolna */}

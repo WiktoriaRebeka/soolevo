@@ -1,6 +1,6 @@
 # backend/app/core/report_generator.py
 """
-ReportGenerator v5.0 — Kompletna, stabilna wersja produkcyjna.
+ReportGenerator v5.1 — Zsynchronizowany z nowym RoofVisualizer.jsx
 
 ARCHITEKTURA:
   • Krok 1 — pełna struktura S0–S9 (base.html pozostaje bez zmian)
@@ -9,8 +9,10 @@ ARCHITEKTURA:
       - _chart_monthly_balance  → kolory Tailwind jak w EnergyFlowChart.jsx
       - _chart_cashflow_25      → AreaChart jak CashflowChart25 (React)
       - _chart_daily_flow       → brak legend per-wykres, jedna legenda na dole
-      - _chart_roof_panels      → SVG programatyczny (jak RoofVisualizer.jsx):
-                                   panel #FFD700/#B8860B, dach #E8F4F3/#569793
+      - _chart_roof_panels      → SVG programatyczny (jak RoofVisualizer.jsx v5.1):
+                                   panel: gradient #0A1A2F→#15273D→#1F2F45 stroke #2A2F33
+                                   dach: fill #d9d9d9 pattern dachówki stroke #7a7a7a
+                                   siatka ogniw 3×6, highlight 25%, biały numer panelu
                                    róża wiatrów rotate=180-azimuth (logika frontendu)
   • Krok 4 — polish: DPI 200, tight bbox, spójne marginesy
 
@@ -34,6 +36,13 @@ PALETA (zsynchronizowana z frontendem):
     stroke bat      → #8b5cf6   fill → #f5f3ff
     linia zerowa    → #94a3b8
     zwrot           → #1E8449
+
+  RoofVisualizer.jsx (v5.1 — NOWA PALETA):
+    panel gradient  → #0A1A2F → #15273D → #1F2F45 (ciemny granat diagonal)
+    panel stroke    → #2A2F33
+    dach fill       → #d9d9d9  (szara dachówka, pattern 16×8px)
+    dach stroke     → #7a7a7a
+    wymiary         → #6b6b6b
 """
 
 import os
@@ -393,7 +402,7 @@ class ReportGenerator:
                        linestyle=":", alpha=0.85, zorder=3)
             y_pos = max(pv_cum) * 0.08 if pv_cum else 0
             ax.text(payback_yr + 0.3, y_pos,
-                    f"Zwrot w ~{payback_yr}. roku",
+                    f"Zwrot w ~{payback_yr}.\u00a0roku",
                     fontsize=8.5, color=C_PAYBACK_CLR,
                     fontweight="bold", va="bottom")
 
@@ -582,23 +591,32 @@ class ReportGenerator:
 
     # =========================================================================
     # WYKRES 4 — Schemat dachu z panelami (SVG programatyczny)
-    # Identyczny z RoofVisualizer.jsx:
-    #   panel:  fill=#FFD700  stroke=#B8860B  (jak ScenarioCard.jsx legenda)
-    #   dach:   fill=#E8F4F3  stroke=#569793
+    # Zsynchronizowany z RoofVisualizer.jsx v5.1:
+    #   panel:  gradient #0A1A2F→#15273D→#1F2F45  stroke=#2A2F33  (ciemny granat)
+    #   dach:   fill=#d9d9d9 pattern dachówki (16×8px) stroke=#7a7a7a
+    #   siatka ogniw: 3kol×6wier, białe linie rgba(255,255,255,0.18/0.12)
+    #   highlight: rgba(255,255,255,0.04) na górnych 25% panelu
+    #   numer panelu: rgba(255,255,255,0.75) — biały na ciemnym tle
     #   Y-flip: py = roofH - panel.y*scale - panel.h*scale (jak panelSvgY())
     #   róża:   rotate = 180 - azimuth_deg (jak CompassRose.jsx)
     # =========================================================================
 
     def _chart_roof_panels(self, std: dict, request) -> str:
-        # ── Kolory identyczne z frontendem ─────────────────────────────────────
-        PANEL_FILL  = "#FFD700"   # ScenarioCard legenda
-        PANEL_STR   = "#B8860B"
-        ROOF_FILL   = "#E8F4F3"   # RoofVisualizer ROOF_FILL
-        ROOF_STROKE = "#569793"   # RoofVisualizer ROOF_STROKE
-        DIM_COLOR   = "#1B4F72"   # C.dim z RoofSchemaDisplay
-        MUTED       = "#6b7280"
-        RED_S       = "#E74C3C"   # ramię S = czerwone (kierunek połaci)
-        FONT        = "DejaVu Sans, Arial, sans-serif"
+        # ── Kolory zsynchronizowane z RoofVisualizer.jsx v5.1 ─────────────────
+        # Panel: ciemny gradient granatowy (jak linearGradient pvGrad w JSX)
+        PANEL_GRAD_START = "#0A1A2F"  # stop 0%
+        PANEL_GRAD_MID   = "#15273D"  # stop 50%
+        PANEL_GRAD_END   = "#1F2F45"  # stop 100%
+        PANEL_STR        = "#2A2F33"  # ramka panelu
+        # Dach: szara dachówka (jak ROOF_FILL / ROOF_STROKE w JSX)
+        ROOF_FILL        = "#d9d9d9"
+        ROOF_STROKE      = "#7a7a7a"
+        # Pozostałe
+        DIM_COLOR        = "#6b6b6b"  # linie wymiarów (jak DIM_COLOR w JSX)
+        MUTED            = "#6b7280"
+        RED_S            = "#E74C3C"  # ramię S = czerwone (kierunek połaci)
+        FONT             = "DejaVu Sans, Arial, sans-serif"
+        C_TEXT_SVG       = "#2C3E50"  # LABEL_COLOR jak w JSX
 
         # ── Pobierz layout ──────────────────────────────────────────────────────
         facet_layouts = std.get("facet_layouts") or []
@@ -634,7 +652,7 @@ class ReportGenerator:
         roof_h_px = facet_l * SCALE
 
         svg_w = int(roof_w_px + PAD * 2 + COMP_MX + COMP_R * 2 + 14)
-        svg_h = int(roof_h_px + PAD * 2 + 36)
+        svg_h = int(roof_h_px + PAD * 2 + 50)   # +50 na legendę na dole
 
         # Pozycja dachu w SVG
         rx0 = PAD
@@ -652,8 +670,9 @@ class ReportGenerator:
             f'width="{svg_w}" height="{svg_h}">'
         )
 
-        # Definicje markerów strzałek wymiaru
+        # ── DEFS: markery strzałek + gradient panelu + pattern dachu + cienie ──
         out.append(f'''<defs>
+  <!-- Markery strzałek wymiarów -->
   <marker id="ae" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
     <path d="M0,0 L0,6 L6,3 z" fill="{DIM_COLOR}"/>
   </marker>
@@ -661,20 +680,45 @@ class ReportGenerator:
           orient="auto-start-reverse">
     <path d="M0,0 L0,6 L6,3 z" fill="{DIM_COLOR}"/>
   </marker>
+
+  <!-- Gradient panelu PV — ciemny granat diagonal (identyczny z pvGrad w RoofVisualizer.jsx) -->
+  <linearGradient id="pvGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%"   stop-color="{PANEL_GRAD_START}"/>
+    <stop offset="50%"  stop-color="{PANEL_GRAD_MID}"/>
+    <stop offset="100%" stop-color="{PANEL_GRAD_END}"/>
+  </linearGradient>
+
+  <!-- Pattern dachówki — subtelne poziome linie co 8px (jak patternId w JSX) -->
+  <pattern id="roofTile" x="0" y="0" width="16" height="8" patternUnits="userSpaceOnUse">
+    <rect width="16" height="8" fill="{ROOF_FILL}"/>
+    <line x1="0" y1="8" x2="16" y2="8" stroke="{ROOF_STROKE}" stroke-width="0.4" opacity="0.35"/>
+    <line x1="0" y1="0" x2="0"  y2="8" stroke="{ROOF_STROKE}" stroke-width="0.25" opacity="0.2"/>
+  </pattern>
+
+  <!-- Cień panelu — efekt głębi (jak panelShad filter w RoofVisualizer.jsx) -->
+  <filter id="panelShad" x="-8%" y="-8%" width="120%" height="120%">
+    <feDropShadow dx="1" dy="1.5" stdDeviation="1.2" flood-color="rgba(0,0,0,0.45)"/>
+  </filter>
+
+  <!-- Cień dachu -->
+  <filter id="roofShad" x="-5%" y="-5%" width="115%" height="115%">
+    <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="rgba(0,0,0,0.12)"/>
+  </filter>
 </defs>''')
 
         # Białe tło
         out.append(f'<rect width="{svg_w}" height="{svg_h}" fill="white"/>')
 
-        # Powierzchnia dachu
+        # Powierzchnia dachu — szara dachówka z patterntem (jak w RoofVisualizer.jsx)
         out.append(
             f'<rect x="{rx0}" y="{ry0}" '
             f'width="{roof_w_px:.1f}" height="{roof_h_px:.1f}" '
-            f'fill="{ROOF_FILL}" stroke="{ROOF_STROKE}" '
-            f'stroke-width="2.5" rx="3"/>'
+            f'fill="url(#roofTile)" stroke="{ROOF_STROKE}" '
+            f'stroke-width="2.5" rx="3" filter="url(#roofShad)"/>'
         )
 
-        # ── Panele ─────────────────────────────────────────────────────────────
+        # ── Panele — ciemny gradient + siatka ogniw + cień ────────────────────
+        # Wizualnie identyczne z RoofVisualizer.jsx v5.1 (pvGrad + panelShad)
         for idx, pos in enumerate(panel_positions):
             if isinstance(pos, dict):
                 px_m  = float(pos.get("x", 0))
@@ -696,15 +740,19 @@ class ReportGenerator:
             # panelYFromTop = roofHeightPx - panel.y*scale - panel.height*scale
             py = ry0 + (facet_l * SCALE - py_m * SCALE - ph)
 
-            # Panel
+            # ── Panel: gradient granatowy + cień (jak <g filter="url(#panelShad)"> w JSX)
+            out.append(f'<g filter="url(#panelShad)">')
+
+            # Tło panelu — gradient diagonal (pvGrad)
             out.append(
                 f'<rect x="{px:.1f}" y="{py:.1f}" '
                 f'width="{pw:.1f}" height="{ph:.1f}" '
-                f'fill="{PANEL_FILL}" stroke="{PANEL_STR}" '
-                f'stroke-width="1.2" opacity="0.93" rx="1.5"/>'
+                f'fill="url(#pvGrad)" stroke="{PANEL_STR}" '
+                f'stroke-width="1.2" rx="1"/>'
             )
 
-            # Siatka komórek panelu (3 kolumny × 6 wierszy)
+            # Siatka ogniw: 3 kolumny × 6 wierszy
+            # Pionowe linie — opacity 0.18 (jak w JSX)
             N_COL, N_ROW = 3, 6
             cw = pw / N_COL
             ch = ph / N_ROW
@@ -713,17 +761,25 @@ class ReportGenerator:
                 out.append(
                     f'<line x1="{lx:.1f}" y1="{py:.1f}" '
                     f'x2="{lx:.1f}" y2="{py + ph:.1f}" '
-                    f'stroke="white" stroke-width="0.4" opacity="0.55"/>'
+                    f'stroke="rgba(255,255,255,0.18)" stroke-width="0.5"/>'
                 )
+            # Poziome linie — opacity 0.12 (jak w JSX)
             for ri in range(1, N_ROW):
                 ly = py + ri * ch
                 out.append(
                     f'<line x1="{px:.1f}" y1="{ly:.1f}" '
                     f'x2="{px + pw:.1f}" y2="{ly:.1f}" '
-                    f'stroke="white" stroke-width="0.4" opacity="0.55"/>'
+                    f'stroke="rgba(255,255,255,0.12)" stroke-width="0.4"/>'
                 )
 
-            # Numer (maks 60 jak w frontendzie)
+            # Highlight w lewym górnym rogu — efekt 3D (jak w JSX)
+            out.append(
+                f'<rect x="{px:.1f}" y="{py:.1f}" '
+                f'width="{pw:.1f}" height="{ph * 0.25:.1f}" '
+                f'fill="rgba(255,255,255,0.04)" rx="1"/>'
+            )
+
+            # Numer panelu — BIAŁY tekst (maks 60 jak w JSX)
             if idx < 60:
                 tx = px + pw / 2
                 ty = py + ph / 2
@@ -731,9 +787,12 @@ class ReportGenerator:
                 out.append(
                     f'<text x="{tx:.1f}" y="{ty:.1f}" '
                     f'text-anchor="middle" dominant-baseline="middle" '
-                    f'font-size="{fs}" font-weight="bold" fill="#1a1a1a" '
+                    f'font-size="{fs}" font-weight="bold" '
+                    f'fill="rgba(255,255,255,0.75)" '
                     f'font-family="{FONT}">{label}</text>'
                 )
+
+            out.append('</g>')  # koniec grupy panelu
 
         # ── Wymiar poziomy (szerokość dachu) ────────────────────────────────────
         dim_y = ry0 + roof_h_px + 22
@@ -774,9 +833,39 @@ class ReportGenerator:
         out.append(
             f'<text x="{rx0 + roof_w_px / 2:.1f}" y="{header_y}" '
             f'text-anchor="middle" font-size="12" '
-            f'font-weight="900" fill="{C_TEXT}" '
+            f'font-weight="900" fill="{C_TEXT_SVG}" '
             f'font-family="{FONT}">'
             f'{panels_count}\u00a0paneli\u00a0·\u00a0{total_kwp:.2f}\u00a0kWp</text>'
+        )
+
+        # ── Legenda kolorów (dach + panele) — zsynchronizowana z JSX ──────────
+        # Pozycja: pod wymiarem poziomym
+        leg_y  = svg_h - 14
+        leg_x0 = rx0
+
+        # Kwadrat dachu (szary — jak w legendzie JSX)
+        out.append(
+            f'<rect x="{leg_x0}" y="{leg_y - 9}" width="14" height="10" '
+            f'fill="{ROOF_FILL}" stroke="{ROOF_STROKE}" '
+            f'stroke-width="1.5" rx="2"/>'
+        )
+        out.append(
+            f'<text x="{leg_x0 + 18}" y="{leg_y}" '
+            f'font-size="9.5" fill="{MUTED}" font-family="{FONT}">'
+            f'Powierzchnia dachu</text>'
+        )
+
+        # Kwadrat panelu (środkowy kolor gradientu dla czytelności na małym rect)
+        leg_x1 = leg_x0 + 140
+        out.append(
+            f'<rect x="{leg_x1}" y="{leg_y - 9}" width="14" height="10" '
+            f'fill="{PANEL_GRAD_MID}" stroke="{PANEL_STR}" '
+            f'stroke-width="1.5" rx="2"/>'
+        )
+        out.append(
+            f'<text x="{leg_x1 + 18}" y="{leg_y}" '
+            f'font-size="9.5" fill="{MUTED}" font-family="{FONT}">'
+            f'Panele fotowoltaiczne</text>'
         )
 
         # ── Róża wiatrów (CompassRose z RoofVisualizer.jsx) ─────────────────────
@@ -929,7 +1018,7 @@ class ReportGenerator:
             "warnings":        report_data.warnings_and_confirmations,
             "charts":          charts,
             "generation_date": datetime.now().strftime("%d.%m.%Y %H:%M"),
-            "version":         "5.0.0",
+            "version":         "5.1.0",
             "css_content":     css_content,
         }
 
