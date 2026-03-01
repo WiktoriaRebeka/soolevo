@@ -109,46 +109,12 @@
                 ">Soolevo</span>
             </div>
 
-            {# Badge rok — szklana tabletka #}
-            <div style="
-                background:    rgba(255,255,255,0.08);
-                border:        1px solid rgba(255,255,255,0.20);
-                border-radius: 100px;
-                padding:       4px 14px;
-                font-size:     8.5pt;
-                font-weight:   700;
-                color:         rgba(255,255,255,0.70);
-                letter-spacing:.10em;
-                text-transform: uppercase;
-            ">Raport 2026</div>
+
         </div>
 
 
         {# ── TYTUŁ GŁÓWNY ────────────────────────────────────────────── #}
         <div style="margin-bottom: 10mm; flex-shrink: 0;">
-
-            {# Etykieta kategorii #}
-            <div style="
-                display:        inline-flex;
-                align-items:    center;
-                gap:            6px;
-                background:     rgba(212,172,13,0.18);
-                border:         1px solid rgba(212,172,13,0.40);
-                border-radius:  100px;
-                padding:        3px 12px;
-                font-size:      7.5pt;
-                font-weight:    700;
-                color:          #D4AC0D;
-                letter-spacing: .10em;
-                text-transform: uppercase;
-                margin-bottom:  8mm;
-            ">
-                <span style="
-                    width:8px; height:8px; border-radius:50%;
-                    background:#D4AC0D; display:inline-block; flex-shrink:0;
-                "></span>
-                Analiza fotowoltaiczna
-            </div>
 
             {# Tytuł — ultra bold #}
             <div style="
@@ -158,7 +124,7 @@
                 line-height:    1.05;
                 letter-spacing: -0.03em;
                 margin-bottom:  5mm;
-            ">RAPORT<br>FOTOWOLTAICZNY</div>
+            ">Raport<br>Fotowoltaiczny</div>
 
             {# Podtytuł #}
             <div style="
@@ -167,7 +133,7 @@
                 color:          rgba(180,210,240,0.80);
                 line-height:    1.5;
                 max-width:      120mm;
-            ">Pełna analiza techniczno-finansowa<br>instalacji PV dla Twojego domu</div>
+            ">Analiza techniczno-finansowa<br>instalacji PV dla Twojego domu</div>
         </div>
 
 
@@ -403,38 +369,8 @@
             flex-shrink:     0;
         ">
 
-            {# Meta danych klienta / instalacji #}
+            {# Data generowania #}
             <div style="display:flex; flex-direction:column; gap:1.5mm;">
-                {% if req and req.province %}
-                <div style="
-                    display:    flex;
-                    align-items:center;
-                    gap:        3mm;
-                    font-size:  7.5pt;
-                    color:      rgba(255,255,255,0.45);
-                ">
-                    <span style="
-                        width:5px; height:5px; border-radius:50%;
-                        background:rgba(0,200,220,0.50); flex-shrink:0;
-                    "></span>
-                    Lokalizacja: {{ req.province | title }}
-                </div>
-                {% endif %}
-                {% if data and data.annual_consumption_kwh %}
-                <div style="
-                    display:    flex;
-                    align-items:center;
-                    gap:        3mm;
-                    font-size:  7.5pt;
-                    color:      rgba(255,255,255,0.45);
-                ">
-                    <span style="
-                        width:5px; height:5px; border-radius:50%;
-                        background:rgba(212,172,13,0.50); flex-shrink:0;
-                    "></span>
-                    Zużycie roczne: {{ data.annual_consumption_kwh | round | int | format_num }} kWh/rok
-                </div>
-                {% endif %}
                 <div style="
                     display:    flex;
                     align-items:center;
