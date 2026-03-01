@@ -289,12 +289,6 @@ tr, td, th { break-inside: avoid; page-break-inside: avoid; }
 }
 
 
-.card-block {
-    background: white;
-    border-radius: var(--r-lg);
-    overflow: hidden;
-    border: 1px solid var(--gray-200);
-}
 
 .page-break {
     break-before:      page;
