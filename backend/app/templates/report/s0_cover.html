@@ -1,0 +1,455 @@
+{# ═══════════════════════════════════════════════════════════════════════════
+   S0_COVER — OKŁADKA RAPORTU (Strona 1)
+   Zmienne z kontekstu:
+     standard        → ScenarioResponseItem dict
+     req             → ScenariosRequest (province, facets[])
+     data            → input_data_summary (annual_consumption_kwh, roof_type)
+     generation_date → str
+   Filtry: format_pln, format_num
+═══════════════════════════════════════════════════════════════════════════ #}
+
+{# ══════════════════════════════════════════════════════════════════════════
+   BLOK HERO — gradient, logo, tytuł, pasek statystyk
+══════════════════════════════════════════════════════════════════════════ #}
+<div style="
+    background:    linear-gradient(155deg, var(--c-primary) 0%, #154360 45%, #0E2A45 100%);
+    border-radius: var(--r-lg);
+    overflow:      hidden;
+    color:         white;
+    position:      relative;
+    margin-bottom: 0;
+">
+
+    {# Dekoracyjne koła w tle #}
+    <div style="
+        position:      absolute; top:-30mm; right:-20mm;
+        width:80mm; height:80mm; border-radius:50%;
+        background:    rgba(46,134,193,0.22); pointer-events:none;
+    "></div>
+    <div style="
+        position:      absolute; bottom:-15mm; right:15mm;
+        width:50mm; height:50mm; border-radius:50%;
+        background:    rgba(46,134,193,0.14); pointer-events:none;
+    "></div>
+
+    {# ── Górna część: logo + tytuł ─────────────────────────────── #}
+    <div style="padding:28px 28px 20px; position:relative; z-index:1;">
+
+        {# Logo #}
+        <div style="
+            font-size:      14pt;
+            font-weight:    900;
+            letter-spacing: -0.01em;
+            margin-bottom:  20px;
+            opacity:        0.95;
+        ">☀ Soolevo<span style="color:var(--mid-blue); font-weight:400;">.com</span></div>
+
+        {# Tytuł główny #}
+        <div style="
+            font-size:      24pt;
+            font-weight:    900;
+            line-height:    1.1;
+            margin-bottom:  8px;
+            letter-spacing: -0.02em;
+        ">Raport Fotowoltaiczny</div>
+        <div style="
+            font-size:      13pt;
+            font-weight:    400;
+            color:          var(--mid-blue);
+            margin-bottom:  22px;
+            line-height:    1.3;
+        ">Analiza opłacalności instalacji PV</div>
+
+        {# Meta — lokalizacja, moc, data #}
+        <div style="
+            display:     flex;
+            flex-wrap:   wrap;
+            gap:         8px 20px;
+            font-size:   var(--fs-sm);
+            color:       rgba(255,255,255,0.75);
+        ">
+            {% if req and req.province %}
+            <span>📍 {{ req.province | title }}</span>
+            {% endif %}
+            {% if standard and standard.total_power_kwp %}
+            <span>⚡ {{ "%.2f" | format(standard.total_power_kwp) }} kWp (wariant Standard)</span>
+            {% endif %}
+            {% if data and data.roof_type %}
+            <span>🏠 Dach: {{ data.roof_type }}</span>
+            {% endif %}
+            <span>📅 {{ generation_date }}</span>
+        </div>
+    </div>
+
+    {# ── Pasek 4 kluczowych KPI ────────────────────────────────── #}
+    <div style="
+        display:        grid;
+        grid-template-columns: repeat(4, 1fr);
+        background:     rgba(0,0,0,0.18);
+        border-top:     1px solid rgba(255,255,255,0.12);
+        position:       relative;
+        z-index:        1;
+    ">
+        <div style="padding:12px 14px; text-align:center; border-right:1px solid rgba(255,255,255,0.12);">
+            <div style="font-size:var(--fs-xs); font-weight:700; color:#BFD9ED; text-transform:uppercase; letter-spacing:.07em; margin-bottom:3px;">Zużycie roczne</div>
+            <div style="font-size:11pt; font-weight:900; color:white;">
+                {% if data and data.annual_consumption_kwh %}{{ data.annual_consumption_kwh | round | int | format_num }} kWh{% else %}—{% endif %}
+            </div>
+        </div>
+        <div style="padding:12px 14px; text-align:center; border-right:1px solid rgba(255,255,255,0.12);">
+            <div style="font-size:var(--fs-xs); font-weight:700; color:#BFD9ED; text-transform:uppercase; letter-spacing:.07em; margin-bottom:3px;">Moc systemu</div>
+            <div style="font-size:11pt; font-weight:900; color:white;">
+                {% if standard and standard.total_power_kwp %}{{ "%.2f" | format(standard.total_power_kwp) }} kWp{% else %}—{% endif %}
+            </div>
+        </div>
+        <div style="padding:12px 14px; text-align:center; border-right:1px solid rgba(255,255,255,0.12);">
+            <div style="font-size:var(--fs-xs); font-weight:700; color:#BFD9ED; text-transform:uppercase; letter-spacing:.07em; margin-bottom:3px;">Koszt instalacji</div>
+            <div style="font-size:11pt; font-weight:900; color:white;">
+                {% if standard and standard.pv_cost_gross_pln %}{{ standard.pv_cost_gross_pln | format_pln }}{% else %}—{% endif %}
+            </div>
+        </div>
+        <div style="padding:12px 14px; text-align:center;">
+            <div style="font-size:var(--fs-xs); font-weight:700; color:#BFD9ED; text-transform:uppercase; letter-spacing:.07em; margin-bottom:3px;">Zwrot inwestycji</div>
+            <div style="font-size:11pt; font-weight:900; color:white;">
+                {% if standard and standard.pv_payback_years %}ok. {{ standard.pv_payback_years | round(1) }} lat{% else %}—{% endif %}
+            </div>
+        </div>
+    </div>
+
+</div>{# /hero #}
+
+
+{# ══════════════════════════════════════════════════════════════════════════
+   WSTĘP — krótki opis zakresu raportu
+══════════════════════════════════════════════════════════════════════════ #}
+<div style="
+    margin-top:    16px;
+    padding:       16px 20px;
+    background:    var(--gray-50);
+    border:        1px solid var(--gray-200);
+    border-left:   4px solid var(--c-accent);
+    border-radius: var(--r-md);
+">
+    <div class="section-label" style="margin-bottom:8px; color:var(--c-primary);">O tym raporcie</div>
+    <p style="font-size:var(--fs-body); color:var(--gray-700); line-height:1.6; margin:0;">
+        Niniejszy raport stanowi rzetelną, techniczno-finansową analizę opłacalności instalacji
+        fotowoltaicznej, przygotowaną na podstawie rzeczywistych danych zużycia energii,
+        parametrów dachu oraz aktualnych cen komponentów i energii elektrycznej.
+        Analiza obejmuje trzy warianty instalacji — Economy, Standard i Premium — zarówno
+        w konfiguracji samych paneli PV, jak i zestawów hybrydowych z magazynem energii.
+        Wyniki opierają się na symulacji godzinowej produkcji i konsumpcji energii oraz
+        wieloletniej projekcji finansowej z uwzględnieniem inflacji cen energii i kosztów eksploatacji.
+        Raport ma charakter informacyjny i stanowi podstawę do dalszej rozmowy z doradcą Soolevo.
+    </p>
+</div>
+
+
+{# ══════════════════════════════════════════════════════════════════════════
+   SPIS TREŚCI
+══════════════════════════════════════════════════════════════════════════ #}
+<div style="margin-top:16px;">
+
+    <div class="section-label" style="margin-bottom:10px; color:var(--c-primary);">Spis treści</div>
+
+    {# Siatka 2 kolumn #}
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px 20px;">
+
+        {# Lewa kolumna #}
+        <div>
+            {# S0 #}
+            <div style="
+                display:       flex;
+                align-items:   center;
+                gap:           10px;
+                padding:       8px 10px;
+                background:    white;
+                border:        1px solid var(--gray-200);
+                border-radius: var(--r-sm);
+                margin-bottom: 6px;
+            ">
+                <span style="
+                    background:     var(--c-primary);
+                    color:          white;
+                    font-size:      var(--fs-xs);
+                    font-weight:    900;
+                    padding:        2px 7px;
+                    border-radius:  var(--r-sm);
+                    letter-spacing: .05em;
+                    white-space:    nowrap;
+                    flex-shrink:    0;
+                ">S0</span>
+                <span style="font-size:var(--fs-sm); color:var(--gray-700); font-weight:600;">Dane wejściowe</span>
+                <span style="flex:1; border-bottom:1px dotted var(--gray-300); margin: 0 4px; align-self:flex-end; margin-bottom:3px;"></span>
+                <span style="font-size:var(--fs-xs); color:var(--gray-400); white-space:nowrap;">str. 2</span>
+            </div>
+
+            {# S1 #}
+            <div style="
+                display:       flex;
+                align-items:   center;
+                gap:           10px;
+                padding:       8px 10px;
+                background:    white;
+                border:        1px solid var(--gray-200);
+                border-radius: var(--r-sm);
+                margin-bottom: 6px;
+            ">
+                <span style="
+                    background:     var(--c-accent);
+                    color:          white;
+                    font-size:      var(--fs-xs);
+                    font-weight:    900;
+                    padding:        2px 7px;
+                    border-radius:  var(--r-sm);
+                    letter-spacing: .05em;
+                    white-space:    nowrap;
+                    flex-shrink:    0;
+                ">S1</span>
+                <span style="font-size:var(--fs-sm); color:var(--gray-700); font-weight:600;">Werdykt i rekomendacja</span>
+                <span style="flex:1; border-bottom:1px dotted var(--gray-300); margin: 0 4px; align-self:flex-end; margin-bottom:3px;"></span>
+                <span style="font-size:var(--fs-xs); color:var(--gray-400); white-space:nowrap;">str. 2</span>
+            </div>
+
+            {# S2 #}
+            <div style="
+                display:       flex;
+                align-items:   center;
+                gap:           10px;
+                padding:       8px 10px;
+                background:    var(--light-blue);
+                border:        1px solid var(--mid-blue);
+                border-radius: var(--r-sm);
+                margin-bottom: 6px;
+            ">
+                <span style="
+                    background:     var(--c-accent);
+                    color:          white;
+                    font-size:      var(--fs-xs);
+                    font-weight:    900;
+                    padding:        2px 7px;
+                    border-radius:  var(--r-sm);
+                    letter-spacing: .05em;
+                    white-space:    nowrap;
+                    flex-shrink:    0;
+                ">S2</span>
+                <span style="font-size:var(--fs-sm); color:var(--c-primary); font-weight:700;">Scenariusz główny (Standard)</span>
+                <span style="flex:1; border-bottom:1px dotted var(--mid-blue); margin: 0 4px; align-self:flex-end; margin-bottom:3px;"></span>
+                <span style="font-size:var(--fs-xs); color:var(--gray-500); white-space:nowrap;">str. 2</span>
+            </div>
+
+            {# S3 #}
+            <div style="
+                display:       flex;
+                align-items:   center;
+                gap:           10px;
+                padding:       8px 10px;
+                background:    white;
+                border:        1px solid var(--gray-200);
+                border-radius: var(--r-sm);
+                margin-bottom: 6px;
+            ">
+                <span style="
+                    background:     var(--c-primary);
+                    color:          white;
+                    font-size:      var(--fs-xs);
+                    font-weight:    900;
+                    padding:        2px 7px;
+                    border-radius:  var(--r-sm);
+                    letter-spacing: .05em;
+                    white-space:    nowrap;
+                    flex-shrink:    0;
+                ">S3</span>
+                <span style="font-size:var(--fs-sm); color:var(--gray-700); font-weight:600;">Wykresy energetyczne</span>
+                <span style="flex:1; border-bottom:1px dotted var(--gray-300); margin: 0 4px; align-self:flex-end; margin-bottom:3px;"></span>
+                <span style="font-size:var(--fs-xs); color:var(--gray-400); white-space:nowrap;">str. 3</span>
+            </div>
+
+            {# S4 #}
+            <div style="
+                display:       flex;
+                align-items:   center;
+                gap:           10px;
+                padding:       8px 10px;
+                background:    white;
+                border:        1px solid var(--gray-200);
+                border-radius: var(--r-sm);
+                margin-bottom: 6px;
+            ">
+                <span style="
+                    background:     var(--c-primary);
+                    color:          white;
+                    font-size:      var(--fs-xs);
+                    font-weight:    900;
+                    padding:        2px 7px;
+                    border-radius:  var(--r-sm);
+                    letter-spacing: .05em;
+                    white-space:    nowrap;
+                    flex-shrink:    0;
+                ">S4</span>
+                <span style="font-size:var(--fs-sm); color:var(--gray-700); font-weight:600;">Porównanie wariantów PV</span>
+                <span style="flex:1; border-bottom:1px dotted var(--gray-300); margin: 0 4px; align-self:flex-end; margin-bottom:3px;"></span>
+                <span style="font-size:var(--fs-xs); color:var(--gray-400); white-space:nowrap;">str. 2</span>
+            </div>
+        </div>
+
+        {# Prawa kolumna #}
+        <div>
+            {# S4B #}
+            <div style="
+                display:       flex;
+                align-items:   center;
+                gap:           10px;
+                padding:       8px 10px;
+                background:    #E8F6F7;
+                border:        1px solid #A8D5D7;
+                border-radius: var(--r-sm);
+                margin-bottom: 6px;
+            ">
+                <span style="
+                    background:     #0D7377;
+                    color:          white;
+                    font-size:      var(--fs-xs);
+                    font-weight:    900;
+                    padding:        2px 7px;
+                    border-radius:  var(--r-sm);
+                    letter-spacing: .05em;
+                    white-space:    nowrap;
+                    flex-shrink:    0;
+                ">S4B</span>
+                <span style="font-size:var(--fs-sm); color:#0D7377; font-weight:700;">Warianty PV + Magazyn</span>
+                <span style="flex:1; border-bottom:1px dotted #A8D5D7; margin: 0 4px; align-self:flex-end; margin-bottom:3px;"></span>
+                <span style="font-size:var(--fs-xs); color:var(--gray-400); white-space:nowrap;">str. 2</span>
+            </div>
+
+            {# S6 #}
+            <div style="
+                display:       flex;
+                align-items:   center;
+                gap:           10px;
+                padding:       8px 10px;
+                background:    white;
+                border:        1px solid var(--gray-200);
+                border-radius: var(--r-sm);
+                margin-bottom: 6px;
+            ">
+                <span style="
+                    background:     var(--c-green);
+                    color:          white;
+                    font-size:      var(--fs-xs);
+                    font-weight:    900;
+                    padding:        2px 7px;
+                    border-radius:  var(--r-sm);
+                    letter-spacing: .05em;
+                    white-space:    nowrap;
+                    flex-shrink:    0;
+                ">S6</span>
+                <span style="font-size:var(--fs-sm); color:var(--gray-700); font-weight:600;">Dotacje i programy wsparcia</span>
+                <span style="flex:1; border-bottom:1px dotted var(--gray-300); margin: 0 4px; align-self:flex-end; margin-bottom:3px;"></span>
+                <span style="font-size:var(--fs-xs); color:var(--gray-400); white-space:nowrap;">str. 4</span>
+            </div>
+
+            {# S7 #}
+            <div style="
+                display:       flex;
+                align-items:   center;
+                gap:           10px;
+                padding:       8px 10px;
+                background:    white;
+                border:        1px solid var(--gray-200);
+                border-radius: var(--r-sm);
+                margin-bottom: 6px;
+            ">
+                <span style="
+                    background:     var(--c-primary);
+                    color:          white;
+                    font-size:      var(--fs-xs);
+                    font-weight:    900;
+                    padding:        2px 7px;
+                    border-radius:  var(--r-sm);
+                    letter-spacing: .05em;
+                    white-space:    nowrap;
+                    flex-shrink:    0;
+                ">S7</span>
+                <span style="font-size:var(--fs-sm); color:var(--gray-700); font-weight:600;">Przewodnik instalatora</span>
+                <span style="flex:1; border-bottom:1px dotted var(--gray-300); margin: 0 4px; align-self:flex-end; margin-bottom:3px;"></span>
+                <span style="font-size:var(--fs-xs); color:var(--gray-400); white-space:nowrap;">str. 5</span>
+            </div>
+
+            {# S8 #}
+            <div style="
+                display:       flex;
+                align-items:   center;
+                gap:           10px;
+                padding:       8px 10px;
+                background:    white;
+                border:        1px solid var(--gray-200);
+                border-radius: var(--r-sm);
+                margin-bottom: 6px;
+            ">
+                <span style="
+                    background:     var(--c-accent);
+                    color:          white;
+                    font-size:      var(--fs-xs);
+                    font-weight:    900;
+                    padding:        2px 7px;
+                    border-radius:  var(--r-sm);
+                    letter-spacing: .05em;
+                    white-space:    nowrap;
+                    flex-shrink:    0;
+                ">S8</span>
+                <span style="font-size:var(--fs-sm); color:var(--gray-700); font-weight:600;">Następne kroki</span>
+                <span style="flex:1; border-bottom:1px dotted var(--gray-300); margin: 0 4px; align-self:flex-end; margin-bottom:3px;"></span>
+                <span style="font-size:var(--fs-xs); color:var(--gray-400); white-space:nowrap;">str. 6</span>
+            </div>
+
+            {# S9 #}
+            <div style="
+                display:       flex;
+                align-items:   center;
+                gap:           10px;
+                padding:       8px 10px;
+                background:    white;
+                border:        1px solid var(--gray-200);
+                border-radius: var(--r-sm);
+                margin-bottom: 6px;
+            ">
+                <span style="
+                    background:     var(--gray-500);
+                    color:          white;
+                    font-size:      var(--fs-xs);
+                    font-weight:    900;
+                    padding:        2px 7px;
+                    border-radius:  var(--r-sm);
+                    letter-spacing: .05em;
+                    white-space:    nowrap;
+                    flex-shrink:    0;
+                ">S9</span>
+                <span style="font-size:var(--fs-sm); color:var(--gray-700); font-weight:600;">Zastrzeżenia prawne</span>
+                <span style="flex:1; border-bottom:1px dotted var(--gray-300); margin: 0 4px; align-self:flex-end; margin-bottom:3px;"></span>
+                <span style="font-size:var(--fs-xs); color:var(--gray-400); white-space:nowrap;">str. 6</span>
+            </div>
+        </div>
+
+    </div>{# /grid spisu #}
+</div>
+
+
+{# ══════════════════════════════════════════════════════════════════════════
+   STOPKA OKŁADKI
+══════════════════════════════════════════════════════════════════════════ #}
+<div style="
+    margin-top:     18px;
+    padding-top:    12px;
+    border-top:     2px solid var(--gray-200);
+    display:        flex;
+    justify-content:space-between;
+    align-items:    center;
+">
+    <div style="font-size:9pt; font-weight:900; color:var(--c-primary);">
+        ☀ Soolevo
+    </div>
+    <div style="font-size:var(--fs-xs); color:var(--gray-400); text-align:right; line-height:1.5;">
+        Raport wygenerowany automatycznie przez system Soolevo<br>
+        Data: {{ generation_date }} · Wersja raportu: {{ version }}
+    </div>
+</div>

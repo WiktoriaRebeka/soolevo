@@ -12,10 +12,18 @@
     <span class="pdf-generation-date" aria-hidden="true">{{ generation_date }}</span>
 
     {# ════════════════════════════════════════════════════════════════════════
-       STRONA 1: DASHBOARD (Hero + S0 + S1)
+       STRONA 1: OKŁADKA (Cover + Wstęp + Spis treści)
+       Pełna strona A4, po której następuje page-break.
+    ════════════════════════════════════════════════════════════════════════ #}
+    <div class="page-section" style="page-break-after: always;">
+        {% include "report/s0_cover.html" %}
+    </div>
+
+    {# ════════════════════════════════════════════════════════════════════════
+       STRONA 2: DASHBOARD (Hero + S0 + S1)
        Kompaktowy układ, aby wszystko zmieściło się na jednej stronie A4.
     ════════════════════════════════════════════════════════════════════════ #}
-    
+
     <div class="dashboard-page" style="page-break-after: always;">
 
         {# 1. HERO / COVER SECTION (Skompresowana wysokość) #}
@@ -23,12 +31,12 @@
             background: linear-gradient(135deg, var(--c-primary) 0%, var(--c-accent) 100%);
             border-radius: 0 0 14px 14px;
             overflow: hidden;
-            margin-bottom: 10px; /* Mniejszy margines dolny */
+            margin-bottom: 10px;
             color: white;
-            padding: 16px 20px; /* Zmniejszony padding (było 24px) */
+            padding: 16px 20px;
         ">
             {# Logo i Tytuł #}
-            <div style="margin-bottom: 14px;"> <!-- Zmniejszony odstęp -->
+            <div style="margin-bottom: 14px;">
                 <div class="cover-logo" style="font-size:12pt; font-weight:900; margin-bottom:8px; letter-spacing:-0.02em;">
                     ☀ Soolevo<span style="opacity:0.7;">.com</span>
                 </div>
@@ -37,18 +45,16 @@
                 </div>
                 <div class="cover-subtitle" style="color:#BFD9ED; font-size:9pt; margin:0; line-height:1.4;">
                     Pełna analiza opłacalności instalacji PV
-  
                 </div>
             </div>
 
-
-            {# Pasek 4 kluczowych statystyk (Brak zaokrągleń, mniejsza wysokość) #}
+            {# Pasek 4 kluczowych statystyk #}
             <div style="
                 display: grid;
                 grid-template-columns: repeat(4, 1fr);
                 background: rgba(0,0,0,0.15);
                 border: 1px solid rgba(255,255,255,0.14);
-                border-radius: 0; /* USUNIĘTE ZAOKRĄGLENIE */
+                border-radius: 0;
             ">
                 {# 1. Zużycie roczne #}
                 <div class="hero-stat" style="padding:10px 14px; border-right:1px solid rgba(255,255,255,0.14);">
@@ -107,7 +113,7 @@
 
 
     {# ════════════════════════════════════════════════════════════════════════
-       STRONA 2+: SZCZEGÓŁY ANALIZY
+       STRONA 3+: SZCZEGÓŁY ANALIZY
     ════════════════════════════════════════════════════════════════════════ #}
 
     {# S4 — Porównanie wariantów #}
@@ -116,14 +122,6 @@
     </div>
 
     <div class="page-break"></div>
-    {# S4 — Porównanie wariantów #}
-    <div class="page-section">
-        {% include "report/s4b_battery_alternatives.html" %}
-    </div>
-
-    <div class="page-break"></div>
-    
-
 
     {# S3 — Wykresy #}
     <div class="page-section">
@@ -131,7 +129,6 @@
     </div>
 
     <div class="page-break"></div>
-
 
     {# S6 — Dotacje #}
     <div class="page-section">
