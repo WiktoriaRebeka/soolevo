@@ -34,6 +34,7 @@ function CompassRose({ x, y, r = 15, azimuthDeg = 180 }) {
   const cx = x;
   const cy = y;
 
+  // Identyczna logika jak RoofSchemaDisplay.jsx
   const rotate = 180 - azimuthDeg;
 
   const arm = r * 0.78;
@@ -41,30 +42,34 @@ function CompassRose({ x, y, r = 15, azimuthDeg = 180 }) {
 
   return (
     <g transform={`rotate(${rotate}, ${cx}, ${cy})`}>
+      {/* Zewnętrzny krąg */}
       <circle cx={cx} cy={cy} r={r} fill="white" stroke={C.dim} strokeWidth={r * 0.08} opacity="0.92"/>
 
+      {/* Ramię S (dół) — czerwone: kierunek połaci */}
       <polygon
         points={`${cx},${cy+arm} ${cx-hw},${cy+2} ${cx+hw},${cy+2}`}
         fill="#E74C3C" opacity="0.9"
       />
-
+      {/* Ramię N (góra) — ciemny */}
       <polygon
         points={`${cx},${cy-arm} ${cx-hw},${cy-2} ${cx+hw},${cy-2}`}
         fill={C.dim} opacity="0.75"
       />
-
+      {/* Ramię E (prawo) — szary */}
       <polygon
         points={`${cx+arm},${cy} ${cx+2},${cy-hw} ${cx+2},${cy+hw}`}
         fill={C.muted} opacity="0.5"
       />
-
+      {/* Ramię W (lewo) — szary */}
       <polygon
         points={`${cx-arm},${cy} ${cx-2},${cy-hw} ${cx-2},${cy+hw}`}
         fill={C.muted} opacity="0.5"
       />
 
+      {/* Środkowy krążek */}
       <circle cx={cx} cy={cy} r={r * 0.17} fill="white" stroke={C.dim} strokeWidth={r * 0.08}/>
 
+      {/* Opisy kierunków — obracają się razem z różą */}
       <text x={cx} y={cy - r - r*0.2} textAnchor="middle" fontSize={r * 0.55} fontWeight="900" fill={C.dim}>N</text>
       <text x={cx} y={cy + r + r*0.45} textAnchor="middle" fontSize={r * 0.55} fontWeight="900" fill="#E74C3C">S</text>
       <text x={cx + r + r*0.25} y={cy + r*0.1} textAnchor="start" fontSize={r * 0.45} fontWeight="700" fill={C.muted}>E</text>
@@ -72,6 +77,7 @@ function CompassRose({ x, y, r = 15, azimuthDeg = 180 }) {
     </g>
   );
 }
+
 // ══════════════════════════════════════════════════════════════════════════════
 // GŁÓWNY KOMPONENT
 // ══════════════════════════════════════════════════════════════════════════════
